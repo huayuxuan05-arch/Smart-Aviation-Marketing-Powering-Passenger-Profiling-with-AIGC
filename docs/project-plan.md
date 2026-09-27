@@ -326,8 +326,6 @@ S3是整理资料，尚未独立核验其引用的企业宣讲、作品页面和
 
 ## 仓库入口
 
-仓库名称：Smart Aviation Marketing Powering Passenger Profiling with AIGC
-
 GitHub地址：
 
 https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC
@@ -337,10 +335,8 @@ https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-
 | README.md | 入口 当前状态和目录 |
 | docs/project-plan.md | 本指南的可编辑文字源 |
 | docs/requirements.md | 逐项需求和来源 |
-| docs/data-contracts.md | 数据字段 时间和用途边界 |
-| docs/architecture.md | 公开信号与沙盒研究架构 |
-| docs/evaluation.md | 基线 对照与证据标准 |
-| docs/business-case.md | 管理建议和收益测算 |
+| docs/data-contracts.md及architecture.md | 数据计划和研究架构 |
+| docs/evaluation.md及business-case.md | 方法验证 管理与收益测算 |
 | docs/report/outline.md | 官方报告写作骨架 |
 
 ## 今天就可以开始的三项工作
@@ -349,4 +345,3 @@ https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-
 2. 核对作品要求和规程附件二，建立可获取的公开数据来源台账。
 3. 按第九章分工，把每周交付物转成GitHub任务，再开始第一批需求分析。
 
-本指南提供实施顺序和验收方法。最终比赛报告需由团队完成真实研究、资料核验和证据整理后写成，不直接把计划文本当作已完成成果提交。
