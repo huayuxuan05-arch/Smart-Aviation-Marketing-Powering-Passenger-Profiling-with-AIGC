@@ -16,4 +16,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: python -m unittest discover -s tests -v
+        working-directory: prototypes/offline-demo
       - run: python scripts/export_demo.py
+        working-directory: prototypes/offline-demo
