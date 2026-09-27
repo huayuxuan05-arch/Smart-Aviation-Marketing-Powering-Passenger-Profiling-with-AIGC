@@ -278,7 +278,7 @@
 
 ## GitHub只承载可复用和可公开内容
 
-主入口为README和本指南；docs保存需求、数据、架构、验证、商业与报告思路。使用Issue模板分配任务，用PR记录修改依据和验收。已有app及web为可选演示参考，当前不要求扩展。真实数据、凭据、成员身份和匿名评审包不得误上传。
+主入口为README和本指南；docs保存需求、数据、架构、验证、商业与报告思路。使用Issue模板分配任务，用PR记录修改依据和验收。已有原型位于prototypes/offline-demo目录，仅供参考，当前不要求扩展。真实数据、凭据、成员身份和匿名评审包不得误上传。
 
 **交付物**：分工表、阶段计划、任务池与文档索引。**验收**：每个任务有负责人角色和完成定义，研究证据能追溯到报告。
 
@@ -338,7 +338,7 @@ https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-
 | docs/project-plan.md | 本指南的可编辑文字源 |
 | docs/requirements.md | 逐项需求和来源 |
 | docs/data-contracts.md | 数据字段 时间和用途边界 |
-| docs/architecture.md | 当前示例与目标架构 |
+| docs/architecture.md | 公开信号与沙盒研究架构 |
 | docs/evaluation.md | 基线 对照与证据标准 |
 | docs/business-case.md | 管理建议和收益测算 |
 | docs/report/outline.md | 官方报告写作骨架 |
