@@ -25,6 +25,7 @@
 
 ## 文档入口
 
+- [首轮公开数据调研](docs/research/2025-national-day-first-round.md)：2025年国庆中秋、三目的地证据、5项已核验来源及数据缺口；[继续采集的方法](docs/research/public-data-collection.md)。
 - [完整实施指南](docs/project-plan.md)：步骤、交付、验收、分工和报告写作。
 - [需求与来源](docs/requirements.md)：命题、模板和补充攻略的要求及边界。
 - [数据计划](docs/data-contracts.md)、[技术思路](docs/architecture.md)：公开信号、沙盒及实现边界。

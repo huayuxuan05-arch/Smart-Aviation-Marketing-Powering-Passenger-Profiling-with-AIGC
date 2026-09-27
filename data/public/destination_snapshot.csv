@@ -1,0 +1,4 @@
+﻿destination,planned_origin,observed_origin,source_id,available_date,metric,in_top10,rank,order_count,search_index,holiday_city_tourists,note
+成都,上海（研究设定）,unknown,S02,2025-09-24,domestic_car_rental_order_top10_membership,true,,,,,仅确认名单成员；未获取订单量、城市搜索指数及上海出发分布
+三亚,上海（研究设定）,unknown,S02,2025-09-24,domestic_car_rental_order_top10_membership,true,,,,,仅确认名单成员；未获取订单量、城市搜索指数及上海出发分布
+昆明,上海（研究设定）,unknown,S02,2025-09-24,domestic_car_rental_order_top10_membership,true,,,,,仅确认名单成员；未获取订单量、城市搜索指数及上海出发分布

@@ -1,0 +1,11 @@
+﻿observation_id,source_id,geography,origin_region,period_start,period_end,metric,value,unit,value_type,note
+O01,S01,全国,unknown,2025-10-01,2025-10-08,holiday_days,8,天,reported,
+O02,S03,全国,unknown,2025-10-01,2025-10-08,domestic_tourist_trips,8.88,亿人次,reported,
+O03,S03,全国,unknown,2025-10-01,2025-10-08,domestic_tourist_spending,8090.06,亿元,reported,
+O04,S03,全国,unknown,2024-10-01,2024-10-07,domestic_tourist_trips,7.65,亿人次,derived,2025总量减去报道的增加量；7天假期
+O05,S03,全国,unknown,2024-10-01,2024-10-07,domestic_tourist_spending,7008.17,亿元,derived,2025总量减去报道的增加量；7天假期
+O06,S04,四川省,unknown,2025-10-01,2025-10-08,tourist_trips,4734.15,万人次,reported_estimate,第三方大数据综合测算；不等于成都市或A级景区接待量
+O07,S04,四川省,unknown,2025-10-01,2025-10-08,tourism_spending,384.01,亿元,reported_estimate,按可比口径同比增长6.53%；比较口径细节未披露
+O08,S05,三亚市,unknown,2025-01-01,2025-12-31,overnight_tourist_trips,2708.3,万人次,reported,全年过夜游客；不可与国庆全部游客直接比较
+O09,S05,三亚市,unknown,2025-01-01,2025-12-31,overnight_tourist_spending,984.26,亿元,reported,
+O10,S05,三亚市,unknown,2025-01-01,2025-12-31,tourist_hotel_occupancy,69.0,%,reported,旅游饭店全年平均开房率；非航空客座率
