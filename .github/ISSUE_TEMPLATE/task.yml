@@ -1,0 +1,22 @@
+name: 落地任务
+description: 将赛题要求转化为可验收工作
+title: '[任务] '
+body:
+  - type: textarea
+    id: requirement
+    attributes:
+      label: 需求与来源
+      description: 对应 docs/requirements.md 的需求编号，注明来源页码或团队决策。
+    validations:
+      required: true
+  - type: textarea
+    id: delivery
+    attributes:
+      label: 交付物与验收标准
+      description: 代码、数据、实验或报告章节，以及如何验证。
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: 前置依赖、授权与风险

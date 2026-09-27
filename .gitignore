@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.venv/
+runtime/
+data/raw/
+data/processed/
+output/
+*.sqlite*
+*.log
+node_modules/
+.DS_Store
