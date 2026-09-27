@@ -344,4 +344,3 @@ https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-
 1. 定下试点节日、出发区域和目的地集合，写出一页项目定义。
 2. 核对作品要求和规程附件二，建立可获取的公开数据来源台账。
 3. 按第九章分工，把每周交付物转成GitHub任务，再开始第一批需求分析。
-
