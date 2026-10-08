@@ -1,0 +1,468 @@
+{
+  "verified_date": "2026-10-08",
+  "network": "Explicit configured HTTPS proxy; no credentials stored",
+  "individual_records_published": false,
+  "new_dataset_count": 6,
+  "existing_comparison_dataset": "P08 Booking.com Multi-Destination Trips; see project-related-datasets-20261008.json",
+  "datasets": [
+    {
+      "id": "P14",
+      "name": "Fliggy User Behaviour / UBF",
+      "source_url": "https://tianchi.aliyun.com/dataset/113649",
+      "country_context": "China platform; encoded user and product locations",
+      "status": "publisher_documentation_verified_login_or_application_required_behavior_file_not_listed",
+      "reported_period": [
+        "2019-06-03",
+        "2021-06-03"
+      ],
+      "period_semantics": "Publisher description; timestamps not inspected",
+      "event_types": [
+        "clk",
+        "fav",
+        "cart",
+        "pay"
+      ],
+      "behavior_fields": [
+        "User ID",
+        "Item ID",
+        "Behavior type",
+        "Timestamp"
+      ],
+      "profile_fields": [
+        "User ID",
+        "Age ID",
+        "Gender ID",
+        "Occupation ID",
+        "Habitual City ID",
+        "User Tag List"
+      ],
+      "item_fields": [
+        "Item ID",
+        "Category ID",
+        "Item City ID",
+        "Item Tag List"
+      ],
+      "holiday_fit": "conditional_on_real_dates_timezone_coverage_and_city_mapping",
+      "license_note": "Body says CC BY-NC 4.0; license metadata label and link conflict; confirm applicable terms",
+      "limitations": [
+        "No behavioral data file in current anonymous listing",
+        "No actual transaction amount or search keywords verified",
+        "Do not interpret encoded age/gender/city as literal values",
+        "Publisher statistics differ across detail/detailEn; no actual row counts verified",
+        "Historical period includes pandemic; not current China holiday air travel"
+      ],
+      "evidence": {
+        "endpoint": "https://tianchi.aliyun.com/api/notebook/dataDetail",
+        "method": "POST",
+        "request_data_id": 113649,
+        "retrieved_at": "2026-10-08T07:02:33.487248+00:00",
+        "anonymous_session": true,
+        "response_code": "SUCCESS",
+        "response_sha256": "c8e3633a87ef905c7d09a757529d53a65db6ab3df47fe633d6aac7b615be4d3e",
+        "listed_files": [
+          {
+            "name": "user_profile.csv",
+            "bytes": 168674266
+          },
+          {
+            "name": "item_profile.csv",
+            "bytes": 4564951
+          }
+        ],
+        "license_metadata": {
+          "secondLevelLicense": "CC-BY-SA-NC 4.0",
+          "licenseUrl": "http://creativecommons.org/licenses/by-sa/4.0/"
+        }
+      }
+    },
+    {
+      "id": "P15",
+      "name": "Fliggy Transfer-Plans",
+      "source_url": "https://tianchi.aliyun.com/dataset/140721",
+      "country_context": "China platform",
+      "transport_mode": "train_based_on_First_Train_ID_and_Second_Train_ID",
+      "status": "publisher_schema_and_file_listing_verified_download_requires_login",
+      "reported_period": [
+        "2022-08-16",
+        "2022-09-17"
+      ],
+      "period_semantics": "Publisher description; timestamps not inspected",
+      "event_types": [
+        "browsing",
+        "purchasing",
+        "reference"
+      ],
+      "behavior_fields": [
+        "User ID",
+        "OD Query ID",
+        "Transfer Plan ID",
+        "Behavior type",
+        "Timestamp"
+      ],
+      "plan_attributes": [
+        "encoded departure/arrival cities",
+        "two train IDs",
+        "two departure/arrival times",
+        "two prices",
+        "total time",
+        "total price"
+      ],
+      "holiday_fit": "conditional; period does not cover October National Day",
+      "license_note": "License label and URL inconsistent; not verified for downstream use",
+      "limitations": [
+        "Rail transfer rather than flight itinerary",
+        "Raw file not downloaded",
+        "Ambiguous publisher scale text 48.8M million; not treated as user count",
+        "Encoded city and query IDs need mapping"
+      ],
+      "evidence": {
+        "endpoint": "https://tianchi.aliyun.com/api/notebook/dataDetail",
+        "method": "POST",
+        "request_data_id": 140721,
+        "retrieved_at": "2026-10-08T07:03:10.096612+00:00",
+        "anonymous_session": true,
+        "response_code": "SUCCESS",
+        "response_sha256": "f6cbc51688dfc15136ab379b543d82f14c3b517e60a4e0f8cdebe371e0e0ac6e",
+        "listed_files": [
+          {
+            "name": "user_behavior_transfer_plans.csv",
+            "bytes": 1484201975
+          },
+          {
+            "name": "user_profile.csv",
+            "bytes": 45923468
+          },
+          {
+            "name": "transfer_plan_profile.csv",
+            "bytes": 710349152
+          }
+        ],
+        "license_metadata": {
+          "secondLevelLicense": "CC-BY-SA-NC 4.0",
+          "licenseUrl": "http://creativecommons.org/licenses/by-sa/4.0/"
+        }
+      }
+    },
+    {
+      "id": "P16",
+      "name": "Fliggy Creative / POM-Recommendation",
+      "source_url": "https://tianchi.aliyun.com/dataset/151847",
+      "country_context": "China platform",
+      "status": "not_training_ready_release_pending_and_two_four_byte_attachments",
+      "reported_period": [
+        "2022-09-03",
+        "2022-12-03"
+      ],
+      "period_semantics": "Description only, no behavioral records verified",
+      "event_types": [
+        "browsing",
+        "click",
+        "pay"
+      ],
+      "behavior_fields": [
+        "User ID",
+        "Creative ID",
+        "Context IDs",
+        "Behavior type",
+        "Timestamp"
+      ],
+      "creative_fields": [
+        "Creative ID",
+        "Category ID",
+        "Creative Picture Tag IDs",
+        "Creative Text Tag IDs"
+      ],
+      "holiday_fit": "cannot_validate_with_placeholder_files",
+      "license_note": "Page metadata CC BY-NC-SA 4.0",
+      "limitations": [
+        "Description says release application in progress",
+        "Two listed attachments only four bytes",
+        "Attachment names differ from creative schema",
+        "Tag IDs are not raw images or marketing copy",
+        "Ambiguous 62M million not treated as user count",
+        "Observed clicks do not establish causal effect of new generated creatives"
+      ],
+      "evidence": {
+        "endpoint": "https://tianchi.aliyun.com/api/notebook/dataDetail",
+        "method": "POST",
+        "request_data_id": 151847,
+        "retrieved_at": "2026-10-08T07:03:10.074343+00:00",
+        "anonymous_session": true,
+        "response_code": "SUCCESS",
+        "response_sha256": "0ea6a1eb4335aec24e3c7426a058159295c691790a35d68e0cf1753e00a84af9",
+        "listed_files": [
+          {
+            "name": "user_profile.csv",
+            "bytes": 168674266
+          },
+          {
+            "name": "user_behavior_item_sample.csv",
+            "bytes": 4
+          },
+          {
+            "name": "item_profile.csv",
+            "bytes": 4
+          }
+        ],
+        "license_metadata": {
+          "secondLevelLicense": "CC BY-NC-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+        }
+      }
+    },
+    {
+      "id": "P17",
+      "name": "IntTravel",
+      "source_url": "https://github.com/AMAP-ML/IntTravel",
+      "data_url": "https://huggingface.co/datasets/GD-ML/IntTravel_dataset",
+      "paper_url": "https://arxiv.org/html/2602.11664v1",
+      "country_context": "China mobility platform, not exclusively tourism or aviation",
+      "status": "official_small_samples_downloaded_full_repository_listing_verified",
+      "publisher_reported_scale": {
+        "users": 162815861,
+        "pois": 7291872,
+        "interactions": 4129827011,
+        "independently_counted": false
+      },
+      "sample_inspections": [
+        {
+          "name": "user_action.csv",
+          "rows": 137,
+          "columns": [
+            "user_id",
+            "timestamp",
+            "action_type",
+            "poi_id",
+            "geographic_id",
+            "administrative_region_id",
+            "weather",
+            "travel_mode",
+            "via_poi_id"
+          ],
+          "bytes": 5783,
+          "sha256": "4ed0417f478e3812a38a30511bfbd5dc195bc03ce1e84c889c7925f4bc293b0d",
+          "delimiter": "tab",
+          "source": {
+            "url": "https://raw.githubusercontent.com/AMAP-ML/IntTravel/main/data_process/raw_data/user_action.csv",
+            "retrieved_at": "2026-10-08T06:59:41.287336+00:00",
+            "status": 200,
+            "sha256": "4ed0417f478e3812a38a30511bfbd5dc195bc03ce1e84c889c7925f4bc293b0d"
+          },
+          "record_values_published": false
+        },
+        {
+          "name": "user_profile.csv",
+          "rows": 4,
+          "columns": [
+            "user_id",
+            "profile_feature_1",
+            "profile_feature_2",
+            "profile_feature_3",
+            "profile_feature_4",
+            "profile_feature_5",
+            "profile_feature_6"
+          ],
+          "bytes": 161,
+          "sha256": "38f5827f76b517adbe4856a91282c8f37303d8c65f537e6b978ee606304adf76",
+          "delimiter": "tab",
+          "source": {
+            "url": "https://raw.githubusercontent.com/AMAP-ML/IntTravel/main/data_process/raw_data/user_profile.csv",
+            "retrieved_at": "2026-10-08T06:59:41.318233+00:00",
+            "status": 200,
+            "sha256": "38f5827f76b517adbe4856a91282c8f37303d8c65f537e6b978ee606304adf76"
+          },
+          "record_values_published": false
+        },
+        {
+          "name": "poi_info.csv",
+          "rows": 112,
+          "columns": [
+            "poi_id",
+            "normalized_score",
+            "geographic_id",
+            "category_id",
+            "administrative_region_id"
+          ],
+          "bytes": 3720,
+          "sha256": "e6bfa5614895ec05036e0856a190e46b69b232e8fb8be12442591d8a78b0eed3",
+          "delimiter": "tab",
+          "source": {
+            "url": "https://raw.githubusercontent.com/AMAP-ML/IntTravel/main/data_process/raw_data/poi_info.csv",
+            "retrieved_at": "2026-10-08T06:59:41.827316+00:00",
+            "status": 200,
+            "sha256": "e6bfa5614895ec05036e0856a190e46b69b232e8fb8be12442591d8a78b0eed3"
+          },
+          "record_values_published": false
+        }
+      ],
+      "sample_behavior_summary": {
+        "users": 4,
+        "interacted_pois": 82,
+        "action_codes": [
+          "0",
+          "1",
+          "2",
+          "3"
+        ],
+        "processed_timestamp_min": 71071000,
+        "processed_timestamp_max": 6856134208
+      },
+      "time_semantics": "Processed milliseconds preserving relative order; not actual calendar timestamps",
+      "holiday_fit": "not_directly_joinable_to_real_holidays",
+      "license_note": "No explicit dataset license found in inspected GitHub tree or HF card",
+      "limitations": [
+        "Tiny sample for schema checks, not representative model evaluation",
+        "Locations/profile names and values/action types anonymized",
+        "HF current data card says coordinates unavailable; inspected POI file has no coordinates",
+        "No flight price/booking/marketing treatment outcomes verified",
+        "No inferred real demographics or cities from code IDs"
+      ],
+      "evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/AMAP-ML/IntTravel/main/README.md",
+          "retrieved_at": "2026-10-08T06:58:34.825750+00:00",
+          "status": 200,
+          "sha256": "d1be8c59d6f6fd9a7cd1e1aef8b9aa31c61a82ae4b190d0101c7551951cfb90b"
+        },
+        {
+          "url": "https://huggingface.co/api/datasets/GD-ML/IntTravel_dataset",
+          "retrieved_at": "2026-10-08T06:58:34.835793+00:00",
+          "status": 200,
+          "sha256": "5b9682fe3738e2497927af2a968b9434685368c558b33576c649669172eadaaa"
+        },
+        {
+          "url": "https://huggingface.co/datasets/GD-ML/IntTravel_dataset/raw/main/README.md",
+          "retrieved_at": "2026-10-08T06:59:00.733688+00:00",
+          "status": 200,
+          "sha256": "6e780f520abb3f9dbe36222a1225c044779885f26ecbe644513f534899f130ef"
+        },
+        {
+          "url": "https://arxiv.org/html/2602.11664v1",
+          "retrieved_at": "2026-10-08T06:59:00.733688+00:00",
+          "status": 200,
+          "sha256": "60d18488b3b76ef19802d80e156c969751dddc1ee4accfe57cfd64635d917a42"
+        },
+        {
+          "url": "https://api.github.com/repos/AMAP-ML/IntTravel/git/trees/main?recursive=1",
+          "retrieved_at": "2026-10-08T06:59:00.733688+00:00",
+          "status": 200,
+          "sha256": "6b19713199308e2412a97280a24beb7b961e9a228c3e2e1b1cb45db8a517db72"
+        }
+      ],
+      "full_repository_listing": {
+        "gated": false,
+        "revision": "1585298e474bebbcd66c766be1f7e38f06367c1b",
+        "interaction_file_count": 99,
+        "missing_from_advertised_1_to_100": [
+          82
+        ],
+        "full_data_downloaded": false
+      }
+    },
+    {
+      "id": "P18",
+      "name": "trivago RecSys Challenge 2019",
+      "source_url": "https://www.recsyschallenge.com/2019/",
+      "code_url": "https://github.com/trivago/recsys-challenge-2019-benchmarks",
+      "status": "official_task_and_code_fields_verified_legacy_download_host_unavailable",
+      "country_context": "International hotel search; China subset not verified",
+      "event_types_verified_in_publisher_code": [
+        "clickout item",
+        "interaction item deals",
+        "interaction item image",
+        "interaction item info",
+        "interaction item rating",
+        "search for item"
+      ],
+      "fields_verified_in_publisher_code": [
+        "user_id",
+        "session_id",
+        "timestamp",
+        "step",
+        "action_type",
+        "reference",
+        "impressions",
+        "prices"
+      ],
+      "holiday_fit": "not_verified",
+      "license_note": "Official page requires account and acceptance of data terms; code license is not dataset license",
+      "limitations": [
+        "Raw dataset not downloaded",
+        "Clickout is not paid booking",
+        "Generated example data from benchmark utility is not real logs"
+      ],
+      "evidence": [
+        {
+          "url": "https://www.recsyschallenge.com/2019/",
+          "retrieved_at": "2026-10-08T06:55:56.249881+00:00",
+          "status": 200,
+          "sha256": "b7c9c94583fce88be1e6b1787e37b87d5c9f15af0b42f75f79cf48b00b4d00c0"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/trivago/recsys-challenge-2019-benchmarks/master/README.md",
+          "retrieved_at": "2026-10-08T06:54:34.933173+00:00",
+          "status": 200,
+          "sha256": "50e270ea82fd1fc23f5ba2985e6542c56ad4a783589c85b96ebfc422b73cc8ec"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/trivago/recsys-challenge-2019-benchmarks/master/src/data_handling/feature_building.py",
+          "retrieved_at": "2026-10-08T07:01:49.308740+00:00",
+          "status": 200,
+          "sha256": "85dc46c535a460d3486028433bcee7728186ac2c0910c270aeb643afd069c8b6"
+        },
+        {
+          "url": "https://recsys.trivago.cloud/",
+          "retrieved_at": "2026-10-08T06:59:01.697612+00:00",
+          "status": "failed"
+        }
+      ]
+    },
+    {
+      "id": "P19",
+      "name": "Boutique Travel Services Predict / 精品旅行服务成单预测",
+      "source_url": "https://github.com/Bifzivkar/Boutique-Travel-Services-Predict",
+      "source_role": "competition_participant_not_data_publisher",
+      "status": "participant_documentation_only_no_original_data_or_data_license_verified",
+      "country_context": "Participant describes Chinese overseas travel app users",
+      "documented_tables": [
+        "userProfile",
+        "action",
+        "orderHistory",
+        "orderFuture",
+        "userComment"
+      ],
+      "documented_behavior_fields": [
+        "user ID",
+        "action type",
+        "event time"
+      ],
+      "holiday_fit": "not_verified",
+      "license_note": "Participant code MIT declaration does not establish dataset rights",
+      "limitations": [
+        "Inspected repository data directory has Readme only",
+        "Original organizer download not verified",
+        "Participant described statistics not independently checked"
+      ],
+      "evidence": [
+        {
+          "url": "https://raw.githubusercontent.com/Bifzivkar/Boutique-Travel-Services-Predict/master/Readme.md",
+          "retrieved_at": "2026-10-08T07:02:32.332957+00:00",
+          "status": 200,
+          "sha256": "6f6addc06c4542daee081184ea9030cba8b7bd6049d59a48086f7b6f89a474d5"
+        },
+        {
+          "url": "https://api.github.com/repos/Bifzivkar/Boutique-Travel-Services-Predict/git/trees/master?recursive=1",
+          "retrieved_at": "2026-10-08T07:02:32.336240+00:00",
+          "status": 200,
+          "sha256": "e11b85495e2aa8f8035398b1ddf55c3323b9cb80edd759f5fa5e87634a02963b"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/Bifzivkar/Boutique-Travel-Services-Predict/master/data/Readme.md",
+          "retrieved_at": "2026-10-08T07:04:51.912361+00:00",
+          "status": 200,
+          "sha256": "cb8e68bd0c145799c7dd4ad7eaf557ddc9aade5c9ab7300a14d581f3c0503d29"
+        }
+      ]
+    }
+  ]
+}
