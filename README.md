@@ -26,6 +26,7 @@
 ## 文档入口
 
 - [旅客层面公开数据选型](docs/research/passenger-level-public-data.md)：个人出行、匿名预订消费、旅游评分与航空会员数据，含真实/虚构来源和下载核验。
+- [第二轮强相关数据](docs/research/project-related-data-second-round.md)：Booking.com行程序列、航空方式选择、文字偏好、模拟选择及待登录核验的购前搜索数据。
 - [首轮公开数据调研](docs/research/2025-national-day-first-round.md)：2025年国庆中秋、三目的地证据、5项已核验来源及数据缺口；[继续采集的方法](docs/research/public-data-collection.md)。
 - [完整实施指南](docs/project-plan.md)：步骤、交付、验收、分工和报告写作。
 - [需求与来源](docs/requirements.md)：命题、模板和补充攻略的要求及边界。

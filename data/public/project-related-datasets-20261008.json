@@ -1,0 +1,252 @@
+{
+  "verified_date": "2026-10-08",
+  "network": "Explicit configured HTTPS proxy; no credentials stored",
+  "individual_records_published": false,
+  "datasets": [
+    {
+      "id": "P08",
+      "name": "Booking.com Multi-Destination Trips",
+      "source_url": "https://github.com/bookingcom/ml-dataset-mdt",
+      "source_metadata": {
+        "url": "https://github.com/bookingcom/ml-dataset-mdt",
+        "retrieved_at": "2026-10-08T01:27:21.611562+00:00",
+        "status": 200,
+        "sha256": "23d076b4e8e7f597b4c43d2d97e4d9396bf8ab24672939e1367ba8e025a70198"
+      },
+      "provenance": "publisher_documented_real_anonymized_bookings",
+      "status": "full_training_file_verified",
+      "inspection": {
+        "source_url": "https://raw.githubusercontent.com/bookingcom/ml-dataset-mdt/main/train_set.csv",
+        "retrieved_at": "2026-10-08T01:31:45.980482+00:00",
+        "status": "full_file_verified",
+        "bytes": 92651064,
+        "sha256": "ad7bfeb3d6e8621862a03e8491545d3b9134ba87c0fb8fce12864580f95662e7",
+        "rows": 1166835,
+        "header": [
+          "user_id",
+          "checkin",
+          "checkout",
+          "city_id",
+          "device_class",
+          "affiliate_id",
+          "booker_country",
+          "hotel_country",
+          "utrip_id"
+        ],
+        "unique_users": 200153,
+        "unique_trips": 217686,
+        "unique_city_ids": 39901,
+        "checkin_min": "2015-12-31",
+        "checkin_max": "2017-02-27",
+        "created_date_present": false,
+        "record_values_published": false
+      },
+      "license_note": "Non-commercial only; no harmful or competitive use toward Booking.com/Booking Holdings; comply with law",
+      "relevance": [
+        "destination_sequence",
+        "within_dataset_user_and_trip_linkage",
+        "device_and_acquisition_channel"
+      ],
+      "limitations": [
+        "Cities and countries anonymized",
+        "No created_date in inspected file despite README mention",
+        "No purchase amount or search events",
+        "Checkin is not booking time"
+      ]
+    },
+    {
+      "id": "P09",
+      "name": "ModeCanada",
+      "source_url": "https://cran.r-project.org/web/packages/mlogit/refman/mlogit.html#ModeCanada",
+      "data_url": "https://raw.githubusercontent.com/ycroissant/mlogit/master/data/ModeCanada.rda",
+      "source_metadata": {
+        "url": "https://cran.r-project.org/web/packages/mlogit/refman/mlogit.html",
+        "retrieved_at": "2026-10-08T01:28:55.711648+00:00",
+        "status": 200,
+        "sha256": "302f79a3def3c25c6a9e8b607be67c1956c400be08c64e91515165698fc162db"
+      },
+      "provenance": "package_documented_historical_transport_choice_data",
+      "status": "full_maintainer_rda_verified",
+      "inspection": {
+        "name": "ModeCanada",
+        "rows": 15520,
+        "columns": [
+          "case",
+          "alt",
+          "choice",
+          "dist",
+          "cost",
+          "ivt",
+          "ovt",
+          "freq",
+          "income",
+          "urban",
+          "noalt"
+        ],
+        "unique_cases": 4324,
+        "modes": [
+          "air",
+          "bus",
+          "car",
+          "train"
+        ],
+        "chosen_rows": 4324,
+        "missing_cells": 0,
+        "source_sha256": "02e764dfed52ade3874820a4c14bbac42fe600ff3bb6acea9b018c9f4d8e8983",
+        "download_status": "full_rda_verified",
+        "four_alternative_cases": 2779,
+        "one_chosen_per_case": true,
+        "row_count_distribution_per_case": {
+          "2": 231,
+          "3": 1314,
+          "4": 2779
+        },
+        "documentation_count_note": "Current CRAN help describes3880 travelers; inspected maintainer RDA has4324 distinct cases. Do not silently equate counts."
+      },
+      "license_note": "mlogit software GPL; standalone survey data conditions not verified",
+      "relevance": [
+        "air_vs_other_modes",
+        "cost_and_time_sensitivity",
+        "individual_alternative_choice"
+      ],
+      "limitations": [
+        "Historical foreign choice situations",
+        "Documentation states3880 travelers while inspected file contains4324 cases",
+        "Cost unit and original survey period need original study confirmation",
+        "No search sequence or long-term customer spending"
+      ]
+    },
+    {
+      "id": "P10",
+      "name": "HotelRec",
+      "source_url": "https://github.com/diegoantognini/HotelRec",
+      "download_landing_url": "https://drive.switch.ch/index.php/s/n48smsdufhRA7fR",
+      "source_metadata": {
+        "url": "https://github.com/Diego999/HotelRec",
+        "retrieved_at": "2026-10-08T01:27:51.671324+00:00",
+        "status": 200,
+        "sha256": "c2b4ef969b1be94a2ed2fa7fb08fd170c66e1e1795efd3e23dd817195a46cdd8"
+      },
+      "provenance": "author_documented_TripAdvisor_reviews",
+      "status": "publisher_documentation_and_sample_verified_only",
+      "publisher_reported_reviews_approx": 50000000,
+      "full_file_downloaded": false,
+      "license_note": "Academic research only",
+      "relevance": [
+        "review_text_preference_labels",
+        "ratings_and_dates",
+        "AIGC_research_text"
+      ],
+      "limitations": [
+        "Account/profile identifiers present",
+        "Review text is not verified current product facts",
+        "Full archive rows and integrity not checked"
+      ]
+    },
+    {
+      "id": "P11",
+      "name": "Apollo mode choice",
+      "source_url": "https://www.apollochoicemodelling.com/examples.html",
+      "data_url": "https://www.apollochoicemodelling.com/files/examples/data/apollo_modeChoiceData.csv",
+      "provenance_url": "https://cran.r-project.org/web/packages/apollo/refman/apollo.html#apollo_modeChoiceData",
+      "source_metadata": {
+        "url": "https://cran.r-project.org/web/packages/apollo/refman/apollo.html",
+        "retrieved_at": "2026-10-08T01:30:38.133733+00:00",
+        "status": 200,
+        "sha256": "ab9a0b41b8e8acbe067314f05e14d51e44580c26716939aa844b140a9af92868"
+      },
+      "provenance": "explicitly_simulated",
+      "status": "full_official_csv_verified",
+      "inspection": {
+        "rows": 8000,
+        "individuals": 500,
+        "columns": [
+          "ID",
+          "RP",
+          "SP",
+          "RP_journey",
+          "SP_task",
+          "av_car",
+          "av_bus",
+          "av_air",
+          "av_rail",
+          "time_car",
+          "cost_car",
+          "time_bus",
+          "cost_bus",
+          "access_bus",
+          "time_air",
+          "cost_air",
+          "access_air",
+          "service_air",
+          "time_rail",
+          "cost_rail",
+          "access_rail",
+          "service_rail",
+          "female",
+          "business",
+          "income",
+          "choice"
+        ],
+        "RP_label_rows": 1000,
+        "SP_label_rows": 7000,
+        "sha256": "7fe1a0905fb970f6dff1a15c220c077af0ec60a452031a36568efe88bcb1c11a",
+        "provenance": "explicitly_simulated_per_official_Apollo_documentation"
+      },
+      "license_note": "Public CSV; standalone data license not verified",
+      "relevance": [
+        "repeated_choice_demonstration",
+        "air_cost_time_service_attributes"
+      ],
+      "limitations": [
+        "RP and SP labels in simulated data do not establish real observations",
+        "No real business outcome evidence"
+      ]
+    },
+    {
+      "id": "P12",
+      "name": "Personalize Expedia Hotel Searches ICDM 2013",
+      "source_url": "https://www.kaggle.com/competitions/expedia-personalized-sort/data",
+      "source_metadata": {
+        "url": "https://www.kaggle.com/competitions/expedia-personalized-sort/data",
+        "retrieved_at": "2026-10-08T01:27:22.244198+00:00",
+        "status": 200,
+        "sha256": "0e07e3b25cae5958fa887eec0f586aaec5c87ace6111c67ce61fce72ad4b761a"
+      },
+      "status": "login_required_candidate_not_verified",
+      "data_list_http_status": 401,
+      "complete_schema_verified": false,
+      "full_file_downloaded": false,
+      "license_note": "Competition rules not verified; normal account flow required",
+      "relevance_target": [
+        "prepurchase_search",
+        "ranking_and_choice"
+      ],
+      "limitations": [
+        "No unverified field or scale claims"
+      ]
+    },
+    {
+      "id": "P13",
+      "name": "Expedia Hotel Recommendations",
+      "source_url": "https://www.kaggle.com/competitions/expedia-hotel-recommendations/data",
+      "source_metadata": {
+        "url": "https://www.kaggle.com/competitions/expedia-hotel-recommendations/data",
+        "retrieved_at": "2026-10-08T01:27:21.611562+00:00",
+        "status": 200,
+        "sha256": "c35751d8203dbe487583004bc70d98af101bdd0733496f19d37e1bd398f18d7d"
+      },
+      "status": "login_required_candidate_not_verified",
+      "data_list_http_status": 401,
+      "complete_schema_verified": false,
+      "full_file_downloaded": false,
+      "license_note": "Competition rules not verified; normal account flow required",
+      "relevance_target": [
+        "travel_user_recommendation"
+      ],
+      "limitations": [
+        "No unverified field or scale claims"
+      ]
+    }
+  ]
+}
