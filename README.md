@@ -25,6 +25,7 @@
 
 ## 文档入口
 
+- [中国节假日航空数据（当前优先）](docs/research/china-holiday-aviation-data.md)：2025国庆中秋的热门航线、东航运力计划、节前预订与价格、上海及三目的地机场客流，附结构化事实和口径说明。
 - [旅客层面公开数据选型](docs/research/passenger-level-public-data.md)：个人出行、匿名预订消费、旅游评分与航空会员数据，含真实/虚构来源和下载核验。
 - [第二轮强相关数据](docs/research/project-related-data-second-round.md)：Booking.com行程序列、航空方式选择、文字偏好、模拟选择及待登录核验的购前搜索数据。
 - [首轮公开数据调研](docs/research/2025-national-day-first-round.md)：2025年国庆中秋、三目的地证据、5项已核验来源及数据缺口；[继续采集的方法](docs/research/public-data-collection.md)。

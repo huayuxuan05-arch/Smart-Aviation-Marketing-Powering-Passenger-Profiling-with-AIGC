@@ -1,0 +1,1222 @@
+{
+  "schema_version": "1.0",
+  "compiled_date": "2026-10-08",
+  "network": "Configured HTTPS proxy explicitly used; no credentials stored",
+  "holiday": {
+    "id": "CN_2025_NATIONAL_DAY_MID_AUTUMN",
+    "name": "2025年国庆中秋",
+    "start": "2025-10-01",
+    "end": "2025-10-08",
+    "days": 8,
+    "calendar_source_id": "S01"
+  },
+  "decision_cutoff": "2025-09-30T23:59:59+08:00",
+  "new_sources": [
+    {
+      "id": "H01",
+      "title": "国庆中秋假期民航运输旅客1913.8万人次",
+      "url": "https://www.caac.gov.cn/PHONE/XWZX/MHYW/202510/t20251009_228760.html",
+      "published_date": "2025-10-09",
+      "data_provider": "中国民用航空局",
+      "source_type": "official_release",
+      "role": "post_holiday_actual",
+      "retrieved_at": "2026-10-08T05:39:24.680677+00:00",
+      "sha256": "342f9fb34ae3bca58e9e12bd4577869940c9f573771a46dcf18dce3dcf298086",
+      "local_cache_id": "3c73d1bc00be0163",
+      "verification": "body_read",
+      "raw_records_available": false
+    },
+    {
+      "id": "H02",
+      "title": "国庆假期上海机场日均客流量超40万人次，创历史新高",
+      "url": "https://m.thepaper.cn/newsDetail_forward_31746555",
+      "published_date": "2025-10-09",
+      "data_provider": "上海机场集团；澎湃新闻报道",
+      "source_type": "media_reporting_airport_data",
+      "role": "post_holiday_actual",
+      "retrieved_at": "2026-10-08T05:43:38.662314+00:00",
+      "sha256": "679ac115155dd7e102ca1fca8138c1fdb1a64cf038c827b8e0a87ffda45cce6b",
+      "local_cache_id": "fbf79396ce3b13e1",
+      "verification": "body_read",
+      "raw_records_available": false
+    },
+    {
+      "id": "H03",
+      "title": "2025国庆中秋假期云南机场运送旅客超182万人次_文娱_云南频道_云南网",
+      "url": "https://yn.yunnan.cn/system/2025/10/09/033677711.shtml",
+      "published_date": "2025-10-09",
+      "data_provider": "云南机场集团；云南网报道",
+      "source_type": "media_reporting_airport_data",
+      "role": "post_holiday_actual",
+      "retrieved_at": "2026-10-08T05:42:52.521335+00:00",
+      "sha256": "7ae80f91e705b7f795ce7f654983992c3a22e5ef7cebdf7b9e815ab39d004309",
+      "local_cache_id": "d5f648cc16e4ff67",
+      "verification": "body_read",
+      "raw_records_available": false
+    },
+    {
+      "id": "H04",
+      "title": "国庆中秋假期，成都航空枢纽预计运送旅客超220万人次_四川在线",
+      "url": "https://sichuan.scol.com.cn/ggxw/202509/83129721.html",
+      "published_date": "2025-09-29",
+      "data_provider": "四川省机场集团；四川在线报道",
+      "source_type": "media_reporting_airport_forecast",
+      "role": "pre_holiday_forecast",
+      "retrieved_at": "2026-10-08T05:42:52.191805+00:00",
+      "sha256": "b4b200cc973ad09e033f2f7f06361e9609f3400ad5d7f7b21c5ba8b7b94ef767",
+      "local_cache_id": "2e13fcb7d53beed3",
+      "verification": "body_read",
+      "raw_records_available": false
+    },
+    {
+      "id": "H05",
+      "title": "成都国际航空枢纽国庆、中秋假期运送旅客227.6万人次 _ 东方财富网",
+      "url": "https://finance.eastmoney.com/a/202510093529698994.html",
+      "published_date": "2025-10-09",
+      "data_provider": "四川机场集团；人民财讯，东方财富转载",
+      "source_type": "reprinted_media_reporting_airport_data",
+      "role": "post_holiday_actual",
+      "retrieved_at": "2026-10-08T05:43:38.662314+00:00",
+      "sha256": "6ff61ff2ff136737f1c1af58c4852799547a8877bc9d987aa7c15ce7da1504f0",
+      "local_cache_id": "323118c762d25431",
+      "verification": "body_read",
+      "raw_records_available": false
+    },
+    {
+      "id": "H06",
+      "title": "三亚凤凰机场国庆中秋预计迎客超50万人次-南海网",
+      "url": "https://www.hinews.cn/page?m=1&n=2754788&s=1044",
+      "published_date": "2025-09-23",
+      "data_provider": "三亚凤凰国际机场；南海网报道",
+      "source_type": "media_reporting_airport_forecast",
+      "role": "pre_holiday_forecast",
+      "retrieved_at": "2026-10-08T05:42:51.961326+00:00",
+      "sha256": "ce14b7323a51e068f51b9d067a4556b8ca4f6973fdc6ac3edfa6ccfc80d5d460",
+      "local_cache_id": "fc55ee4b70f51259",
+      "verification": "body_read",
+      "raw_records_available": false
+    },
+    {
+      "id": "H07",
+      "title": "国庆中秋假期 三亚凤凰机场运送旅客超52万人次-南海网",
+      "url": "https://www.hinews.cn/page?m=1&n=2759851&s=1044",
+      "published_date": "2025-10-09",
+      "data_provider": "三亚凤凰国际机场；南海网报道",
+      "source_type": "media_reporting_airport_data",
+      "role": "post_holiday_actual",
+      "retrieved_at": "2026-10-08T05:44:10.941202+00:00",
+      "sha256": "13257d90acf421d9f63258e32e36c5f45366826fedaa5a4b9a95f18e64405350",
+      "local_cache_id": "8fc8b50b624dc3c9",
+      "verification": "body_read",
+      "raw_records_available": false
+    },
+    {
+      "id": "H08",
+      "title": "东航2025年“超长黄金周”日均计划执行航班超3000班 - 营销 - 中国产业经济信息网",
+      "url": "https://www.cinic.org.cn/zgzz/yx/1606180.html",
+      "published_date": "2025-09-30",
+      "data_provider": "中国东航（含上海航空、中国联合航空）；中国产业经济信息网注明转自国资委",
+      "source_type": "reprinted_airline_plan",
+      "role": "pre_holiday_supply_plan",
+      "retrieved_at": "2026-10-08T05:43:39.139090+00:00",
+      "sha256": "7e207fadc46e2dd5f9c75b28dac6ec637cfc8c0e469a0b4082cbfc9ab1f7fa2c",
+      "local_cache_id": "0e28429572ba18ec",
+      "verification": "body_read",
+      "raw_records_available": false
+    },
+    {
+      "id": "H09",
+      "title": "国庆“机票价格跳水”别盼了：机票裸价涨9.1%，这些地方最火|杭州市|疫情|浙江省|国庆假期|数据_手机新浪网",
+      "url": "https://finance.sina.cn/2025-09-27/detail-infrxmap9783534.d.html?cid=76524&node_id=76524",
+      "published_date": "2025-09-27",
+      "data_provider": "航旅纵横、航班管家及记者查询；新京报官方账号在新浪发布",
+      "source_type": "media_reporting_multiple_platforms",
+      "role": "pre_holiday_snapshot",
+      "retrieved_at": "2026-10-08T05:44:11.181443+00:00",
+      "sha256": "993fc48702d46eb3392f3cb54f12e9e899d8865806187df7760e5a2e929a25e1",
+      "local_cache_id": "614dfc97fc5219af",
+      "verification": "body_read",
+      "raw_records_available": false
+    },
+    {
+      "id": "H10",
+      "title": "2025国庆中秋假期国内航线机票均价同比上涨10%|国际机场|航班量|王心|重庆|厦门_手机新浪网",
+      "url": "https://news.sina.cn/2025-10-09/detail-infticea9577648.d.html",
+      "published_date": "2025-10-09",
+      "data_provider": "飞常准民航看板；新京报官方账号在新浪发布",
+      "source_type": "media_reporting_platform_data",
+      "role": "post_holiday_actual",
+      "retrieved_at": "2026-10-08T05:42:52.900500+00:00",
+      "sha256": "42c163d7a8d31592efb9bd4810f5d38fe9a31b303d26251324c294b3180edb60",
+      "local_cache_id": "6987e6f9e894f194",
+      "verification": "body_read",
+      "raw_records_available": false
+    }
+  ],
+  "reused_sources": [
+    {
+      "id": "S01",
+      "title": "国务院办公厅关于2025年部分节假日安排的通知_其他_中国政府网",
+      "url": "https://www.gov.cn/zhengce/content/202411/content_6986382.htm",
+      "published_date": "2024-11-12",
+      "data_provider": "国务院办公厅",
+      "source_type": "official_notice",
+      "role": "holiday_calendar",
+      "retrieved_at": "2026-09-27T05:07:19.998992+00:00",
+      "sha256": "0510bc1f09ef9b5719e01cf0fa33f618e2a61f05ee7912c549042fea1c31c6a4",
+      "local_cache_id": "c605a0728ea71798",
+      "verification": "body_read",
+      "raw_records_available": false
+    },
+    {
+      "id": "S02",
+      "title": "2025年国庆中秋假期文旅消费热点预测",
+      "url": "https://www.mct.gov.cn/whzx/zsdw/whbxxzx_bnsj/202509/t20250924_962388.html",
+      "published_date": "2025-09-24",
+      "data_provider": "文旅部信息中心转载中国旅游新闻客户端，含多平台汇总",
+      "source_type": "official_hosted_media_report",
+      "role": "pre_holiday_demand_signals",
+      "retrieved_at": "2026-09-27T05:06:39.693477+00:00",
+      "sha256": "b88b2bfd7f32db9de144abab729ec97532468f16607fd01392fa5b19dede7963",
+      "local_cache_id": "d624d4ab5bffa46d",
+      "verification": "body_read",
+      "raw_records_available": false
+    }
+  ],
+  "observations": [
+    {
+      "id": "HA001",
+      "source_id": "H01",
+      "metric": "运输旅客",
+      "value": 1913.8,
+      "operator": "eq",
+      "unit": "万人次",
+      "geography": "全国民航",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "中国民用航空局",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA002",
+      "source_id": "H01",
+      "metric": "日均运输旅客",
+      "value": 239.2,
+      "operator": "eq",
+      "unit": "万人次/日",
+      "geography": "全国民航",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "中国民用航空局",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA003",
+      "source_id": "H01",
+      "metric": "日均运输旅客同比",
+      "value": 3.2,
+      "operator": "eq",
+      "unit": "百分比",
+      "geography": "全国民航",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "中国民用航空局",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": "比较2024年国庆假期日均值"
+    },
+    {
+      "id": "HA004",
+      "source_id": "H01",
+      "metric": "日均客座率",
+      "value": 87.9,
+      "operator": "eq",
+      "unit": "百分比",
+      "geography": "全国民航",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "中国民用航空局",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA005",
+      "source_id": "H01",
+      "metric": "日均客座率同比增量",
+      "value": 3.5,
+      "operator": "eq",
+      "unit": "百分点",
+      "geography": "全国民航",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "中国民用航空局",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA006",
+      "source_id": "H01",
+      "metric": "单日运输旅客",
+      "value": 247.5,
+      "operator": "eq",
+      "unit": "万人次",
+      "geography": "全国民航",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-01"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "中国民用航空局",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA007",
+      "source_id": "H02",
+      "metric": "机场进出港旅客",
+      "value": 325.1,
+      "operator": "eq",
+      "unit": "万人次",
+      "geography": "上海浦东与虹桥合计",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "上海机场集团；澎湃新闻报道",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA008",
+      "source_id": "H02",
+      "metric": "机场进出港旅客",
+      "value": 206.6,
+      "operator": "eq",
+      "unit": "万人次",
+      "geography": "上海浦东机场",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "上海机场集团；澎湃新闻报道",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA009",
+      "source_id": "H02",
+      "metric": "机场进出港旅客",
+      "value": 118.5,
+      "operator": "eq",
+      "unit": "万人次",
+      "geography": "上海虹桥机场",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "上海机场集团；澎湃新闻报道",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA010",
+      "source_id": "H02",
+      "metric": "日均机场进出港旅客",
+      "value": 40.6,
+      "operator": "eq",
+      "unit": "万人次/日",
+      "geography": "上海浦东与虹桥合计",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "上海机场集团；澎湃新闻报道",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA011",
+      "source_id": "H02",
+      "metric": "日均航班起降",
+      "value": 2448,
+      "operator": "eq",
+      "unit": "架次/日",
+      "geography": "上海浦东与虹桥合计",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "上海机场集团；澎湃新闻报道",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA012",
+      "source_id": "H03",
+      "metric": "机场旅客吞吐量",
+      "value": 120.81,
+      "operator": "eq",
+      "unit": "万人次",
+      "geography": "昆明机场",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "云南机场集团；云南网报道",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA013",
+      "source_id": "H03",
+      "metric": "机场航班起降",
+      "value": 8068,
+      "operator": "eq",
+      "unit": "架次",
+      "geography": "昆明机场",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "云南机场集团；云南网报道",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA014",
+      "source_id": "H03",
+      "metric": "日均机场旅客吞吐量同比",
+      "value": 5.26,
+      "operator": "eq",
+      "unit": "百分比",
+      "geography": "昆明机场",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "云南机场集团；云南网报道",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA015",
+      "source_id": "H04",
+      "metric": "机场旅客运输量预测下界",
+      "value": 220,
+      "operator": "gt",
+      "unit": "万人次",
+      "geography": "成都双流与天府枢纽合计",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "forecast",
+      "provider": "四川省机场集团；四川在线报道",
+      "published_date": "2025-09-29",
+      "available_before_decision_cutoff": true,
+      "note": ""
+    },
+    {
+      "id": "HA016",
+      "source_id": "H04",
+      "metric": "单日机场旅客运输量预测",
+      "value": 29,
+      "operator": "approx",
+      "unit": "万人次",
+      "geography": "成都双流与天府枢纽合计",
+      "statistic_period": [
+        "2025-10-08",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "forecast",
+      "provider": "四川省机场集团；四川在线报道",
+      "published_date": "2025-09-29",
+      "available_before_decision_cutoff": true,
+      "note": ""
+    },
+    {
+      "id": "HA017",
+      "source_id": "H04",
+      "metric": "单日航班量预测",
+      "value": 1823,
+      "operator": "eq",
+      "unit": "架次",
+      "geography": "成都双流与天府枢纽合计",
+      "statistic_period": [
+        "2025-10-08",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "forecast",
+      "provider": "四川省机场集团；四川在线报道",
+      "published_date": "2025-09-29",
+      "available_before_decision_cutoff": true,
+      "note": ""
+    },
+    {
+      "id": "HA018",
+      "source_id": "H05",
+      "metric": "机场旅客吞吐量",
+      "value": 227.6,
+      "operator": "eq",
+      "unit": "万人次",
+      "geography": "成都双流与天府枢纽合计",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "四川机场集团；人民财讯，东方财富转载",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA019",
+      "source_id": "H05",
+      "metric": "机场航班起降",
+      "value": 1.4,
+      "operator": "approx",
+      "unit": "万架次",
+      "geography": "成都双流与天府枢纽合计",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "四川机场集团；人民财讯，东方财富转载",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": "报道舍入值；不据此构造逐日序列"
+    },
+    {
+      "id": "HA020",
+      "source_id": "H06",
+      "metric": "机场旅客运输量预测",
+      "value": 50.4,
+      "operator": "eq",
+      "unit": "万人次",
+      "geography": "三亚凤凰机场",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "forecast",
+      "provider": "三亚凤凰国际机场；南海网报道",
+      "published_date": "2025-09-23",
+      "available_before_decision_cutoff": true,
+      "note": ""
+    },
+    {
+      "id": "HA021",
+      "source_id": "H06",
+      "metric": "机场航班起降预测",
+      "value": 3000,
+      "operator": "approx",
+      "unit": "架次",
+      "geography": "三亚凤凰机场",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "forecast",
+      "provider": "三亚凤凰国际机场；南海网报道",
+      "published_date": "2025-09-23",
+      "available_before_decision_cutoff": true,
+      "note": ""
+    },
+    {
+      "id": "HA022",
+      "source_id": "H07",
+      "metric": "机场旅客吞吐量",
+      "value": 52.03,
+      "operator": "eq",
+      "unit": "万人次",
+      "geography": "三亚凤凰机场",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "三亚凤凰国际机场；南海网报道",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA023",
+      "source_id": "H07",
+      "metric": "机场航班运输起降",
+      "value": 3104,
+      "operator": "eq",
+      "unit": "架次",
+      "geography": "三亚凤凰机场",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "三亚凤凰国际机场；南海网报道",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA024",
+      "source_id": "H07",
+      "metric": "日均机场旅客吞吐量",
+      "value": 6.5,
+      "operator": "eq",
+      "unit": "万人次/日",
+      "geography": "三亚凤凰机场",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "三亚凤凰国际机场；南海网报道",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA025",
+      "source_id": "H08",
+      "metric": "日均计划航班量",
+      "value": 3174,
+      "operator": "eq",
+      "unit": "班/日",
+      "geography": "东航含上海航空、中国联合航空，国内外合计",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "supply_plan",
+      "provider": "中国东航（含上海航空、中国联合航空）；中国产业经济信息网注明转自国资委",
+      "published_date": "2025-09-30",
+      "available_before_decision_cutoff": true,
+      "note": ""
+    },
+    {
+      "id": "HA026",
+      "source_id": "H08",
+      "metric": "计划客运航线数",
+      "value": 988,
+      "operator": "eq",
+      "unit": "条",
+      "geography": "东航含上海航空、中国联合航空，国内外合计",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "supply_plan",
+      "provider": "中国东航（含上海航空、中国联合航空）；中国产业经济信息网注明转自国资委",
+      "published_date": "2025-09-30",
+      "available_before_decision_cutoff": true,
+      "note": "来源未提供全部988条航线明细"
+    },
+    {
+      "id": "HA027",
+      "source_id": "H08",
+      "metric": "计划投入客机数",
+      "value": 816,
+      "operator": "eq",
+      "unit": "架",
+      "geography": "东航含上海航空、中国联合航空",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "supply_plan",
+      "provider": "中国东航（含上海航空、中国联合航空）；中国产业经济信息网注明转自国资委",
+      "published_date": "2025-09-30",
+      "available_before_decision_cutoff": true,
+      "note": ""
+    },
+    {
+      "id": "HA028",
+      "source_id": "H09",
+      "metric": "国内假期机票累计预订量下界",
+      "value": 593,
+      "operator": "gt",
+      "unit": "万张",
+      "geography": "国内航线合计",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": "2025-09-17",
+      "value_type": "booking_snapshot",
+      "provider": "航旅纵横",
+      "published_date": "2025-09-27",
+      "available_before_decision_cutoff": true,
+      "note": "针对假期出行的累计预订快照；不是9月17日当天售票数或独立旅客数"
+    },
+    {
+      "id": "HA029",
+      "source_id": "H09",
+      "metric": "假期预售机票裸价监测值",
+      "value": 819,
+      "operator": "eq",
+      "unit": "人民币元",
+      "geography": "国庆假期预售市场，原文未明确全部航线覆盖范围",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": "2025-09-25",
+      "value_type": "price_snapshot",
+      "provider": "航班管家",
+      "published_date": "2025-09-27",
+      "available_before_decision_cutoff": true,
+      "note": "原文未给出完整抽样方法；不能赋给单条航线",
+      "tax_included": false,
+      "trip_type": "not_explicit",
+      "price_statistic": "aggregate_monitoring_value"
+    },
+    {
+      "id": "HA030",
+      "source_id": "H09",
+      "metric": "预售机票价格同比",
+      "value": 9.1,
+      "operator": "eq",
+      "unit": "百分比",
+      "geography": "国庆假期预售市场，原文未明确全部航线覆盖范围",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": "2025-09-25",
+      "value_type": "price_snapshot",
+      "provider": "航班管家",
+      "published_date": "2025-09-27",
+      "available_before_decision_cutoff": true,
+      "note": ""
+    },
+    {
+      "id": "HA031",
+      "source_id": "H09",
+      "metric": "查询最低裸票价",
+      "value": 1450,
+      "operator": "from",
+      "unit": "人民币元",
+      "geography": "成都至北京",
+      "statistic_period": [
+        "2025-10-07",
+        "2025-10-07"
+      ],
+      "observation_as_of": "2025-09-26",
+      "value_type": "price_snapshot",
+      "provider": "新京报记者查询",
+      "published_date": "2025-09-27",
+      "available_before_decision_cutoff": true,
+      "note": "机场、航司、舱位和退改条件未明；仅为历史个例，非上海场景价格",
+      "tax_included": false,
+      "trip_type": "one_way_context",
+      "price_statistic": "lowest_observed",
+      "origin_city": "成都",
+      "destination_city": "北京"
+    },
+    {
+      "id": "HA032",
+      "source_id": "H09",
+      "metric": "查询最低裸票价",
+      "value": 1318,
+      "operator": "from",
+      "unit": "人民币元",
+      "geography": "成都至北京",
+      "statistic_period": [
+        "2025-10-08",
+        "2025-10-08"
+      ],
+      "observation_as_of": "2025-09-26",
+      "value_type": "price_snapshot",
+      "provider": "新京报记者查询",
+      "published_date": "2025-09-27",
+      "available_before_decision_cutoff": true,
+      "note": "机场、航司、舱位和退改条件未明；仅为历史个例，非上海场景价格",
+      "tax_included": false,
+      "trip_type": "one_way_context",
+      "price_statistic": "lowest_observed",
+      "origin_city": "成都",
+      "destination_city": "北京"
+    },
+    {
+      "id": "HA033",
+      "source_id": "H10",
+      "metric": "国内实际执行客运航班量",
+      "value": 11.6,
+      "operator": "eq",
+      "unit": "万班",
+      "geography": "国内航线合计",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "飞常准民航看板；新京报官方账号在新浪发布",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA034",
+      "source_id": "H10",
+      "metric": "国际及地区实际执行客运航班量",
+      "value": 1.9,
+      "operator": "eq",
+      "unit": "万班",
+      "geography": "国际及地区航线合计",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "飞常准民航看板；新京报官方账号在新浪发布",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": ""
+    },
+    {
+      "id": "HA035",
+      "source_id": "H10",
+      "metric": "单程含税机票均价",
+      "value": 910,
+      "operator": "approx",
+      "unit": "人民币元",
+      "geography": "国内航线合计",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "飞常准民航看板；新京报官方账号在新浪发布",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": "",
+      "tax_included": true,
+      "trip_type": "one_way",
+      "price_statistic": "mean"
+    },
+    {
+      "id": "HA036",
+      "source_id": "H10",
+      "metric": "单程含税机票均价",
+      "value": 1760,
+      "operator": "approx",
+      "unit": "人民币元",
+      "geography": "国际及地区航线合计",
+      "statistic_period": [
+        "2025-10-01",
+        "2025-10-08"
+      ],
+      "observation_as_of": null,
+      "value_type": "actual",
+      "provider": "飞常准民航看板；新京报官方账号在新浪发布",
+      "published_date": "2025-10-09",
+      "available_before_decision_cutoff": false,
+      "note": "",
+      "tax_included": true,
+      "trip_type": "one_way",
+      "price_statistic": "mean"
+    }
+  ],
+  "popular_route_memberships": [
+    {
+      "source_id": "H09",
+      "provider": "航旅纵横",
+      "city_pair": [
+        "北京",
+        "上海"
+      ],
+      "holiday_id": "CN_2025_NATIONAL_DAY_MID_AUTUMN",
+      "published_date": "2025-09-27",
+      "observation_as_of": null,
+      "top10_membership": true,
+      "rank": null,
+      "booking_count": null,
+      "directionality": "not_specified",
+      "airports": null,
+      "note": "名单统计截止日未单独明确，不沿用同文593万张的9月17日作为确定截止日；列举顺序不作为名次。"
+    },
+    {
+      "source_id": "H09",
+      "provider": "航旅纵横",
+      "city_pair": [
+        "上海",
+        "广州"
+      ],
+      "holiday_id": "CN_2025_NATIONAL_DAY_MID_AUTUMN",
+      "published_date": "2025-09-27",
+      "observation_as_of": null,
+      "top10_membership": true,
+      "rank": null,
+      "booking_count": null,
+      "directionality": "not_specified",
+      "airports": null,
+      "note": "名单统计截止日未单独明确，不沿用同文593万张的9月17日作为确定截止日；列举顺序不作为名次。"
+    },
+    {
+      "source_id": "H09",
+      "provider": "航旅纵横",
+      "city_pair": [
+        "北京",
+        "成都"
+      ],
+      "holiday_id": "CN_2025_NATIONAL_DAY_MID_AUTUMN",
+      "published_date": "2025-09-27",
+      "observation_as_of": null,
+      "top10_membership": true,
+      "rank": null,
+      "booking_count": null,
+      "directionality": "not_specified",
+      "airports": null,
+      "note": "名单统计截止日未单独明确，不沿用同文593万张的9月17日作为确定截止日；列举顺序不作为名次。"
+    },
+    {
+      "source_id": "H09",
+      "provider": "航旅纵横",
+      "city_pair": [
+        "上海",
+        "成都"
+      ],
+      "holiday_id": "CN_2025_NATIONAL_DAY_MID_AUTUMN",
+      "published_date": "2025-09-27",
+      "observation_as_of": null,
+      "top10_membership": true,
+      "rank": null,
+      "booking_count": null,
+      "directionality": "not_specified",
+      "airports": null,
+      "note": "名单统计截止日未单独明确，不沿用同文593万张的9月17日作为确定截止日；列举顺序不作为名次。"
+    },
+    {
+      "source_id": "H09",
+      "provider": "航旅纵横",
+      "city_pair": [
+        "北京",
+        "深圳"
+      ],
+      "holiday_id": "CN_2025_NATIONAL_DAY_MID_AUTUMN",
+      "published_date": "2025-09-27",
+      "observation_as_of": null,
+      "top10_membership": true,
+      "rank": null,
+      "booking_count": null,
+      "directionality": "not_specified",
+      "airports": null,
+      "note": "名单统计截止日未单独明确，不沿用同文593万张的9月17日作为确定截止日；列举顺序不作为名次。"
+    },
+    {
+      "source_id": "H09",
+      "provider": "航旅纵横",
+      "city_pair": [
+        "北京",
+        "广州"
+      ],
+      "holiday_id": "CN_2025_NATIONAL_DAY_MID_AUTUMN",
+      "published_date": "2025-09-27",
+      "observation_as_of": null,
+      "top10_membership": true,
+      "rank": null,
+      "booking_count": null,
+      "directionality": "not_specified",
+      "airports": null,
+      "note": "名单统计截止日未单独明确，不沿用同文593万张的9月17日作为确定截止日；列举顺序不作为名次。"
+    },
+    {
+      "source_id": "H09",
+      "provider": "航旅纵横",
+      "city_pair": [
+        "上海",
+        "深圳"
+      ],
+      "holiday_id": "CN_2025_NATIONAL_DAY_MID_AUTUMN",
+      "published_date": "2025-09-27",
+      "observation_as_of": null,
+      "top10_membership": true,
+      "rank": null,
+      "booking_count": null,
+      "directionality": "not_specified",
+      "airports": null,
+      "note": "名单统计截止日未单独明确，不沿用同文593万张的9月17日作为确定截止日；列举顺序不作为名次。"
+    },
+    {
+      "source_id": "H09",
+      "provider": "航旅纵横",
+      "city_pair": [
+        "成都",
+        "深圳"
+      ],
+      "holiday_id": "CN_2025_NATIONAL_DAY_MID_AUTUMN",
+      "published_date": "2025-09-27",
+      "observation_as_of": null,
+      "top10_membership": true,
+      "rank": null,
+      "booking_count": null,
+      "directionality": "not_specified",
+      "airports": null,
+      "note": "名单统计截止日未单独明确，不沿用同文593万张的9月17日作为确定截止日；列举顺序不作为名次。"
+    },
+    {
+      "source_id": "H09",
+      "provider": "航旅纵横",
+      "city_pair": [
+        "广州",
+        "成都"
+      ],
+      "holiday_id": "CN_2025_NATIONAL_DAY_MID_AUTUMN",
+      "published_date": "2025-09-27",
+      "observation_as_of": null,
+      "top10_membership": true,
+      "rank": null,
+      "booking_count": null,
+      "directionality": "not_specified",
+      "airports": null,
+      "note": "名单统计截止日未单独明确，不沿用同文593万张的9月17日作为确定截止日；列举顺序不作为名次。"
+    },
+    {
+      "source_id": "H09",
+      "provider": "航旅纵横",
+      "city_pair": [
+        "北京",
+        "乌鲁木齐"
+      ],
+      "holiday_id": "CN_2025_NATIONAL_DAY_MID_AUTUMN",
+      "published_date": "2025-09-27",
+      "observation_as_of": null,
+      "top10_membership": true,
+      "rank": null,
+      "booking_count": null,
+      "directionality": "not_specified",
+      "airports": null,
+      "note": "名单统计截止日未单独明确，不沿用同文593万张的9月17日作为确定截止日；列举顺序不作为名次。"
+    }
+  ],
+  "route_supply_events": [
+    {
+      "source_id": "H08",
+      "published_date": "2025-09-30",
+      "route_endpoints_as_reported": [
+        "上海浦东",
+        "喀什"
+      ],
+      "status": "published_supply_plan",
+      "event": "增加班次",
+      "added_flights": null,
+      "added_seats": null,
+      "fare": null,
+      "note": "报道为节前运力安排，未给增加数量；不等同于逐日实际执行记录。"
+    },
+    {
+      "source_id": "H08",
+      "published_date": "2025-09-30",
+      "route_endpoints_as_reported": [
+        "上海浦东",
+        "伊宁"
+      ],
+      "status": "published_supply_plan",
+      "event": "增加班次",
+      "added_flights": null,
+      "added_seats": null,
+      "fare": null,
+      "note": "报道为节前运力安排，未给增加数量；不等同于逐日实际执行记录。"
+    },
+    {
+      "source_id": "H08",
+      "published_date": "2025-09-30",
+      "route_endpoints_as_reported": [
+        "上海浦东",
+        "大同"
+      ],
+      "status": "published_supply_plan",
+      "event": "增加班次",
+      "added_flights": null,
+      "added_seats": null,
+      "fare": null,
+      "note": "报道为节前运力安排，未给增加数量；不等同于逐日实际执行记录。"
+    },
+    {
+      "source_id": "H08",
+      "published_date": "2025-09-30",
+      "route_endpoints_as_reported": [
+        "上海浦东",
+        "敦煌"
+      ],
+      "status": "published_supply_plan",
+      "event": "增加班次",
+      "added_flights": null,
+      "added_seats": null,
+      "fare": null,
+      "note": "报道为节前运力安排，未给增加数量；不等同于逐日实际执行记录。"
+    },
+    {
+      "source_id": "H08",
+      "published_date": "2025-09-30",
+      "route_endpoints_as_reported": [
+        "上海虹桥",
+        "广州"
+      ],
+      "status": "published_supply_plan",
+      "event": "通过机型扩大等方式增加运力",
+      "added_flights": null,
+      "added_seats": null,
+      "fare": null,
+      "note": "报道为节前运力安排，未给增加数量；不等同于逐日实际执行记录。"
+    },
+    {
+      "source_id": "H08",
+      "published_date": "2025-09-30",
+      "route_endpoints_as_reported": [
+        "上海虹桥",
+        "西安"
+      ],
+      "status": "published_supply_plan",
+      "event": "通过机型扩大等方式增加运力",
+      "added_flights": null,
+      "added_seats": null,
+      "fare": null,
+      "note": "报道为节前运力安排，未给增加数量；不等同于逐日实际执行记录。"
+    },
+    {
+      "source_id": "H08",
+      "published_date": "2025-09-30",
+      "route_endpoints_as_reported": [
+        "上海虹桥",
+        "乌鲁木齐"
+      ],
+      "status": "published_supply_plan",
+      "event": "通过机型扩大等方式增加运力",
+      "added_flights": null,
+      "added_seats": null,
+      "fare": null,
+      "note": "报道为节前运力安排，未给增加数量；不等同于逐日实际执行记录。"
+    },
+    {
+      "source_id": "H08",
+      "published_date": "2025-09-30",
+      "route_endpoints_as_reported": [
+        "上海虹桥",
+        "重庆"
+      ],
+      "status": "published_supply_plan",
+      "event": "通过机型扩大等方式增加运力",
+      "added_flights": null,
+      "added_seats": null,
+      "fare": null,
+      "note": "报道为节前运力安排，未给增加数量；不等同于逐日实际执行记录。"
+    },
+    {
+      "source_id": "H08",
+      "published_date": "2025-09-30",
+      "route_endpoints_as_reported": [
+        "上海虹桥",
+        "成都双流"
+      ],
+      "status": "published_supply_plan",
+      "event": "通过机型扩大等方式增加运力",
+      "added_flights": null,
+      "added_seats": null,
+      "fare": null,
+      "note": "报道为节前运力安排，未给增加数量；不等同于逐日实际执行记录。"
+    },
+    {
+      "source_id": "H08",
+      "published_date": "2025-09-30",
+      "route_endpoints_as_reported": [
+        "上海浦东",
+        "瑞金"
+      ],
+      "status": "reported_launch",
+      "event": "2025-09-28新开，每天1班往返",
+      "reported_start_date": "2025-09-28",
+      "round_trips_per_day": 1,
+      "added_seats": null,
+      "fare": null
+    }
+  ],
+  "limits": [
+    "Public aggregate reporting; not passenger-level behavior or booking records.",
+    "Airport throughput does not measure Shanghai-origin route demand.",
+    "No fabricated daily series, route counts, prices, ranks, or personal identities.",
+    "Forecasts and supply plans are not realized outcomes.",
+    "Publication time gates backtests; source observation dates and travel dates are distinct.",
+    "Raw articles and images are not redistributed.",
+    "H05 and H07 ambiguous year-on-year bases excluded from numeric observations.",
+    "The 199IT secondary compilation was not used: its price attribution conflicts with the clearer earlier H09 report."
+  ],
+  "counts": {
+    "new_sources": 10,
+    "reused_sources": 2,
+    "observations": 36,
+    "popular_route_memberships": 10,
+    "route_supply_events": 10
+  }
+}
