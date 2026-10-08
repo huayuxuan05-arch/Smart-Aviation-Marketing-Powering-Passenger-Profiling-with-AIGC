@@ -8,8 +8,6 @@ runtime/
 data/raw/
 data/processed/
 output/
-prototypes/offline-demo/runtime/
-prototypes/offline-demo/output/
 *.sqlite*
 *.log
 node_modules/

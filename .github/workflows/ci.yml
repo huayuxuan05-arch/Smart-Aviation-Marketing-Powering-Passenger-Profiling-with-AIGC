@@ -1,21 +1,15 @@
-name: Offline demo checks
+name: Framework and public data checks
 on:
   push:
   pull_request:
 permissions:
   contents: read
 jobs:
-  test:
+  validate:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.11', '3.12', '3.13']
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - run: python -m unittest discover -s tests -v
-        working-directory: prototypes/offline-demo
-      - run: python scripts/export_demo.py
-        working-directory: prototypes/offline-demo
+      - name: Validate framework and links
+        run: python3 scripts/validate_framework.py
+      - name: Validate public data
+        run: python3 scripts/validate_public_data.py

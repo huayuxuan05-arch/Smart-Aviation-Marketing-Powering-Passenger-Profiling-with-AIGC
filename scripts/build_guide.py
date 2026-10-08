@@ -7,10 +7,11 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
+from docx.opc.constants import RELATIONSHIP_TYPE as RT
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'docs' / 'project-plan.md'
-TARGET = ROOT / 'deliverables' / '航旅数字画像项目实施指南.docx'
+TARGET = ROOT / 'deliverables' / '航旅智策_项目实施指南.docx'
 
 
 def font(run, size=11, bold=False, family='宋体'):
@@ -22,8 +23,21 @@ def font(run, size=11, bold=False, family='宋体'):
 
 
 def text(paragraph, content, size=11):
-    for index, part in enumerate(re.split(r'\*\*(.*?)\*\*', content)):
-        font(paragraph.add_run(part), size, bool(index % 2))
+    for part in re.split(r'(\*\*.*?\*\*|\[[^\]]+\]\([^)]+\))', content):
+        link = re.fullmatch(r'\[([^\]]+)\]\(([^)]+)\)', part)
+        if link:
+            label, target = link.groups()
+            node = OxmlElement('w:hyperlink')
+            node.set(qn('r:id'), paragraph.part.relate_to(target, RT.HYPERLINK, is_external=True))
+            run = paragraph.add_run(label)
+            font(run, size)
+            run.font.underline = True
+            node.append(run._r)
+            paragraph._p.append(node)
+        elif part.startswith('**') and part.endswith('**'):
+            font(paragraph.add_run(part[2:-2]), size, True)
+        else:
+            font(paragraph.add_run(part), size)
 
 
 def table(doc, lines):
@@ -87,8 +101,8 @@ def main():
         style.element.get_or_add_rPr().rFonts.set(qn('w:eastAsia'),'黑体')
         style.paragraph_format.space_before = Pt(12 if name == 'Heading 2' else 0)
         style.paragraph_format.space_after = Pt(10)
-    doc.core_properties.title = '航旅数字画像项目实施指南'
-    doc.core_properties.subject = '钻石命题2的研究框架与实施步骤'
+    doc.core_properties.title = '航旅智策——节假日航空智慧营销决策系统'
+    doc.core_properties.subject = '五层架构与项目实施指南 版本2.0'
     doc.core_properties.author = ''
     doc.core_properties.last_modified_by = ''
     # 清除Word内置Title等样式可能继承的装饰线。

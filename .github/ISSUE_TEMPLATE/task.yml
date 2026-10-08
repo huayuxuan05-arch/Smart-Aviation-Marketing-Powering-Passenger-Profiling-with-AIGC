@@ -1,22 +1,28 @@
-name: 落地任务
-description: 将赛题要求转化为可验收工作
-title: '[任务] '
+name: 五层建设任务
+description: 按数据 算法 AIGC 应用 评估登记任务
+title: "[层次] 任务名称"
 body:
-  - type: textarea
-    id: requirement
+  - type: dropdown
+    id: layer
     attributes:
-      label: 需求与来源
-      description: 对应 docs/requirements.md 的需求编号，注明来源页码或团队决策。
+      label: 所属层
+      options: [数据层, 算法层, AIGC层, 应用层, 评估层, 报告与管理]
     validations:
       required: true
   - type: textarea
-    id: delivery
+    id: objective
     attributes:
-      label: 交付物与验收标准
-      description: 代码、数据、实验或报告章节，以及如何验证。
+      label: 业务问题 输入与输出
     validations:
       required: true
   - type: textarea
     id: dependencies
     attributes:
-      label: 前置依赖、授权与风险
+      label: 数据条件与任务依赖
+      description: 写明真实 聚合 合成数据及缺口
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 验收标准与证据
+    validations:
+      required: true

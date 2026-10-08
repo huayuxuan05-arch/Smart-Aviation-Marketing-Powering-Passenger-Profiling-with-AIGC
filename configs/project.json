@@ -1,0 +1,89 @@
+{
+  "project_name": "航旅智策——节假日航空智慧营销决策系统",
+  "framework_version": "2.0",
+  "updated_date": "2026-10-08",
+  "delivery_scope": "framework_and_word_guide",
+  "scenario": {
+    "holiday": "2025国庆中秋",
+    "start": "2025-10-01",
+    "end": "2025-10-08",
+    "origin_region": "上海",
+    "destinations": [
+      "成都",
+      "三亚",
+      "昆明"
+    ],
+    "decision_cutoff": "2025-09-30T23:59:59+08:00"
+  },
+  "layers": [
+    {
+      "id": "data",
+      "name": "数据层",
+      "modules": [
+        "旅游搜索",
+        "航线",
+        "节假日",
+        "用户行为",
+        "营销反馈"
+      ],
+      "spec": "docs/data-contracts.md",
+      "status": "public_evidence_available_individual_data_pending"
+    },
+    {
+      "id": "algorithms",
+      "name": "算法层",
+      "modules": [
+        "需求预测",
+        "动态画像",
+        "航线推荐",
+        "营销策略优化"
+      ],
+      "spec": "docs/algorithms.md",
+      "status": "designed_not_implemented"
+    },
+    {
+      "id": "aigc",
+      "name": "AIGC层",
+      "modules": [
+        "RAG知识检索",
+        "个性化文案",
+        "视觉素材生成"
+      ],
+      "spec": "docs/aigc.md",
+      "status": "designed_not_implemented"
+    },
+    {
+      "id": "application",
+      "name": "应用层",
+      "modules": [
+        "可交互航空智慧营销平台"
+      ],
+      "spec": "docs/application.md",
+      "status": "designed_not_implemented"
+    },
+    {
+      "id": "evaluation",
+      "name": "评估层",
+      "modules": [
+        "预测误差",
+        "推荐效果",
+        "营销反馈",
+        "模型对比"
+      ],
+      "spec": "docs/evaluation.md",
+      "status": "protocol_defined_no_model_results"
+    }
+  ],
+  "runtime_plan": {
+    "backend": "Python",
+    "frontend": "browser",
+    "framework_selection": "pending_implementation"
+  },
+  "data_kinds": [
+    "public_aggregate",
+    "authorized_individual",
+    "synthetic"
+  ],
+  "live_marketing_enabled": false,
+  "paid_model_calls_enabled": false
+}

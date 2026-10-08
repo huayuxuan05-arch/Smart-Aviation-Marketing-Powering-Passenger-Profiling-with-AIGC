@@ -1,31 +1,20 @@
-# 本地API
+# 后端接口规划
 
-这是可选原型的接口参考，当前主线为公开信息研究和整体方案。在`prototypes/offline-demo/`目录启动 `python -m app.server`，基址 `http://127.0.0.1:8000`。无需依赖、API Key 或身份登录，仅用于可信本地演示；端口可配置。
+以下接口是待实现契约，不是当前可调用API。统一前缀/api/v1，输入输出携带scenario_id、as_of、data_version和data_kind；时间为带时区的ISO格式。
 
-| 方法 | 路径 | 行为 |
+| 方法与路径 | 输入 | 输出 |
 |---|---|---|
-| GET | /api/health | 离线模式健康检查 |
-| GET | /api/overview | 合成旅客数量、可触达、高意向、群体与目的地分布 |
-| GET | /api/profiles | 画像、推荐候选、触达决策 |
-| GET | /api/campaigns | 所有活动，最新在前 |
-| GET | /api/metrics | 当前可触达合成旅客的随机分组统计演示 |
-| GET | /api/audit | 最近100条活动操作审计 |
-| POST | /api/campaigns | `{ "passenger_id": "SYN-0002" }` 创建模板文案与SVG草稿 |
-| POST | /api/campaigns/{id}/approve | `{}` 从draft变为approved |
-| POST | /api/campaigns/{id}/simulate | `{}` 从approved变为simulated；先复核授权与频控 |
+| GET /sources | 场景、数据类型 | 来源、覆盖、单位、发布日期、使用范围 |
+| POST /forecast-runs | 场景、目标、预测窗口、模型配置 | run_id、预测或数据不足状态、模型版本 |
+| POST /profile-snapshots | 用户／客群标识、截点 | 标签、证据、置信度、快照ID |
+| POST /recommendations | 快照、日期、预算情景 | 候选、约束、理由、未知项 |
+| POST /strategy-plans | 候选、渠道、预算、约束 | 决策方案、成本假设、版本 |
+| POST /knowledge/search | 目的地、主题、任务模式、截点 | 片段、来源、有效期、知识版本 |
+| POST /content-drafts | 方案ID、事实卡、生成方式 | 文案、视觉任务、引用、生成记录 |
+| POST /content-reviews | 草稿版本、审核结论 | 审核记录、允许的下一步 |
+| POST /campaigns | 已审核方案、实验分配 | 活动ID、草稿或可执行状态 |
+| POST /campaigns/{id}/simulate | 活动ID、幂等键、种子 | 模拟事件、状态、合成标记 |
+| POST /campaigns/{id}/stop | 活动ID、原因 | 停止状态 |
+| GET /experiments/{id} | 实验ID | 切分、模型对照、指标与限制 |
 
-POST必须为JSON对象，Content-Type为application/json，请求体最大16KiB。400表示JSON、输入或业务状态错误，403跨站Origin被拒绝，404未知路径，413体积错误，415类型错误。浏览器Origin只允许实际端口的127.0.0.1同源；建议用README中的地址访问。
-
-## 示例（PowerShell）
-
-```powershell
-$demoCampaign = Invoke-RestMethod -Uri 'http://127.0.0.1:8000/api/campaigns' -Method Post -ContentType 'application/json' -Body '{"passenger_id":"SYN-0002"}'
-Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/campaigns/$($demoCampaign.id)/approve" -Method Post -ContentType 'application/json' -Body '{}'
-Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/campaigns/$($demoCampaign.id)/simulate" -Method Post -ContentType 'application/json' -Body '{}'
-```
-
-建议每次录制使用新的数据库。SYN-0002的初始频控余额只有1次；重复创建/模拟会按累计记录被拦截。跨活动并发执行也无法绕过频控。
-
-## 语义边界
-
-审核接口记录状态，不认证审核人的企业权限。模拟接口没有调用渠道，也不会等待建议发送时段；它只是演示状态转换。metrics使用人为设定概率（对照0.12，实验0.18），不统计真实曝光或订单，不是单次活动效果归因。单次模拟把该时点的实验演示结果保存到活动result中，便于查看操作时的快照。
+数据不足用明确业务状态返回，参数无效返回校验错误，资源缺失返回不存在，旧版本审核或重复冲突返回版本冲突。异步生成与训练返回run_id供查询，错误记录不含密钥或个人原文。实际实现需增加角色认证与权限；本框架不提供无保护的公网服务。
