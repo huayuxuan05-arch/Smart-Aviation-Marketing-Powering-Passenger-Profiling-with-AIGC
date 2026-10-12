@@ -1,5 +1,7 @@
 # Python后端实施约定
 
+> 2026-10-12 更新：本文保留框架阶段的设计约定；可运行实现已同步至 `航旅智策应用/`，当前功能、启动方法与完成状态以仓库首页及应用 README 为准。数据仍为历史航班与模拟旅客，不代表真实业务效果。
+
 此目录为待开发后端的入口，当前没有可启动服务。
 
 计划按data、forecast、profiles、recommendations、strategies、retrieval、generation、campaigns、evaluation划分业务模块；API仅负责请求校验与结果序列化。存储、模型供应商、检索器、素材生成器采用可替换适配器，业务模块不硬编码凭据或平台地址。

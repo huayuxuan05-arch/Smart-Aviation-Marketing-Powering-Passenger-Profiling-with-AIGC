@@ -1,19 +1,16 @@
 {
   "project_name": "航旅智策——节假日航空智慧营销决策系统",
-  "framework_version": "2.0",
-  "updated_date": "2026-10-08",
-  "delivery_scope": "framework_and_word_guide",
+  "framework_version": "3.0",
+  "updated_date": "2026-10-12",
+  "delivery_scope": "local_interactive_demo_and_trained_synthetic_models",
   "scenario": {
-    "holiday": "2025国庆中秋",
-    "start": "2025-10-01",
-    "end": "2025-10-08",
-    "origin_region": "上海",
-    "destinations": [
-      "成都",
-      "三亚",
-      "昆明"
-    ],
-    "decision_cutoff": "2025-09-30T23:59:59+08:00"
+    "holiday": "2024国庆历史回放",
+    "start": "2024-10-01",
+    "end": "2024-10-07",
+    "origin_region": "模拟旅客常用出发城市（多城市）",
+    "destinations": "41个模拟目的地，按兴趣与历史航班筛选",
+    "decision_cutoff": "2024-09-30T23:59:59+08:00",
+    "other_holidays": "支持2024元旦、清明、五一、端午、中秋等历史场景"
   },
   "layers": [
     {
@@ -27,7 +24,7 @@
         "营销反馈"
       ],
       "spec": "docs/data-contracts.md",
-      "status": "public_evidence_available_individual_data_pending"
+      "status": "local_full_dataset_index_and_provenance_checks"
     },
     {
       "id": "algorithms",
@@ -39,7 +36,7 @@
         "营销策略优化"
       ],
       "spec": "docs/algorithms.md",
-      "status": "designed_not_implemented"
+      "status": "trained_full_10000_synthetic_travelers_time_split"
     },
     {
       "id": "aigc",
@@ -50,7 +47,7 @@
         "视觉素材生成"
       ],
       "spec": "docs/aigc.md",
-      "status": "designed_not_implemented"
+      "status": "local_qwen35_9b_cuda_reviewed_copy_and_svg"
     },
     {
       "id": "application",
@@ -59,7 +56,7 @@
         "可交互航空智慧营销平台"
       ],
       "spec": "docs/application.md",
-      "status": "designed_not_implemented"
+      "status": "interactive_seven_page_local_marketing_demo"
     },
     {
       "id": "evaluation",
@@ -71,13 +68,15 @@
         "模型对比"
       ],
       "spec": "docs/evaluation.md",
-      "status": "protocol_defined_no_model_results"
+      "status": "frozen_test_metrics_proxy_behavior_no_causal_business_claims"
     }
   ],
   "runtime_plan": {
-    "backend": "Python",
-    "frontend": "browser",
-    "framework_selection": "pending_implementation"
+    "backend": "Python标准库HTTP服务及SQLite",
+    "frontend": "原生HTML/CSS/JavaScript",
+    "entry": "航旅智策应用/server.py",
+    "local_model": "Qwen3.5-9B-Q4_K_M，Unsloth量化，llama.cpp CUDA",
+    "framework_selection": "implemented_local_demo"
   },
   "data_kinds": [
     "public_aggregate",
@@ -85,5 +84,19 @@
     "synthetic"
   ],
   "live_marketing_enabled": false,
-  "paid_model_calls_enabled": false
+  "paid_model_calls_enabled": false,
+  "historical_research_scenario": {
+    "holiday": "2025国庆中秋",
+    "start": "2025-10-01",
+    "end": "2025-10-08",
+    "origin_region": "上海",
+    "destinations": [
+      "成都",
+      "三亚",
+      "昆明"
+    ],
+    "decision_cutoff": "2025-09-30T23:59:59+08:00"
+  },
+  "source_data_version": "DAILY_SYN_2024_V2_SUBSET_10K",
+  "large_artifacts_in_git": false
 }

@@ -1,0 +1,66 @@
+{
+  "verified_date": "2026-10-12",
+  "data_kind": "historical_flights_and_synthetic_travelers",
+  "backend": {
+    "status": "passed",
+    "tests": 36,
+    "command": "python -m unittest test_core test_traveler test_marketing test_local_generation -v"
+  },
+  "repository_checks": {
+    "framework": "passed: 5 layers, 38 local links, 36 holiday observations",
+    "public_data": "passed",
+    "marketing_javascript_syntax": "passed"
+  },
+  "browser": {
+    "marketing-browser-results.json": {
+      "status": "passed",
+      "checks": [
+        "Marketing homepage uses full trained dataset and five-step business flow",
+        "Province filtering actually changes full-population target pool",
+        "Preview traveler profile works before campaign is saved",
+        "Campaign freezes a versioned target audience and persists locally",
+        "Dynamic profile compares old and current interests with source behavior IDs",
+        "Search, pagination and target CSV export work",
+        "Route constraints and six coordinated channel suggestions are displayed",
+        "Real local Qwen inference generates editable copy and a vector poster",
+        "Editing creates a new revision and explicit three-part review approves it",
+        "Generated poster exports as an editable SVG",
+        "Local sends enforce quiet hours, review, per-user frequency and do not fabricate clicks or orders",
+        "Evaluation reads only the future proxy window and exposes updated profiles without causal claims",
+        "Independent historical marketing funnel uses the original 120,000 pushes",
+        "Saved campaign, creative, review and execution survive refresh",
+        "Training protocol and actual artifacts are reviewable in model details",
+        "Changing frozen audience invalidates old creative approvals",
+        "Mobile marketing homepage and creative studio fit a 390px viewport",
+        "No browser page or console errors"
+      ],
+      "check_count": 18,
+      "execution": "本地最近实际验收记录，非GitHub CI执行"
+    },
+    "campaign-delete-browser-results.json": {
+      "status": "passed",
+      "checks": [
+        "Cancel keeps the campaign intact",
+        "Deleting another campaign keeps the current activity open",
+        "Deleting current activity clears refresh state and blocks execution",
+        "Deleted list restores the original campaign and leaves other deletions untouched",
+        "Delete button fits mobile layout without browser errors"
+      ],
+      "check_count": 5,
+      "execution": "本地最近实际验收记录，非GitHub CI执行"
+    },
+    "creative-delete-browser-results.json": {
+      "status": "passed",
+      "checks": [
+        "Cancel preserves the selected pending material",
+        "Deletion removes only the selected material and prevents later approval",
+        "Deletion persists after refresh",
+        "Deleting the last material returns to an empty studio on mobile",
+        "Audience remains intact and browser reports no errors"
+      ],
+      "check_count": 5,
+      "execution": "本地最近实际验收记录，非GitHub CI执行"
+    }
+  },
+  "scope": "后端与浏览器验收在已有原始数据、训练缓存和GPU推理的开发机执行；GitHub框架CI不等于业务验收。"
+}

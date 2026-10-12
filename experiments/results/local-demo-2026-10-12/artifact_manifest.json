@@ -1,0 +1,24 @@
+{
+  "source_sha256": {
+    "01_航班信息.xlsx": "4f82b8901f75e86aaf55d99d367a8cfb41ef69495ee1dba19a35b90578d9b73f",
+    "02_用户行为.xlsx": "d894e544ddc47170d00c9fed62675bc2b81992aadb0588a5b447f71c44f66291",
+    "03_营销反馈.xlsx": "cde6d737fc174c1f06f8d9adc2459f8b49c1657e487ee053e7471bcc85b71860"
+  },
+  "numpy": "2.3.5",
+  "scikit_learn": "1.9.1",
+  "seed": 20261012,
+  "artifacts": {
+    "behavior_arrays.npz": {
+      "sha256": "0877bae32954a769f0c7b0e763a26f55cb8b5cc46e39011902e74663ef3d08d8",
+      "bytes": 33188235
+    },
+    "marketing_models.joblib": {
+      "sha256": "e729fccdac96dd149880fce00f2bdc39500b41e663683490688aafed92a58bf3",
+      "bytes": 95030
+    },
+    "training_report.json": {
+      "sha256": "4bef749c10ac2c959a5909e001d2c3ee46d054f28984f4c9f9eeb27757392dbf",
+      "bytes": 10762
+    }
+  }
+}

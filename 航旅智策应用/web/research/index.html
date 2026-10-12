@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="航旅智策：基于历史航班与模拟行为的动态旅客画像本地研究工作台。">
+  <title>航旅智策 · 航空旅客智能画像</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23172e2c'/%3E%3Cpath d='M12 34L51 13 39 53 29 37z' fill='%23c3f38b'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/research/style.css"><script src="/research/app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#overview"><span class="brand-mark">↗</span><span>航旅智策<small>AEROLENS</small></span></a>
+    <div class="workspace-label">研究工作空间 <span>BETA</span></div>
+    <nav id="navigation" aria-label="主导航"></nav>
+    <div class="side-bottom"><div class="server-dot"><i></i> 本地研究环境</div><p>历史航班 × 模拟行为<br>DAILY_SYN · 10K / 2024</p><button class="text-button" id="data-info">数据与方法说明 ↗</button></div>
+    <div class="side-user"><div class="avatar">研</div><div>研究员工作台<small>Local workspace</small></div><span>⌘</span></div>
+  </aside>
+  <div class="app-shell">
+    <header class="topbar"><div><span class="breadcrumb">工作空间</span><span class="slash">/</span><span id="breadcrumb-title">研究概况</span></div><div class="top-actions"><span class="tag muted">2024 历史研究</span><span class="connected"><i></i> 本机服务已连接</span><button class="icon-button" id="help" aria-label="操作指南">?</button></div></header>
+    <main>
+      <div class="page-heading"><div><div class="eyebrow" id="page-eyebrow">OVERVIEW / 研究总览</div><h1 id="page-title">让每一次关注，成为旅程的起点。</h1><p id="page-subtitle">从行为证据到个性化决策，探索航空旅客的动态偏好。</p></div><button class="button secondary" id="export-button">↓ 导出当前画像</button></div>
+      <section class="scenario" aria-label="全局研究条件">
+        <div class="field user-field"><label for="user-input">模拟旅客 <span>可搜索编号 / 城市</span></label><input id="user-input" list="user-options" autocomplete="off" placeholder="搜索实际用户编号"><datalist id="user-options"></datalist></div>
+        <div class="field"><label for="holiday-select">假期场景</label><select id="holiday-select"><option value="custom">自定义研究截点</option></select></div>
+        <div class="field cutoff-field"><label for="asof-input">计算截点 <span>北京时间</span></label><input id="asof-input" type="datetime-local" min="2023-12-01T00:00" max="2024-12-31T23:59" value="2024-09-30T23:59"></div>
+        <div class="field compact"><label for="window-select">观察窗口</label><select id="window-select"><option value="7">7 天</option><option value="30" selected>30 天</option><option value="60">60 天</option></select></div>
+        <div class="field compact"><label for="half-select">半衰期</label><select id="half-select"><option value="7">7 天</option><option value="14" selected>14 天</option><option value="30">30 天</option></select></div>
+        <button class="button primary" id="apply-button">更新分析 ↗</button>
+      </section>
+      <div class="context-note"><span><i></i> <span id="context-label">正在连接本地数据…</span></span><span>模拟行为与反馈 · 历史航班参考</span></div>
+      <div id="page-content" aria-live="polite"><div class="loading"><span class="spinner"></span>正在读取研究数据…</div></div>
+      <footer><span>AEROLENS / 航旅智策</span><span>可追溯证据 · 可解释决策 · 可复现实验</span><span>本地测试版 v0.1</span></footer>
+    </main>
+  </div>
+  <div id="toast" role="status" hidden></div>
+  <dialog id="info-dialog"><div class="dialog-heading"><h2 id="dialog-title">数据与方法</h2><button class="icon-button" id="close-dialog" aria-label="关闭">×</button></div><div id="dialog-content"></div></dialog>
+</body>
+</html>
+

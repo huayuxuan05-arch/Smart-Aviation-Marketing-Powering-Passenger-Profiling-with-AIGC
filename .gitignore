@@ -12,3 +12,14 @@ output/
 *.log
 node_modules/
 .DS_Store
+
+# 本地原始工作簿、模型和CUDA运行程序保留在用户磁盘。
+/数据集/*.xlsx
+/数据集/*.xls
+/中国航空航班数据.xlsx
+*.gguf
+*.safetensors
+*.downloading
+*.exe
+*.dll
+*.zip
