@@ -79,7 +79,6 @@ experiments/results/          已执行训练及验收的可公开记录
 configs/                      当前五层实现状态与历史研究场景
 docs/                         框架设计、公开证据、报告与实施指南
 data/public/                  原有公开来源台账和聚合事实
-backend/、frontend/            原有分层设计约定
-knowledge/、prompts/           原有知识与生成规范
+prompts/                      营销内容生成规范
 deliverables/                 原有可编辑 Word 指南
 ```
