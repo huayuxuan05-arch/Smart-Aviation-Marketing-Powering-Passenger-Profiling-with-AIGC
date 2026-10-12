@@ -8,5 +8,5 @@
 - 不提交真实旅客身份、密钥或未获许可资料，不自动发送消息或启用收费模型。
 - 变更后运行scripts/validate_framework.py及scripts/validate_public_data.py；修改Word源后重新构建并逐页检查。
 - 应用变更运行与功能相关的单元测试及浏览器验收。完整后端命令为在航旅智策应用/运行python -m unittest test_core test_traveler test_marketing test_local_generation -v，需要本地三份数据和训练产物；无数据环境不能伪称通过业务测试。
-- 新增模型、下载、缓存、临时文件和同步副本均存放D盘项目路径。runtime/、原始Excel和本地活动数据库不提交；不要删除用户活动来准备发布。
+- 新增模型、下载、缓存、临时文件和同步副本均存放D盘项目路径。用户已授权发布原始三份Excel及需求模型、Qwen权重；通过distribution清单和GitHub Release分卷分发，校验来源及Apache许可。runtime/和本地活动数据库不提交；不要删除用户活动来准备发布。
 - docs/project-plan.md是Word文字源，scripts/build_guide.py是构建入口。最终参赛报告遵守匿名要求。

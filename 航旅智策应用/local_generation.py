@@ -63,7 +63,7 @@ def generate(destination,holiday,theme,tone='轻松亲切',variant=1):
   title=parsed['title'].strip();text=parsed['text'].strip()
   if not 1<=len(title)<=40 or not 1<=len(text)<=400 or parsed['palette'] not in ['indigo','teal','sunset'] or parsed['art'] not in ['mountain','coast','city']:raise ValueError('模型输出超出素材范围，请重新生成')
   risks=risk_flags(title+text)
-  return {'title':title,'text':text,'palette':parsed['palette'],'art':parsed['art'],'engine':MODEL_NAME+' / 本地GPU生成（RTX 5070 · CUDA）','generation_seconds':round(time.time()-started,2),'prompt':instruction,'risk_flags':risks,'visual_mode':'语言模型选择配色与抽象主题，本地SVG合成；非扩散文生图，非景点实拍','model_revision':REVISION,'model_alias':result['model'],'thinking':False,'context':8192,'quantizer':'Unsloth','usage':result.get('usage',{}),'timings':result.get('timings',{})}
+  return {'title':title,'text':text,'palette':parsed['palette'],'art':parsed['art'],'engine':MODEL_NAME+' / 本地GPU生成（CUDA）','generation_seconds':round(time.time()-started,2),'prompt':instruction,'risk_flags':risks,'visual_mode':'语言模型选择配色与抽象主题，本地SVG合成；非扩散文生图，非景点实拍','model_revision':REVISION,'model_alias':result['model'],'thinking':False,'context':8192,'quantizer':'Unsloth','usage':result.get('usage',{}),'timings':result.get('timings',{})}
 
 def poster(creative,row):
  e=lambda x:html.escape(str(x),quote=True);palettes={'indigo':('#101c48','#8274e9','#b7abff'),'teal':('#073d43','#29b49a','#b1e8c8'),'sunset':('#4a233e','#e99d73','#f7dfb4')};bg,mid,light=palettes.get(creative.get('palette'),palettes['indigo']);art=creative.get('art','mountain');scene=''

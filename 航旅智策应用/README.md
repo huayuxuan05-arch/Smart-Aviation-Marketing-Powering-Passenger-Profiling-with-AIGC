@@ -4,6 +4,14 @@
 
 本机地址：[http://127.0.0.1:8765](http://127.0.0.1:8765)。旅客数据、模型推理和活动状态均在本机。服务监听127.0.0.1，不需要付费账号或API密钥。
 
+## 换一台电脑准备完整Demo
+
+下载仓库到D盘，安装Python3.11或以上后，双击仓库根目录的 `准备并启动Demo.cmd`，或执行 `./Prepare-Demo.ps1`。脚本自动安装项目虚拟环境依赖，从本仓库Release还原三份原始Excel、已训练需求模型及Qwen权重，校验SHA256并重建SQLite索引，无需重训。首次准备需联网，完成后可离线使用。
+
+权重以Release分卷提供，自动下载、合并，数据和模型的完整清单见上级 `distribution/`。项目虚拟环境、pip缓存、临时文件和模型均跟随D盘项目路径，不创建新的C盘存储目录。已有Python安装仅作为解释器使用。
+
+`./Prepare-Demo.ps1 -DataOnly` 可先准备数据和需求模型；完整文案生成仍需Windows x64、NVIDIA驱动和足够的本地内存/显存。GitHub用于文件分发，运行仍需本地Python服务与模型。
+
 ## 启动与停止
 
 双击 `启动本地测试版.cmd`，或在PowerShell执行 `./Start-Local.ps1`。重复启动复用已有服务；后台运行，关闭浏览器不会停止。电脑重启后需再次启动，没有安装开机自启。
@@ -102,14 +110,14 @@ python server.py --port 8765
 索引和模型已有缓存时无需重建或重训。重建索引前停止服务，再执行 `python build_data.py --rebuild`；来源变更须先核对数据契约与指纹白名单，不能直接套用本报告。
 
 ```powershell
-python -m unittest test_core test_traveler test_marketing test_local_generation -v
+python -m unittest test_core test_traveler test_marketing test_local_generation test_distribution -v
 node --check web/marketing/app.js
 python cleanup_marketing_test.py
 node marketing_browser_check.cjs
 python cleanup_marketing_test.py
 ```
 
-36项后端测试使用真实数据及临时活动库，验证特征未来隔离、子事件遮蔽、标签窗口、模型产物、航班约束、审核、频控和后续评估。浏览器验收实际调用本地Qwen，检查七页流程、导出、刷新、移动布局、原始漏斗和审核失效。依赖Chrome及Playwright，脚本路径适用于本机。
+43项后端测试使用真实数据及临时活动库，验证特征未来隔离、子事件遮蔽、标签窗口、模型产物、航班约束、审核、频控和后续评估。浏览器验收实际调用本地Qwen，检查七页流程、导出、刷新、移动布局、原始漏斗和审核失效。依赖Chrome及Playwright，脚本路径适用于本机。
 
 浏览器验收创建名称精确为“闭环验收_国庆营销”的活动，清理脚本只删除报告明确记录的活动ID且核对名称，保留其他活动。结果与截图位于runtime/marketing-browser-results.json和marketing-*.png。重复验收前清理上次活动，避免正确的跨活动频控阻止本轮测试。旧入口可选验收脚本为traveler_browser_check.cjs、city_browser_check.cjs、browser_check.cjs。
 

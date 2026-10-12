@@ -98,5 +98,12 @@
     "decision_cutoff": "2025-09-30T23:59:59+08:00"
   },
   "source_data_version": "DAILY_SYN_2024_V2_SUBSET_10K",
-  "large_artifacts_in_git": false
+  "large_artifacts_in_git": false,
+  "distribution": {
+    "release_tag": "demo-2026-10-12",
+    "mode": "temporary_verified_git_blobs_assembled_into_github_release",
+    "raw_excel_uploaded": true,
+    "pretrained_qwen_uploaded": "release_workflow_required",
+    "local_activity_database_uploaded": false
+  }
 }

@@ -1,0 +1,16 @@
+Qwen3.5-9B model redistribution notice
+
+Base model: Qwen/Qwen3.5-9B, Copyright 2026 Alibaba Cloud.
+Base source: https://huggingface.co/Qwen/Qwen3.5-9B
+GGUF quantization publisher: Unsloth.
+Quantized source: https://huggingface.co/unsloth/Qwen3.5-9B-GGUF
+Pinned revision: 3885219b6810b007914f3a7950a8d1b469d598a5
+File: Qwen3.5-9B-Q4_K_M.gguf
+SHA256: 03b74727a860a56338e042c4420bb3f04b2fec5734175f4cb9fa853daf52b7e8
+License: Apache License 2.0; included as LICENSE-Qwen3.5.txt.
+
+This release redistributes the pinned Unsloth quantized bytes unchanged,
+split into parts for GitHub Release delivery. Reassembly restores the exact
+source file. This project has not fine-tuned Qwen on passenger data.
+The separate marketing demand models were trained on 10,000 simulated
+travelers; they are distinct from the pretrained language model.

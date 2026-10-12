@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "fresh_directory": true,
+  "raw_workbooks": 3,
+  "trained_model_restored": true,
+  "users": 10000,
+  "sqlite_rebuilt": true,
+  "homepage": 200,
+  "audience_prediction": "passed",
+  "language_model_hardware_test": "已有开发机先前完成；本项只验证数据与需求模型的全新还原"
+}

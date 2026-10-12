@@ -6,18 +6,16 @@
 
 ## 启动本地应用
 
-建议将仓库克隆至 D 盘。将已有三份工作簿放入仓库根目录的 `数据集/`，文件名和指纹要求见[本地数据说明](数据集/README.md)。Git 仓库不包含原始 Excel、SQLite 活动库、模型权重及 CUDA 程序。
+下载或克隆本仓库至 **D 盘**，安装 Python 3.11 或以上，然后双击仓库根目录的 **`准备并启动Demo.cmd`**。脚本会在项目内安装依赖，从 [完整 Release](https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/tag/demo-2026-10-12) 下载并校验三份原始 Excel、已训练需求模型及 Qwen3.5-9B 权重，重建索引并启动网站。**无需重新训练需求模型。**
 
-首次准备（Python 3.11 及以上）：
+也可以在 PowerShell 中执行：
 
 ```powershell
 cd 航旅智策应用
-python -m pip install -r requirements.txt
-python build_data.py
-python marketing_ml.py
-python setup_local_aigc.py
-python server.py --port 8765
+./Prepare-Demo.ps1
 ```
+
+只需画像和航线功能、暂不准备语言模型时使用 `./Prepare-Demo.ps1 -DataOnly`。完整创意生成功能仍需本地 Qwen 推理所需的内存、显存与 NVIDIA 驱动；当前推理程序为 Windows x64 CUDA 版。Python、模型和后端均在本地运行，GitHub 页面本身不托管这些进程。
 
 完成后在浏览器打开 `http://127.0.0.1:8765/`。已有索引、训练产物与语言模型时无需重建；在 Windows 上双击应用目录中的 `启动本地测试版.cmd` 即可，停止时使用 `停止本地测试版.cmd`。在其他机器上需要先安装 Python 及依赖。
 
@@ -66,16 +64,17 @@ python scripts/validate_public_data.py
 已有数据索引和训练产物时，在应用目录运行：
 
 ```powershell
-python -m unittest test_core test_traveler test_marketing test_local_generation -v
+python -m unittest test_core test_traveler test_marketing test_local_generation test_distribution -v
 node --check web/marketing/app.js
 node creative_delete_browser_check.cjs
 ```
 
-后端共 36 项测试。浏览器专项验收需要本地服务、Chrome 与 Playwright；脚本中的既有安装路径适用于当前开发机，迁移时需调整。无原始工作簿的 GitHub CI 仅验证公开框架与资料，不声称运行全量业务验收。
+后端共43项测试（含7项发布包安全与断点恢复测试）。浏览器专项验收需要本地服务、Chrome 与 Playwright；脚本中的既有安装路径适用于当前开发机，迁移时需调整。无原始工作簿的 GitHub CI 仅验证公开框架与资料，不声称运行全量业务验收。
 
 ```text
 航旅智策应用/                 可运行源码、启动脚本、测试与使用说明
-数据集/                       本地数据说明；工作簿由用户自行放入
+数据集/                       原始数据的还原位置与说明
+distribution/                 完整发布清单与模型许可
 experiments/results/          已执行训练及验收的可公开记录
 configs/                      当前五层实现状态与历史研究场景
 docs/                         框架设计、公开证据、报告与实施指南

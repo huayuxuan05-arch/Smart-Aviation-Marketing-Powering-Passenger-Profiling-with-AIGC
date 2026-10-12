@@ -10,7 +10,10 @@ $env:TMPDIR = $taskTemp
 $env:PYTHONDONTWRITEBYTECODE = '1'
 $env:HF_HOME = Join-Path $taskRuntime 'local_aigc\cache\huggingface'
 $env:CUDA_CACHE_PATH = Join-Path $taskRuntime 'local_aigc\cache\cuda'
-$taskPython = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
+$taskPython = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
+if (-not (Test-Path -LiteralPath $taskPython)) {
+    $taskPython = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
+}
 if (-not (Test-Path -LiteralPath $taskPython)) {
     $taskCommand = Get-Command python -ErrorAction Stop
     $taskPython = $taskCommand.Source

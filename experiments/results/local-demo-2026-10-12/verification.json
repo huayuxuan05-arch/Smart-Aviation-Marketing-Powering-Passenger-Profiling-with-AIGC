@@ -3,8 +3,8 @@
   "data_kind": "historical_flights_and_synthetic_travelers",
   "backend": {
     "status": "passed",
-    "tests": 36,
-    "command": "python -m unittest test_core test_traveler test_marketing test_local_generation -v"
+    "tests": 43,
+    "command": "python -m unittest test_core test_traveler test_marketing test_local_generation test_distribution -v"
   },
   "repository_checks": {
     "framework": "passed: 5 layers, 38 local links, 36 holiday observations",
@@ -62,5 +62,7 @@
       "execution": "本地最近实际验收记录，非GitHub CI执行"
     }
   },
-  "scope": "后端与浏览器验收在已有原始数据、训练缓存和GPU推理的开发机执行；GitHub框架CI不等于业务验收。"
+  "scope": "后端与浏览器验收在已有原始数据、训练缓存和GPU推理的开发机执行；GitHub框架CI不等于业务验收。",
+  "portable_distribution_tests": 7,
+  "fresh_restore": "passed: 3 original workbooks, 10000 users, SQLite rebuild, homepage and audience prediction"
 }

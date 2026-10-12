@@ -1,0 +1,40 @@
+name: Publish portable demo data and model weights
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'distribution/**'
+      - 'scripts/prepare_release.py'
+      - '.github/workflows/publish-demo.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: portable-demo-release
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble data and model assets with SHA256 verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/prepare_release.py
+      - name: Publish verified release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG=$(python3 -c "import json; print(json.load(open('distribution/manifest.json'))['release_tag'])")
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --target "$GITHUB_SHA" --draft --title "航旅智策完整本地 Demo · 2026-10-12" --notes "原始三份Excel、已训练需求模型及Qwen3.5-9B量化权重。请下载仓库源码并双击准备并启动Demo.cmd；安装脚本自动还原校验。Qwen权重按1GiB分卷，安装时自动合并。历史航班与模拟旅客仅供本地演示，不含用户活动数据库。"
+          fi
+          gh release upload "$TAG" release-assets/* --clobber
+          gh release edit "$TAG" --draft=false

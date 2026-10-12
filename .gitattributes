@@ -1,0 +1,3 @@
+distribution/source/*.bin -text linguist-generated
+*.gguf -text
+*.xlsx -text
