@@ -1,0 +1,117 @@
+{
+  "verified_date": "2026-10-12",
+  "status": "passed",
+  "repository": "huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC",
+  "release_tag": "demo-2026-10-12",
+  "release_url": "https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/tag/demo-2026-10-12",
+  "release_id": 410649509,
+  "published_at": "2026-10-12T13:47:05Z",
+  "source_commit": "601f605d2b4e002f6d1b669461ae02762516b901",
+  "workflow_run_id": 38256661969,
+  "workflow_url": "https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/actions/runs/38256661969",
+  "raw_workbooks": 3,
+  "trained_models_uploaded": true,
+  "qwen_model_bytes": 5680522464,
+  "model_parts": 6,
+  "assets": [
+    {
+      "name": "demo-data-models.zip",
+      "bytes": 257973254,
+      "digest": "sha256:733f835d877832acf8200ff64539f6f075797839e67745ca7d22d0334081eb85",
+      "url": "https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/download/demo-2026-10-12/demo-data-models.zip"
+    },
+    {
+      "name": "LICENSE-Qwen3.5.txt",
+      "bytes": 11343,
+      "digest": "sha256:50cbab8a892c5f2993b8c7351a99182507472def3b1374558308605d99b86b32",
+      "url": "https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/download/demo-2026-10-12/LICENSE-Qwen3.5.txt"
+    },
+    {
+      "name": "MODEL-NOTICE.txt",
+      "bytes": 830,
+      "digest": "sha256:f2bf611da254c48e4501de345a3aeaad43f372cce878e50f4f58e9f7603049a9",
+      "url": "https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/download/demo-2026-10-12/MODEL-NOTICE.txt"
+    },
+    {
+      "name": "Qwen3.5-9B-Q4_K_M.gguf.part-001",
+      "bytes": 1073741824,
+      "digest": "sha256:ee53fdfa44f7868cfa88ad29d2ad67ac32fbd8880a09fb77e49b0a5cb07d0c6d",
+      "url": "https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/download/demo-2026-10-12/Qwen3.5-9B-Q4_K_M.gguf.part-001"
+    },
+    {
+      "name": "Qwen3.5-9B-Q4_K_M.gguf.part-002",
+      "bytes": 1073741824,
+      "digest": "sha256:0eea2e9a3e08f9ffafc43033e996b84e8f08842b9ccf219baaa570a054198daf",
+      "url": "https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/download/demo-2026-10-12/Qwen3.5-9B-Q4_K_M.gguf.part-002"
+    },
+    {
+      "name": "Qwen3.5-9B-Q4_K_M.gguf.part-003",
+      "bytes": 1073741824,
+      "digest": "sha256:f39e403ee8745ea6559d072a9e7151074f5ca0655b4862761ab7b4a632b7fa39",
+      "url": "https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/download/demo-2026-10-12/Qwen3.5-9B-Q4_K_M.gguf.part-003"
+    },
+    {
+      "name": "Qwen3.5-9B-Q4_K_M.gguf.part-004",
+      "bytes": 1073741824,
+      "digest": "sha256:e398b3e64294a4e8fb9dc87f40eb5b6fb35f91fdc8841dd75ff2fcfbc0f47c5a",
+      "url": "https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/download/demo-2026-10-12/Qwen3.5-9B-Q4_K_M.gguf.part-004"
+    },
+    {
+      "name": "Qwen3.5-9B-Q4_K_M.gguf.part-005",
+      "bytes": 1073741824,
+      "digest": "sha256:a0d6e70cc1a9bda3e45c5e7bc08ec3d150b0f167fe50bb61ad8e4e57cca0d473",
+      "url": "https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/download/demo-2026-10-12/Qwen3.5-9B-Q4_K_M.gguf.part-005"
+    },
+    {
+      "name": "Qwen3.5-9B-Q4_K_M.gguf.part-006",
+      "bytes": 311813344,
+      "digest": "sha256:04587e5f3106256e7e76d93d843fee898eb6291e1106e61e7b037f21dc3297d9",
+      "url": "https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/download/demo-2026-10-12/Qwen3.5-9B-Q4_K_M.gguf.part-006"
+    },
+    {
+      "name": "release-manifest.json",
+      "bytes": 39820,
+      "digest": "sha256:1e6af1e721cc80ecebb81a5da3983299395e358d0e85336d82f910d622a75e19",
+      "url": "https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/download/demo-2026-10-12/release-manifest.json"
+    }
+  ],
+  "asset_checks": [
+    {
+      "name": "demo-data-models.zip",
+      "size": 257973254,
+      "passed": true
+    },
+    {
+      "name": "Qwen3.5-9B-Q4_K_M.gguf.part-001",
+      "size": 1073741824,
+      "passed": true
+    },
+    {
+      "name": "Qwen3.5-9B-Q4_K_M.gguf.part-002",
+      "size": 1073741824,
+      "passed": true
+    },
+    {
+      "name": "Qwen3.5-9B-Q4_K_M.gguf.part-003",
+      "size": 1073741824,
+      "passed": true
+    },
+    {
+      "name": "Qwen3.5-9B-Q4_K_M.gguf.part-004",
+      "size": 1073741824,
+      "passed": true
+    },
+    {
+      "name": "Qwen3.5-9B-Q4_K_M.gguf.part-005",
+      "size": 1073741824,
+      "passed": true
+    },
+    {
+      "name": "Qwen3.5-9B-Q4_K_M.gguf.part-006",
+      "size": 311813344,
+      "passed": true
+    }
+  ],
+  "public_release_manifest_download": "passed: unauthenticated download; bundle, model and all six part specifications match local files",
+  "workflow_conclusion": "success"
+}

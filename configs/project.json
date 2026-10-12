@@ -101,9 +101,11 @@
   "large_artifacts_in_git": false,
   "distribution": {
     "release_tag": "demo-2026-10-12",
-    "mode": "temporary_verified_git_blobs_assembled_into_github_release",
+    "mode": "verified_github_release_assets",
     "raw_excel_uploaded": true,
-    "pretrained_qwen_uploaded": "release_workflow_required",
-    "local_activity_database_uploaded": false
+    "pretrained_qwen_uploaded": true,
+    "local_activity_database_uploaded": false,
+    "release_published": true,
+    "asset_checksums_verified": true
   }
 }
