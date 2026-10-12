@@ -1,12 +1,13 @@
+const taskBaseUrl=process.env.AEROLENS_TEST_URL || 'http://127.0.0.1:8765';
 const path=require('node:path'),fs=require('node:fs');
 const temp=path.join(__dirname,'runtime','browser-temp');fs.mkdirSync(temp,{recursive:true});
 process.env.TEMP=temp;process.env.TMP=temp;process.env.TMPDIR=temp;process.env.PYTHONDONTWRITEBYTECODE='1';
-const {chromium}=require('C:/Users/Administrator/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const assert=require('node:assert/strict'),{execFileSync}=require('node:child_process');
 (async()=>{
- const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
+ const browser=await chromium.launch({executablePath:process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
  const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage();
- const base='http://127.0.0.1:8765/api/mkt/',errors=[],checks=[];let cid;
+ const base=(taskBaseUrl+'/api/mkt/'),errors=[],checks=[];let cid;
  page.on('pageerror',e=>errors.push(e.message));
  const pass=t=>{checks.push(t);console.log('PASS '+t)};
  try{
@@ -17,11 +18,11 @@ const assert=require('node:assert/strict'),{execFileSync}=require('node:child_pr
    const response=await context.request.post(base+`campaigns/${cid}/creatives`,{data:{user_id:user.user_id},timeout:150000});
    assert.equal(response.status(),201);materials.push(await response.json());
   }
-  await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
+  await page.goto((taskBaseUrl+'/'),{waitUntil:'networkidle'});
   await page.locator('[data-action=campaign-list]').click();
   await page.locator(`[data-campaign-id="${cid}"] [data-action=load-campaign]`).click();
   await page.waitForFunction(()=>document.querySelector('#context-name').textContent==='素材删除专项验收');
-  await page.goto('http://127.0.0.1:8765/#creative',{waitUntil:'networkidle'});
+  await page.goto((taskBaseUrl+'/#creative'),{waitUntil:'networkidle'});
   await page.locator(`[data-action=choose-creative][data-id="${materials[0].id}"]`).click();
   await page.locator('[data-action=delete-creative]').click();
   await page.getByRole('button',{name:'取消',exact:true}).click();
@@ -48,7 +49,7 @@ const assert=require('node:assert/strict'),{execFileSync}=require('node:child_pr
   fs.writeFileSync(path.join(__dirname,'runtime','creative-delete-browser-results.json'),JSON.stringify({status:'passed',checks,test_campaign:cid},null,2));
  }finally{
   await browser.close();
-  if(cid)execFileSync(path.join(process.env.USERPROFILE,'.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe'),['-c',`import sys,json,marketing_app as a
+  if(cid)execFileSync((process.env.PYTHON || 'python'),['-c',`import sys,json,marketing_app as a
 with a.db() as c:
  row=c.execute('SELECT payload FROM campaigns WHERE id=?',(sys.argv[1],)).fetchone()
  assert row and json.loads(row[0])['name']=='素材删除专项验收'

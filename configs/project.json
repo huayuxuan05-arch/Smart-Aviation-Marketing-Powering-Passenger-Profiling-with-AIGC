@@ -1,6 +1,6 @@
 {
   "project_name": "航旅智策——节假日航空智慧营销决策系统",
-  "framework_version": "3.0",
+  "framework_version": "4.0",
   "updated_date": "2026-10-12",
   "delivery_scope": "local_interactive_demo_and_trained_synthetic_models",
   "scenario": {
@@ -42,9 +42,9 @@
       "id": "aigc",
       "name": "AIGC层",
       "modules": [
-        "RAG知识检索",
+        "结构化事实引用",
         "个性化文案",
-        "视觉素材生成"
+        "SVG视觉合成"
       ],
       "spec": "docs/aigc.md",
       "status": "local_qwen35_9b_cuda_reviewed_copy_and_svg"
@@ -62,7 +62,7 @@
       "id": "evaluation",
       "name": "评估层",
       "modules": [
-        "预测误差",
+        "需求识别指标",
         "推荐效果",
         "营销反馈",
         "模型对比"
@@ -79,24 +79,11 @@
     "framework_selection": "implemented_local_demo"
   },
   "data_kinds": [
-    "public_aggregate",
-    "authorized_individual",
+    "historical_flights",
     "synthetic"
   ],
   "live_marketing_enabled": false,
   "paid_model_calls_enabled": false,
-  "historical_research_scenario": {
-    "holiday": "2025国庆中秋",
-    "start": "2025-10-01",
-    "end": "2025-10-08",
-    "origin_region": "上海",
-    "destinations": [
-      "成都",
-      "三亚",
-      "昆明"
-    ],
-    "decision_cutoff": "2025-09-30T23:59:59+08:00"
-  },
   "source_data_version": "DAILY_SYN_2024_V2_SUBSET_10K",
   "large_artifacts_in_git": false,
   "distribution": {

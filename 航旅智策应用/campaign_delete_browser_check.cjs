@@ -1,15 +1,16 @@
+const taskBaseUrl=process.env.AEROLENS_TEST_URL || 'http://127.0.0.1:8765';
 const taskBrowserTemp=require('node:path').join(__dirname,'runtime','browser-temp');require('node:fs').mkdirSync(taskBrowserTemp,{recursive:true});process.env.TEMP=taskBrowserTemp;process.env.TMP=taskBrowserTemp;process.env.TMPDIR=taskBrowserTemp;
-const {chromium}=require('C:/Users/Administrator/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {execFileSync}=require('node:child_process');
 const path=require('node:path');
 (async()=>{
- const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
+ const browser=await chromium.launch({executablePath:process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
  const context=await browser.newContext({viewport:{width:1440,height:1000}});
  const page=await context.newPage();const ids=[];const errors=[];const checks=[];
  page.on('pageerror',e=>errors.push(e.message));
- const base='http://127.0.0.1:8765/api/mkt/';
+ const base=(taskBaseUrl+'/api/mkt/');
  const check=t=>{checks.push(t);console.log('PASS '+t)};
  const entry=id=>page.locator(`[data-campaign-id="${id}"]`);
  try{
@@ -17,7 +18,7 @@ const path=require('node:path');
    const response=await context.request.post(base+'campaigns',{data:{name,holiday:'national',limit:1}});
    assert.equal(response.status(),201);ids.push((await response.json()).id);
   }
-  await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
+  await page.goto((taskBaseUrl+'/'),{waitUntil:'networkidle'});
   await page.locator('[data-action=campaign-list]').click();
   await entry(ids[0]).locator('[data-action=load-campaign]').click();
   await page.waitForFunction(()=>document.querySelector('#context-name').textContent==='删除验收_活动甲');
@@ -60,7 +61,7 @@ const path=require('node:path');
   fs.writeFileSync(path.join(__dirname,'runtime','campaign-delete-browser-results.json'),JSON.stringify({status:'passed',checks,test_ids:ids},null,2));
  }finally{
   await browser.close();
-  const python=path.join(process.env.USERPROFILE,'.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe');
+  const python=(process.env.PYTHON || 'python');
   execFileSync(python,['-c',`import sys,json,marketing_app as a
 with a.db() as c:
  for cid in json.loads(sys.argv[1]):

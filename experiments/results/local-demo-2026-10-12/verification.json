@@ -3,13 +3,13 @@
   "data_kind": "historical_flights_and_synthetic_travelers",
   "backend": {
     "status": "passed",
-    "tests": 43,
-    "command": "python -m unittest test_core test_traveler test_marketing test_local_generation test_distribution -v"
+    "tests": 36,
+    "command": "python -m unittest test_core test_marketing test_local_generation test_distribution -v"
   },
   "repository_checks": {
-    "framework": "passed: 5 layers, 38 local links, 36 holiday observations",
-    "public_data": "passed",
-    "marketing_javascript_syntax": "passed"
+    "framework": "passed: 5 layers, 23 local links, 22 Python sources, 2 marketing web assets",
+    "marketing_javascript_syntax": "passed",
+    "dataset_contract": "passed: original workbook fingerprints, trained artifacts and fixed Qwen release metadata"
   },
   "browser": {
     "marketing-browser-results.json": {
@@ -35,7 +35,7 @@
         "No browser page or console errors"
       ],
       "check_count": 18,
-      "execution": "本地最近实际验收记录，非GitHub CI执行"
+      "execution": "彻底清理后在独立D盘副本中重新执行，使用真实本地Qwen；非GitHub CI"
     },
     "campaign-delete-browser-results.json": {
       "status": "passed",
@@ -47,7 +47,7 @@
         "Delete button fits mobile layout without browser errors"
       ],
       "check_count": 5,
-      "execution": "本地最近实际验收记录，非GitHub CI执行"
+      "execution": "彻底清理后在独立D盘副本中重新执行，使用真实本地Qwen；非GitHub CI"
     },
     "creative-delete-browser-results.json": {
       "status": "passed",
@@ -59,10 +59,38 @@
         "Audience remains intact and browser reports no errors"
       ],
       "check_count": 5,
-      "execution": "本地最近实际验收记录，非GitHub CI执行"
+      "execution": "彻底清理后在独立D盘副本中重新执行，使用真实本地Qwen；非GitHub CI"
     }
   },
-  "scope": "后端与浏览器验收在已有原始数据、训练缓存和GPU推理的开发机执行；GitHub框架CI不等于业务验收。",
+  "scope": "清理后的源码在独立目录还原三份原始Excel和训练产物，重建全部SQLite索引，执行36项后端与28项浏览器检查；保留原本机用户活动。CI仅验证源码与发布契约。",
   "portable_distribution_tests": 7,
-  "fresh_restore": "passed: 3 original workbooks, 10000 users, SQLite rebuild, homepage and audience prediction"
+  "fresh_restore": "passed after cleanup: 3 workbooks, complete SQLite rebuild, 10000-user model, real local Qwen generation and marketing workflow",
+  "previous_backend_tests": 43,
+  "cleanup": {
+    "status": "passed",
+    "backend_tests": 36,
+    "isolated_directory": true,
+    "raw_workbooks_restored": 3,
+    "trained_model_loaded": true,
+    "marketing_routes": 5,
+    "retired_routes_return_404": 5,
+    "browser_reports": {
+      "marketing-browser-results.json": {
+        "status": "passed",
+        "checks": 18
+      },
+      "campaign-delete-browser-results.json": {
+        "status": "passed",
+        "checks": 5
+      },
+      "creative-delete-browser-results.json": {
+        "status": "passed",
+        "checks": 5
+      }
+    },
+    "removed_files": 43,
+    "files_before": 107,
+    "files_after": 65,
+    "retired_test_scope": "移除旧研究模板、规则研究评估及旅客体验入口对应的7项测试；当前营销测试保留并全部执行"
+  }
 }

@@ -1,16 +1,12 @@
-"""数据契约与研究语义的回归检查；不改写原始Excel和用户草稿。"""
+"""数据契约、动态画像、历史航班及营销漏斗回归检查。"""
 import unittest
 from datetime import datetime,timedelta
-from pathlib import Path
-from tempfile import TemporaryDirectory
-from unittest.mock import patch
 from data_layer import connect,build,convert
 from algorithm_layer import profile,history,flight_search
-from evaluation_layer import marketing,evaluate
-import aigc_layer as aigc
+from evaluation_layer import marketing
 
 
-class ResearchTests(unittest.TestCase):
+class CoreTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.c = connect()
@@ -92,47 +88,6 @@ class ResearchTests(unittest.TestCase):
         self.assertEqual(result['counts']['effective_exposure'],0)
         self.assertEqual(result['pushes'],[])
         self.assertIsNone(result['rates']['effective_ctr']['value'])
-
-    def test_09_complete_evaluation_and_determinism(self):
-        a=evaluate(self.c,'2024-10-01',7,10)
-        b=evaluate(self.c,'2024-10-01',7,10)
-        self.assertEqual(a,b)
-        self.assertEqual(len(a['metrics']),4)
-        self.assertTrue(all(0<=m['recall_at_3']<=1 and 0<=m['ndcg_at_3']<=1 for m in a['metrics']))
-        with self.assertRaises(ValueError):evaluate(self.c,'2024-12-25',14,10)
-        with self.assertRaises(ValueError):evaluate(self.c,'2024-09-01',7,10)
-
-    def test_10_content_review_revision_and_simulation(self):
-        context={'user':self.uid,'asof':'2024-09-30T23:59','window':30,'half':14}
-        with TemporaryDirectory() as directory,patch.object(aigc,'RUNTIME',Path(directory)):
-            d=aigc.generate(self.c,{'context':context,'hour':10})
-            self.assertGreater(len(d['facts']),0)
-            with self.assertRaises(ValueError):aigc.update(d['id'],{'action':'simulate','context':context})
-            checks=['facts','historical','synthetic']
-            approved=aigc.update(d['id'],{'action':'approve','context':context,'checks':checks})
-            self.assertEqual(approved['status'],'已审核')
-            revised=aigc.update(d['id'],{'action':'edit','title':'修改标题'})
-            self.assertEqual(revised['revision'],2)
-            self.assertEqual(revised['status'],'待审核')
-            with self.assertRaises(ValueError):aigc.update(d['id'],{'action':'approve','context':{**context,'half':7},'checks':checks})
-            aigc.update(d['id'],{'action':'approve','context':context,'checks':checks})
-            done=aigc.update(d['id'],{'action':'simulate','context':context})
-            self.assertEqual(done['status'],'完成')
-            self.assertNotIn('order',done['simulation'])
-            again=aigc.generate(self.c,{'context':context,'hour':10})
-            aigc.update(again['id'],{'action':'approve','context':context,'checks':checks})
-            with self.assertRaisesRegex(ValueError,'频次上限'):aigc.update(again['id'],{'action':'simulate','context':context})
-
-    def test_11_quiet_time_and_optout(self):
-        context={'user':self.uid,'asof':'2024-09-30T23:59','window':30,'half':14}
-        with TemporaryDirectory() as directory,patch.object(aigc,'RUNTIME',Path(directory)):
-            d=aigc.generate(self.c,{'context':context,'hour':23})
-            checks=['facts','historical','synthetic']
-            aigc.update(d['id'],{'action':'approve','context':context,'checks':checks})
-            with self.assertRaisesRegex(ValueError,'安静时段'):aigc.update(d['id'],{'action':'simulate','context':context})
-            aigc.update(d['id'],{'action':'edit','hour':10,'opted_out':True})
-            aigc.update(d['id'],{'action':'approve','context':context,'checks':checks})
-            with self.assertRaisesRegex(ValueError,'退订'):aigc.update(d['id'],{'action':'simulate','context':context})
 
 
 if __name__=='__main__':

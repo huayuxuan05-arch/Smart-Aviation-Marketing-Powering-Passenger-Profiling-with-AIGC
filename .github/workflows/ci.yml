@@ -1,4 +1,4 @@
-name: Framework and public data checks
+name: Demo source and package checks
 on:
   push:
   pull_request:
@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate framework and links
+      - name: Validate five layers, source and links
         run: python3 scripts/validate_framework.py
-      - name: Validate public data
-        run: python3 scripts/validate_public_data.py
+      - name: Validate original dataset and model manifests
+        run: python3 scripts/validate_dataset.py
       - name: Check portable package verification and restore
         run: python3 -m unittest discover -s 航旅智策应用 -p test_distribution.py -v
