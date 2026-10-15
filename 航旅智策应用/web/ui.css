@@ -2,7 +2,6 @@
 body,body.wd-template{font-family:var(--wd-font);font-size:15px;line-height:1.7;letter-spacing:normal;word-spacing:normal}
 button,input,select,textarea,pre,code,svg text{font-family:inherit}
 body.wd-template :is(h1,h2,h3,h4,p,li,td,th,button,input,select,textarea,label,summary,nav a,small,time,.badge,.metric strong,.selection-stages strong,.workflow-no,.nav-label,.brand){letter-spacing:normal;word-spacing:normal}
-.marketing-page #sidebar nav a.active,.marketing-page #sidebar nav a.active:hover{background:#e1f0e9;color:#153d45;box-shadow:none}.marketing-page #sidebar nav a.active>span{color:#23685b}.marketing-page #sidebar nav a:not(.active):hover{background:#ffffff12;color:#fff}
 body.wd-template :is(.personal-heading,.page-head) h1{font-size:clamp(26px,2.2vw,32px);line-height:1.35}
 body.wd-template :is(.card>h2,.section-head h2,.assistant-heading h2,.personal-disclosure>summary>h2){font-size:22px;line-height:1.4}
 body.wd-template :is(.card>h3,.section-head h3,.row>h3,.assistant-card h3,.personal-disclosure>summary>h3){font-size:18px;line-height:1.5}
@@ -19,23 +18,13 @@ body.wd-template :is(.portal-nav,.personal-header nav,#sidebar nav) a{font-size:
 body.wd-template .brand small{font-size:11px;line-height:1.4;letter-spacing:.04em}
 body.wd-template :is(.personal-history,.assistant-controls,.assistant-confirmation) button{font-size:14px}
 body.wd-template .personal-delete-confirm{font-size:14px}
-.portal-page>header{max-width:1160px;padding:22px 32px}
-.portal-page main.wd-split{max-width:1160px;padding:8px 32px 24px}
-.portal-page .intro.wd-story{min-height:340px;padding:36px 44px 72px}
-.portal-page .intro h1{font-size:clamp(38px,4vw,56px)}
-.portal-page .portal-choices{max-width:860px;margin:-42px auto 0}
-.portal-page .entry-grid{gap:18px}
-.portal-page .entry-card,.portal-page .entry-card.personal{min-height:0;padding:24px;gap:0}
-.portal-page .entry-card:hover{transform:none;border-color:#e1eae5;box-shadow:0 12px 26px #123e4210}
-.portal-page .entry-card:focus-within{border-color:#8eb5a2}
-.portal-page .entry-top{right:24px;top:24px}
-.portal-page .entry-card h2{font-size:24px;margin:0 0 6px}
-.portal-page .entry-card p,.portal-page .personal p{margin:0;line-height:1.6}
-.portal-page .entry-action,.portal-page .personal .entry-action{display:inline-flex;align-items:center;justify-content:center;width:auto;min-height:42px;padding:10px 15px;gap:16px;margin-top:18px;border:1px solid transparent;border-radius:8px}
-.portal-page .staff .entry-action{border-color:#bfd6c8}
-.portal-page .entry-action:hover{background:#115d58;color:#fff}
-.portal-page .entry-action:focus-visible{outline:3px solid #77a78f;outline-offset:4px}
-.portal-page>footer{max-width:1096px;width:calc(100% - 64px);padding:16px 0 20px}
+.personal-page details>summary{display:flex;align-items:center;gap:12px;min-height:44px;list-style:none;cursor:pointer}
+.personal-page details>summary::-webkit-details-marker{display:none}
+.personal-page details>summary::marker{content:""}
+.personal-page details>summary::after{content:"";display:block;flex:0 0 32px;width:32px;height:32px;margin-left:auto;border:1px solid #cbd9c7;border-radius:50%;background:#f5f8ef url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232d6350' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 5 7 7-7 7'/%3E%3C/svg%3E") center/15px 15px no-repeat;transform:rotate(0);transition:transform .18s ease,background-color .18s ease,border-color .18s ease}
+.personal-page details[open]>summary::after{transform:rotate(90deg);background-color:#e0eee6;border-color:#b3cfbf}
+.personal-page details>summary:hover::after{background-color:#d9eadf;border-color:#93b9a5}
+.personal-page details>summary:focus-visible{outline:2px solid #78a695;outline-offset:5px;border-radius:5px}
 @media(max-width:780px){
  body.wd-template :is(.card>h2,.section-head h2,.assistant-heading h2,.personal-disclosure>summary>h2){font-size:20px}
  body.wd-template :is(.card>h3,.section-head h3,.row>h3,.assistant-card h3,.personal-disclosure>summary>h3){font-size:17px}
@@ -43,16 +32,4 @@ body.wd-template .personal-delete-confirm{font-size:14px}
  body.wd-template :is(.field input,.field select,.field textarea,.assistant-card textarea,.current-flight-controls select){font-size:16px}
  body.wd-template .brand small{font-size:10px}
 }
-@media(max-width:650px){
- .portal-page>header{padding:18px}
- .portal-page main.wd-split{padding:6px 18px 18px}
- .portal-page .intro.wd-story{min-height:230px;padding:28px 26px 54px}
- .portal-page .intro h1{font-size:36px}
- .portal-page .portal-choices{margin:-28px 12px 0}
- .portal-page .entry-grid{grid-template-columns:1fr;gap:12px}
- .portal-page .entry-card,.portal-page .entry-card.personal{padding:20px}
- .portal-page .entry-top{right:20px;top:20px}
- .portal-page .entry-card h2{font-size:22px}
- .portal-page .entry-action,.portal-page .personal .entry-action{margin-top:14px}
- .portal-page>footer{width:calc(100% - 60px);margin:0 auto;padding:14px 0 18px}
-}
+@media(prefers-reduced-motion:reduce){.personal-page details>summary::after{transition:none}}
