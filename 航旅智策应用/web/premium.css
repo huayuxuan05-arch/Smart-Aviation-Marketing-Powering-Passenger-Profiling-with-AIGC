@@ -177,7 +177,7 @@ body.wd-template {
 /* Marketing: an ink rail, warm canvas and varied information surfaces. */
 .marketing-page.wd-template{--marketing-surface:#f8faf4eb;position:relative;isolation:isolate;background:#e2e8df}
 .marketing-page.wd-template::before{content:"";position:fixed;z-index:-1;inset:0;background:linear-gradient(90deg,#e2e8dfb3 0%,#e2e8df8c 60%,#e2e8df80 100%),linear-gradient(0deg,#e2e8df66 0%,#e2e8df00 75%),url('/assets/marketing-airport-background.png') right center / cover;filter:blur(3px);pointer-events:none}
-.marketing-page #sidebar{width:232px;background:#102f40f5;border-right:0}
+.marketing-page #sidebar{width:232px;background:linear-gradient(100deg,#173746fa 0%,#284954f5 100%);border-right:0;border-radius:0 20px 20px 0;box-shadow:10px 0 26px #18374626}
 .marketing-page .card{background:var(--marketing-surface)}
 .marketing-page .empty,.marketing-page #app>.table-tools,.marketing-page #audience-table{background:var(--marketing-surface);border:0;border-radius:var(--wd-radius)}
 .marketing-page #app>.table-tools{padding:18px}
@@ -198,7 +198,7 @@ body.wd-template {
 .marketing-page .sidebar-bottom{padding-inline:25px}
 .marketing-page .sidebar-bottom :is(button,a){color:#bad0c7}
 .marketing-page .sidebar-bottom>button{border-color:#ffffff26}
-.marketing-page .topbar{min-height:80px;height:auto;padding:16px 32px;flex-wrap:wrap;background:#fcfcf7f2;border-bottom-color:#d9e0d4}
+.marketing-page .topbar{min-height:80px;height:auto;padding:16px 32px;flex-wrap:wrap;background:linear-gradient(110deg,#dbe5dfed 0%,#f5f7efed 60%,#eef3ebed 100%);border-bottom:0;border-radius:0 0 20px 20px;box-shadow:0 8px 24px #244b501a}
 .marketing-page .top-actions{gap:12px;flex-wrap:wrap;justify-content:flex-end}
 .marketing-page .breadcrumb{color:#526b73}
 .marketing-page .breadcrumb strong{color:#244b50}
@@ -264,7 +264,7 @@ body.wd-template {
  .marketing-page :is(main,.topbar){padding-inline:24px}
 }
 @media(max-width:1100px){
- .marketing-page #sidebar{position:relative;inset:auto;width:100%;height:auto;padding:0 24px}
+ .marketing-page #sidebar{position:relative;inset:auto;width:100%;height:auto;padding:0 24px;background:linear-gradient(180deg,#173746fa 0%,#284954f5 100%);border-radius:0 0 20px 20px;box-shadow:0 7px 18px #18374626}
  .marketing-page .main-shell{margin-left:0}
  .marketing-page #sidebar .brand{padding:18px 0 13px}
  .marketing-page #sidebar .brand>span:last-child{display:block}
