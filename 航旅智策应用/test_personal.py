@@ -46,6 +46,33 @@ class PersonalTests(unittest.TestCase):
         self.assertEqual(app.state(self.other)['revision'],0);self.assertEqual(app.state(self.other)['plans'],[])
         with self.assertRaisesRegex(ValueError,'不属于'):app.get_plan(self.other,plan['id'])
         self.assertEqual(app.get_plan(self.owner,plan['id'])['destination'],'杭州')
+    def test_deletion_requires_confirmation_and_session_ownership(self):
+        plan=self.create()['plan']
+        for owner,body in [(self.owner,{}),(self.owner,{'confirmed':False}),(self.other,{'confirmed':True})]:
+            with self.subTest(owner=owner,body=body):
+                with self.assertRaises(ValueError):app.delete_plan(owner,plan['id'],body)
+                self.assertEqual(app.get_plan(self.owner,plan['id']),plan)
+    def test_delete_one_plan_preserves_other_plans_preferences_and_versions(self):
+        first=self.create()['plan'];second=self.create(destination='西安')['plan'];other=self.create(self.other)['plan']
+        before=app.state(self.owner)
+        after=app.delete_plan(self.owner,second['id'],{'confirmed':True})
+        self.assertEqual([p['id'] for p in after['plans']],[first['id']])
+        self.assertEqual(after['latest_plan']['id'],first['id'])
+        for key in ('preferences','revision','profile_history'):self.assertEqual(after[key],before[key])
+        self.assertEqual(app.get_plan(self.other,other['id']),other)
+        with self.assertRaises(ValueError):app.get_plan(self.owner,second['id'])
+        with self.assertRaises(ValueError):app.delete_plan(self.owner,second['id'],{'confirmed':True})
+        empty=app.delete_plan(self.owner,first['id'],{'confirmed':True})
+        self.assertEqual(empty['plans'],[]);self.assertIsNone(empty['latest_plan'])
+        self.assertEqual(empty['preferences'],before['preferences'])
+    def test_inflight_ai_cannot_return_a_deleted_plan_as_saved(self):
+        plan=self.create()['plan']
+        def delete_during_inference(_):
+            app.delete_plan(self.owner,plan['id'],{'confirmed':True})
+            return {'summary':'已删除方案的延迟输出'}
+        with patch.object(gen,'explain_trip',side_effect=delete_during_inference):
+            with self.assertRaisesRegex(ValueError,'已删除'):app.explain(self.owner,plan['id'])
+        self.assertEqual(app.state(self.owner)['plans'],[])
     def test_preference_snapshots_do_not_rewrite_old_plans(self):
         first=self.create()['plan'];second=self.create(destination='西安',days=5)['plan']
         state=app.state(self.owner);self.assertEqual(state['revision'],2);self.assertEqual(len(state['profile_history']),2)

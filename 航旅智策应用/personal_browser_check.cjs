@@ -1,0 +1,43 @@
+// Personal deletion and disclosure checks use isolated plans, never user data.
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),{spawn}=require('node:child_process');
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||path.join(process.env.USERPROFILE,'.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright'));
+const out=path.join(__dirname,'runtime/tmp/personal-qa');fs.mkdirSync(out,{recursive:true});let server,servingPid;
+function stop(){if(servingPid){try{process.kill(servingPid);}catch{}servingPid=null;}server?.kill();}process.on('exit',stop);
+(async()=>{
+ const base='http://127.0.0.1:8773';try{await fetch(base+'/api/health');throw Error('QA port is occupied');}catch(e){if(e.message.includes('occupied'))throw e;}
+ server=spawn(path.join(__dirname,'.venv/Scripts/python.exe'),['-u','decision_qa_server.py'],{cwd:__dirname,windowsHide:true,stdio:'ignore',env:{...process.env,PYTHONUTF8:'1',PYTHONDONTWRITEBYTECODE:'1',AEROLENS_QA_PORT:'8773',AEROLENS_GENERATION_MODE:'template'}});
+ for(let i=0;i<90;i++){try{const r=await fetch(base+'/api/health');if(r.ok){servingPid=(await r.json()).process_id;break;}}catch{}if(server.exitCode!==null)throw Error('QA server exited');await new Promise(r=>setTimeout(r,500));}assert.ok(servingPid);
+ const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true}),context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage(),errors=[],checks=[];
+ page.on('pageerror',e=>errors.push(e.message));const pass=s=>{checks.push(s);console.log('PASS '+s);};
+ try{
+  await page.goto(base+'/personal/');await page.locator('[name=origin]').waitFor();
+  const client=await context.newCDPSession(page);await client.send('DOM.enable');await client.send('CSS.enable');const {root}=await client.send('DOM.getDocument');
+  for(const [selector,family] of [['.brand small','Times New Roman'],['h1','Microsoft YaHei']]){const {nodeId}=await client.send('DOM.querySelector',{nodeId:root.nodeId,selector});const fonts=await client.send('CSS.getPlatformFontsForNode',{nodeId});assert.ok(fonts.fonts.some(f=>f.familyName===family),JSON.stringify(fonts));}pass('English uses actual Times New Roman glyphs and Chinese retains Microsoft YaHei');
+  const bootstrap=await (await context.request.get(base+'/api/personal/bootstrap')).json(),plans=[];
+  for(const destination of ['杭州','西安','成都']){const r=await context.request.post(base+'/api/personal/plans',{data:{preferences:{...bootstrap.preferences,origin:'北京',destination,start_date:'2026-11-15',days:4,party:'亲子',trip_budget:4000}}});assert.equal(r.status(),201);plans.push((await r.json()).plan);}
+  await page.reload();await page.locator('[data-personal-action=open-plan]').first().waitFor();assert.equal(await page.locator('[data-personal-action=open-plan]').count(),3);
+  const before=await (await context.request.get(base+'/api/personal/state')).json();
+  assert.ok(await page.locator('details[data-personal-section]').count()>=12);
+  for(const key of ['assistant','preferences','history','profile','flights','trip-budget','trip-ai','day-DAY 2'])assert.equal(await page.locator(`details[data-personal-section="${key}"]>summary`).count(),1);
+  const day=page.locator('details[data-personal-section="day-DAY 2"]');assert.equal(await day.getAttribute('open'),null);await day.locator(':scope>summary').focus();await page.keyboard.press('Enter');assert.equal(await day.evaluate(e=>e.open),true);pass('Main modules and individual days have keyboard-operable disclosure arrows');
+  const flight=page.locator('[data-personal-section=flights]');await flight.locator(':scope>summary').click();await page.waitForFunction(()=>!document.querySelector('[data-personal-section=flights]').open);await page.evaluate(()=>renderPersonal());assert.equal(await flight.evaluate(e=>e.open),false);await page.reload();await page.locator('[data-trip-detail]').waitFor();assert.equal(await flight.evaluate(e=>e.open),false);pass('Folded sections keep their state through redraws and refresh');
+  assert.equal(await page.locator('.assistant-intro,.personal-small,.card-sub,.trip-basis,.assistant-prompt,.personal-reference').count(),0);
+  for(const text of ['解析与预览不会修改已保存的偏好','描述想法，核对调整','旅行想法或修改意见','原始训练数据保留在离线数据层'])assert.ok(!(await page.locator('body').innerText()).includes(text));pass('Personal page contains none of the removed explanatory captions');
+  await page.locator(`[data-personal-action=delete-plan][data-id="${plans[0].id}"]`).click();await page.locator('[data-personal-action=cancel-delete-plan]').click();assert.equal((await (await context.request.get(base+'/api/personal/state')).json()).plans.length,3);pass('Canceling deletion leaves all saved plans intact');
+  const other=await browser.newContext();await other.request.get(base+'/api/personal/bootstrap');assert.equal((await other.request.post(base+'/api/personal/plans/'+plans[0].id+'/delete',{data:{confirmed:true}})).status(),400);await other.close();pass('Another browser session cannot delete these plans');
+  await page.screenshot({path:path.join(out,'personal-desktop.png'),fullPage:true});await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.screenshot({path:path.join(out,'personal-mobile.png'),fullPage:true});pass('Disclosure controls and plan deletion fit mobile');
+  for(const [index,remaining] of [[0,2],[2,1],[1,0]]){
+   await page.locator(`[data-personal-action=delete-plan][data-id="${plans[index].id}"]`).click();await page.locator('[data-personal-action=confirm-delete-plan]').click();await page.waitForFunction(n=>document.querySelectorAll('[data-personal-action=open-plan]').length===n,remaining);
+   const state=await (await context.request.get(base+'/api/personal/state')).json();assert.equal(state.plans.length,remaining);assert.deepEqual(state.preferences,before.preferences);assert.equal(state.revision,before.revision);assert.deepEqual(state.profile_history,before.profile_history);assert.equal((await context.request.get(base+'/api/personal/plans/'+plans[index].id)).status(),400);
+   if(remaining)assert.equal(await page.evaluate(()=>tripPlan.id),plans[remaining===2?2:1].id);
+  }
+  assert.equal(await page.locator('[data-trip-detail]').count(),0);assert.match(await page.locator('#personal-result').innerText(),/暂无方案/);await page.reload();await page.locator('[name=origin]').waitFor();assert.equal(await page.locator('[data-personal-action=open-plan]').count(),0);assert.equal(await page.locator('[data-trip-detail]').count(),0);pass('Deleting inactive, current and final plans updates the display and preserves every preference version');
+  await page.setViewportSize({width:1440,height:1000});await page.goto(base+'/');assert.equal(await page.locator('.portal-story-note,.entry-footnote').count(),0);assert.ok(!(await page.locator('body').innerText()).includes('营销工作台'));
+  const fixture=JSON.parse(fs.readFileSync(path.join(__dirname,'runtime/tmp/decision-qa-8773/fixture.json'),'utf8'));await page.addInitScript(id=>sessionStorage.setItem('aerolens_campaign',id),fixture.campaign);
+  for(const tab of ['trips','overview','insights','audience','routes','creative','delivery','evaluation']){
+   await page.goto(base+'/marketing/#'+tab);await page.locator('.page-head').waitFor({timeout:60000});if(tab==='trips')await page.locator('[data-trip-detail]').waitFor();
+   assert.equal(await page.locator('#app .card-sub,#app .metric-foot,#app .trip-basis').count(),0);assert.ok(!(await page.locator('body').innerText()).includes('本页面不宣称'));await page.screenshot({path:path.join(out,`marketing-${tab}.png`)});
+  }
+  pass('Portal and all eight staff pages use the same concise caption rules');assert.deepEqual(errors,[]);pass('No browser JavaScript errors');fs.writeFileSync(path.join(out,'checks.json'),JSON.stringify({passed:checks.length,checks},null,2));
+ }finally{await browser.close();stop();}
+})().catch(e=>{console.error(e);process.exitCode=1;stop();});

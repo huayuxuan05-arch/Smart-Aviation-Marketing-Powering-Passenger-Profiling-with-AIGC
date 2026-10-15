@@ -153,6 +153,7 @@ class Handler(BaseHTTPRequestHandler):
                         if parts[3]=='confirm':return self.send_json(assistant.confirm(c,owner,parts[2],body))
                         if parts[3]=='cancel':return self.send_json(assistant.cancel(owner,parts[2],body))
                     if len(parts)==3 and parts[0]=='plans' and parts[2]=='explain':return self.send_json(personal.explain(owner,parts[1]))
+                    if len(parts)==3 and parts[0]=='plans' and parts[2]=='delete':return self.send_json(personal.delete_plan(owner,parts[1],body))
                 return self.send_json({'error':'接口不存在'},404)
             if path.startswith('/api/mkt/'):
                 tail = path.removeprefix('/api/mkt/')

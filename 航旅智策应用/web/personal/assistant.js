@@ -1,7 +1,6 @@
 'use strict';
 let assistantDraft=null;
 function initAssistant(){
- $('#assistant-mode').textContent=personalMeta.generation.model_enabled?'本地模型 · 建议需确认':'本地规则解析 · 大模型未接入';
  $('#assistant-parse').disabled=false;
 }
 function assistantValue(value){return value===null||value===undefined||value===''?'尚未确定':Array.isArray(value)?value.join('、')||'未选择':String(value);}
@@ -15,6 +14,7 @@ function renderAssistant(){
  ${d.error?`<p class="assistant-error">${esc(d.error)}；请修改描述后重新解析。</p>`:''}
  ${c.after?`<h3>程序核验后的方案预览</h3><div class="assistant-comparison">${metrics('调整前',c.before)}${metrics('本次草稿',c.after)}</div>${c.estimated_delta!==null?`<p class="assistant-note">情景总额${c.estimated_delta===0?'未变化':c.estimated_delta>0?'增加 ¥'+fmt(c.estimated_delta):'减少 ¥'+fmt(-c.estimated_delta)}。这是同一规划工具的估算比较，不是实际节省证明。</p>`:''}<ul class="assistant-checks">${c.after.checks.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
  <p class="assistant-note">${esc(d.basis)}</p><div class="assistant-confirmation">${d.can_confirm?`<label><input type="checkbox" id="assistant-consent"> 我已核对调整、沿用或默认条件；金额按每名成人口径。</label><button class="primary" type="button" id="assistant-confirm" disabled>${d.preview?'确认调整并保存新方案':'确认并保存出游意向'}</button>`:''}<button class="secondary" type="button" id="assistant-cancel">放弃草稿</button></div>`;
+ compactPersonalNotes();
 }
 async function assistantRun(action){
  if(personalWorking)return;personalWorking=true;renderPersonal();$('#assistant-error').textContent='';

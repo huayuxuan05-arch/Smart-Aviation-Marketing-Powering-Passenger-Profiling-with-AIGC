@@ -198,6 +198,15 @@ def get_plan(owner,plan_id):
     return json.loads(row[0])
 
 
+def delete_plan(owner,plan_id,body):
+    if body.get('confirmed') is not True:raise ValueError('请确认删除此旅行方案')
+    with db() as c:
+        deleted=c.execute('DELETE FROM personal_plans WHERE id=? AND owner=?',(plan_id,owner))
+        if deleted.rowcount!=1:raise ValueError('方案不存在或不属于当前浏览器')
+        c.commit()
+    return state(owner)
+
+
 def apply_flight_quote(owner,body):
     import flight_quotes
     if body.get('confirmed') is not True:raise ValueError('请确认报价与预算后保存')
@@ -217,7 +226,9 @@ def explain(owner,plan_id):
     import local_generation
     plan=get_plan(owner,plan_id);plan['ai_explanation']=local_generation.explain_trip(plan)
     with db() as c:
-        c.execute('UPDATE personal_plans SET payload=? WHERE id=? AND owner=?',(json.dumps(plan,ensure_ascii=False),plan_id,owner));c.commit()
+        updated=c.execute('UPDATE personal_plans SET payload=? WHERE id=? AND owner=?',(json.dumps(plan,ensure_ascii=False),plan_id,owner))
+        if updated.rowcount!=1:raise ValueError('方案已删除，请刷新后重试')
+        c.commit()
     return plan
 
 

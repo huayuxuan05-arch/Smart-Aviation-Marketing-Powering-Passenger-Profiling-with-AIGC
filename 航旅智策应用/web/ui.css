@@ -1,0 +1,27 @@
+:root{--wd-font:"Times New Roman","Microsoft YaHei","PingFang SC",serif}
+body,body.wd-template{font-family:var(--wd-font);font-size:15px;line-height:1.7}
+button,input,select,textarea,pre,code,svg text{font-family:inherit}
+.marketing-page #sidebar nav a.active,.marketing-page #sidebar nav a.active:hover{background:#e1f0e9;color:#153d45;box-shadow:none}.marketing-page #sidebar nav a.active>span{color:#23685b}.marketing-page #sidebar nav a:not(.active):hover{background:#ffffff12;color:#fff}
+body.wd-template :is(.personal-heading,.page-head) h1{font-size:clamp(26px,2.2vw,32px);line-height:1.35}
+body.wd-template :is(.card>h2,.section-head h2,.assistant-heading h2,.personal-disclosure>summary>h2){font-size:22px;line-height:1.4}
+body.wd-template :is(.card>h3,.section-head h3,.row>h3,.assistant-card h3,.personal-disclosure>summary>h3){font-size:18px;line-height:1.5}
+body.wd-template .trip-day-heading h4{font-size:16px;line-height:1.5}
+body.wd-template :is(.field>span,label,.assistant-question span){font-size:14px;line-height:1.6}
+body.wd-template .personal-layout .field>span{font-size:14px;line-height:1.6}
+body.wd-template :is(button,.primary,.secondary,.text-button,.entry-action){font-size:14px;line-height:1.5}
+body.wd-template :is(input,select,textarea){font-size:15px;line-height:1.6}
+body.wd-template :is(.field input,.field select,.field textarea,.assistant-card textarea,.current-flight-controls select){font-size:15px;line-height:1.6}
+body.wd-template :is(p,li,.trip-time-block p){font-size:15px;line-height:1.75}
+body.wd-template :is(table,th,td){font-size:14px;line-height:1.65}
+body.wd-template :is(small,time,.badge,.metric-label,.nav-label,.breadcrumb,.personal-role,.trip-date-line,.workflow-no){font-size:13px;line-height:1.6}
+body.wd-template :is(.portal-nav,.personal-header nav,#sidebar nav) a{font-size:14px;line-height:1.5}
+body.wd-template .brand small{font-size:11px;line-height:1.4;letter-spacing:.1em}
+body.wd-template :is(.personal-history,.assistant-controls,.assistant-confirmation) button{font-size:14px}
+body.wd-template .personal-delete-confirm{font-size:14px}
+@media(max-width:780px){
+ body.wd-template :is(.card>h2,.section-head h2,.assistant-heading h2,.personal-disclosure>summary>h2){font-size:20px}
+ body.wd-template :is(.card>h3,.section-head h3,.row>h3,.assistant-card h3,.personal-disclosure>summary>h3){font-size:17px}
+ body.wd-template :is(input,select,textarea){font-size:16px}
+ body.wd-template :is(.field input,.field select,.field textarea,.assistant-card textarea,.current-flight-controls select){font-size:16px}
+ body.wd-template .brand small{font-size:10px}
+}
