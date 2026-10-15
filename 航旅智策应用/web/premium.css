@@ -20,6 +20,9 @@ body.wd-template {
 .wd-template :is(.primary,.secondary):disabled{opacity:.6;transform:none}
 .wd-template .text-button{color:#176b60}
 .wd-template .quiet-button{color:#405d69}
+.wd-template a.home-exit{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 14px;border:1px solid #c7d5cb;border-radius:8px;background:#f6f8f1;color:#183746;white-space:nowrap;font-size:14px;line-height:1.5}
+.wd-template a.home-exit:hover{background:#e1ebe1;border-color:#9fb7a6;color:#183746}
+.wd-template a.home-exit:focus-visible{outline:3px solid var(--wd-accent);outline-offset:3px}
 .wd-template .card{background:#fff;border:0;border-radius:14px;box-shadow:var(--wd-shadow)}
 .wd-template :is(.card h3,.section-head h2){color:#234753}
 .wd-template .field>span{color:#49636c}
@@ -190,7 +193,8 @@ body.wd-template {
 .marketing-page .sidebar-bottom{padding-inline:25px}
 .marketing-page .sidebar-bottom :is(button,a){color:#bad0c7}
 .marketing-page .sidebar-bottom>button{border-color:#ffffff26}
-.marketing-page .topbar{min-height:80px;padding-inline:32px;background:#fcfcf7;border-bottom-color:#d9e0d4}
+.marketing-page .topbar{min-height:80px;height:auto;padding:16px 32px;flex-wrap:wrap;background:#fcfcf7;border-bottom-color:#d9e0d4}
+.marketing-page .top-actions{gap:12px;flex-wrap:wrap;justify-content:flex-end}
 .marketing-page .breadcrumb{color:#526b73}
 .marketing-page .breadcrumb strong{color:#244b50}
 .marketing-page .operator{color:#375e45;background:#e1eadb}
