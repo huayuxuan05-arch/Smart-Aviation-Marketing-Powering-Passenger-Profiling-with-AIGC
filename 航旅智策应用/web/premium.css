@@ -204,10 +204,6 @@ body.wd-template {
 .marketing-page .hero h2{color:#f7f6eb;font-size:34px;font-weight:600}
 .marketing-page .hero .primary{color:#163f36;background:#c2e3cd;margin-top:24px}
 .marketing-page .hero .primary:hover{background:#d9efde}
-.marketing-page .hero-graphic{background:none}
-.marketing-page .hero-graphic svg{display:none}
-.marketing-page .hero-graphic .floating-tag{color:#f7f6eb;background:#143a44ee;border:0;box-shadow:none;border-radius:6px}
-.marketing-page .floating-tag strong{color:#f7f6eb;white-space:nowrap;font-size:22px}
 .marketing-page .overview-aside{background:#e4e9dc;border:0;border-radius:12px;padding:26px}
 .marketing-page .overview-aside h3{color:#284b40}
 .marketing-page .overview-aside .number-circle{display:none}
@@ -222,13 +218,20 @@ body.wd-template {
 .marketing-page .selection-stages>div:first-child{padding-left:0}
 .marketing-page .selection-stages>div:last-child{border-right:0}
 .marketing-page .selection-stages strong{color:#2c6d58}
-.marketing-page .workflow{background:transparent;border:0;padding:0;gap:12px;box-shadow:none}
-.marketing-page .workflow-card{padding:19px 16px;background:#e4e9dd;border:0;border-radius:8px}
-.marketing-page .workflow-card::after{color:#6f9079}
-.marketing-page .workflow-card.current{background:#cde3cc}
-.marketing-page .workflow-title{color:#31584c}
-.marketing-page .workflow-no{color:#496751}
-.marketing-page .workflow-card button{color:#225f4d}
+.marketing-page .workflow{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;list-style:none;margin:0;padding:28px 16px;background:#fff;border:0;border-radius:14px;box-shadow:var(--wd-shadow)}
+.marketing-page .workflow::before{content:"";position:absolute;top:51px;left:10%;right:10%;height:2px;background:#c8d9c7;pointer-events:none}
+.marketing-page .workflow-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:12px;min-width:0;min-height:0;padding:0 8px;background:none;border:0;border-radius:0}
+.marketing-page .workflow-card::after{content:none;display:none}
+.marketing-page .workflow-card.current{background:none;border:0}
+.marketing-page .workflow .workflow-no{position:relative;display:grid;place-items:center;flex:none;width:46px;height:46px;border:1px solid #b4c9b2;border-radius:50%;background:#eff4eb;color:#31584c;font-size:20px;font-weight:600;line-height:1}
+.marketing-page .workflow .workflow-title{margin:0;color:#244b50;font-size:18px;font-weight:600;line-height:1.5;white-space:nowrap}
+.marketing-page .workflow .workflow-card button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;margin:0;padding:9px 12px;border-radius:7px;background:none;color:#225f4d;font-size:16px;line-height:1.5;white-space:nowrap}
+.marketing-page .workflow .workflow-card button svg{width:16px;height:16px;flex:none}
+.marketing-page .workflow .workflow-card button:hover{background:#edf4e8;color:#164735}
+.marketing-page .workflow .current .workflow-no{background:#176b60;border-color:#176b60;color:#fff}
+.marketing-page .workflow .current .workflow-title{color:#105247}
+.marketing-page .workflow .current button{background:#e3eedf;color:#164735}
+.marketing-page .workflow .current button:hover{background:#d3e5cc}
 .marketing-page .hotspot{background:#eef2e7;border:0;border-radius:7px;color:#2d6353}
 .marketing-page .hotspot span{color:#526b5d}
 .marketing-page .hotspot:hover{background:#dce9d8}
@@ -253,7 +256,6 @@ body.wd-template {
  .marketing-page :is(main,.topbar){padding-inline:24px}
 }
 @media(max-width:1100px){
- .marketing-page .floating-tag strong{font-size:18px}
  .marketing-page #sidebar{position:relative;inset:auto;width:100%;height:auto;padding:0 24px}
  .marketing-page .main-shell{margin-left:0}
  .marketing-page #sidebar .brand{padding:18px 0 13px}
@@ -313,15 +315,24 @@ body.wd-template {
  .marketing-page .topbar{padding:14px 18px}.marketing-page main{padding:23px 18px 30px}
  .marketing-page .overview-grid{grid-template-columns:minmax(0,1fr);gap:18px}
  .marketing-page .hero{min-height:220px;padding:26px}.marketing-page .hero h2{font-size:28px}
- .marketing-page .hero-graphic{display:none}.marketing-page .overview-aside{padding:22px}
+ .marketing-page .overview-aside{padding:22px}
  .marketing-page .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:0}
  .marketing-page .metric{padding:20px 18px}.marketing-page .metric:nth-child(2n){border-right:0}
  .marketing-page .metric:last-child:nth-child(odd){grid-column:1/-1;border-top:1px solid #d3dccd}
  .marketing-page .metric strong{font-size:30px}
- .marketing-page .workflow{gap:8px}.marketing-page .workflow-card{padding:16px}
+ .marketing-page .workflow{grid-template-columns:minmax(0,1fr);padding:12px 16px;gap:0}
+ .marketing-page .workflow::before{top:52px;bottom:52px;left:39px;right:auto;width:2px;height:auto}
+ .marketing-page .workflow-card{display:grid;grid-template-columns:46px minmax(0,1fr) auto;align-items:center;gap:12px;min-height:80px;padding:12px 0}
+ .marketing-page .workflow .workflow-no{grid-column:1;grid-row:1}
+ .marketing-page .workflow .workflow-title{grid-column:2;grid-row:1}
+ .marketing-page .workflow .workflow-card button{grid-column:3;grid-row:1;padding-inline:8px}
  .marketing-page .selection-stages>div{padding:10px}
  .wd-template .profile-head{margin:-24px -20px 23px;padding:28px 55px 23px 22px}
  .wd-template .profile-head h2{font-size:21px}.wd-template .profile-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:380px){
+ .marketing-page .workflow{padding-inline:12px}
+ .marketing-page .workflow::before{left:35px}
 }
 @media(prefers-reduced-motion:no-preference){
   .portal-page .travel-hero-image{animation:travel-arrival .7s cubic-bezier(.16,1,.3,1) both}
