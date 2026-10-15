@@ -18,10 +18,10 @@ const assert=require('node:assert/strict'),{execFileSync}=require('node:child_pr
    const response=await context.request.post(base+`campaigns/${cid}/creatives`,{data:{user_id:user.user_id},timeout:150000});
    assert.equal(response.status(),201);materials.push(await response.json());
   }
-  await page.goto((taskBaseUrl+'/'),{waitUntil:'networkidle'});
+  await page.goto((taskBaseUrl+'/marketing/#overview'),{waitUntil:'networkidle'});
   await page.locator('[data-action=campaign-list]').click();
   await page.locator(`[data-campaign-id="${cid}"] [data-action=load-campaign]`).click();
-  await page.waitForFunction(()=>document.querySelector('#context-name').textContent==='素材删除专项验收');
+  await page.waitForFunction(()=>document.querySelector('#active-campaign').textContent.startsWith('素材删除专项验收'));
   await page.goto((taskBaseUrl+'/#creative'),{waitUntil:'networkidle'});
   await page.locator(`[data-action=choose-creative][data-id="${materials[0].id}"]`).click();
   await page.locator('[data-action=delete-creative]').click();
@@ -31,7 +31,7 @@ const assert=require('node:assert/strict'),{execFileSync}=require('node:child_pr
   await page.locator('[data-action=confirm-delete-creative]').click();
   await page.locator(`[data-action=choose-creative][data-id="${materials[0].id}"]`).waitFor({state:'detached'});
   await page.locator(`[data-action=choose-creative][data-id="${materials[1].id}"]`).waitFor();
-  assert.equal(await page.locator('#context-name').innerText(),'素材删除专项验收');
+  assert.equal((await page.locator('#active-campaign').innerText()).split(' · ')[0],'素材删除专项验收');
   const denied=await context.request.post(base+`campaigns/${cid}/creatives/${materials[0].id}`,{data:{action:'approve',checks:['facts','historical','synthetic']}});
   assert.equal(denied.status(),400);pass('Deletion removes only the selected material and prevents later approval');
   await page.reload({waitUntil:'networkidle'});

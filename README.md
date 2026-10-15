@@ -1,66 +1,66 @@
-# 航旅智策——节假日航空智慧营销决策系统
+# 华翼朝阳 · 个性化旅游定制
 
-面向航空营销人员的本地交互 Demo，基于 10,000 名模拟旅客和 2024 年历史航班，实现“需求识别—旅客分群—内容生成—渠道触达—效果评估”的操作闭环。
+航旅智策——节假日航空智慧营销决策系统的当前实现，保留数据、算法、AIGC、应用、评估五层。
 
-## 换电脑运行
+<img src="航旅智策应用/web/assets/huayi-chaoyang-logo.png" alt="华翼朝阳" width="76">
 
-1. 下载本仓库并解压至 D 盘，安装 Python 3.11 或以上。
-2. 双击根目录的“准备并启动Demo.cmd”。
-3. 等待自动下载、校验及恢复数据和模型，浏览器打开 http://127.0.0.1:8765/ 。
+## 两个使用入口
 
-[完整发布包](https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/tag/demo-2026-10-12) 包含三份原始 Excel、已训练需求模型和 Qwen3.5-9B 量化权重，无需重新训练。项目虚拟环境、模型、下载缓存和临时文件都在项目盘内。
-
-完整文案生成使用 Windows x64、NVIDIA 驱动及 llama.cpp CUDA 运行时。暂不使用语言模型时，在应用目录运行：
-
-    ./Prepare-Demo.ps1 -DataOnly
-
-GitHub 分发源码及发布文件，Python 网站和语言模型在本机运行。后续启动、停止分别双击应用目录中的“启动本地测试版.cmd”和“停止本地测试版.cmd”。
-
-## 使用流程
-
-1. 在活动总览查看热点，新建营销活动；在需求洞察调整假期、区域、目的地和客群。
-2. 在潜客与画像中查看证据、兴趣变化和预算，选择旅客并冻结名单。
-3. 在航线与策略中检查出发城市、历史日期、价格、渠道和触达时段。
-4. 在创意工坊调用本地 Qwen 生成文案和 SVG 海报，编辑并完成三项人工审核。
-5. 在渠道触达执行本地模拟；在效果复盘查看未来七天的关注、机票查询及收藏代理结果。
-
-“我的活动”支持删除、恢复；创意工坊支持删除待审核素材。完整操作见[应用说明](航旅智策应用/README.md)。
-
-## 五层实现
-
-| 层 | 当前能力 | 说明 |
+| 入口 | 地址 | 当前功能 |
 | --- | --- | --- |
-| 数据层 | 三份原始 Excel 流式导入、来源校验、SQLite 索引 | [数据层](docs/data-contracts.md) |
-| 算法层 | 23 项特征、需求模型、五类聚类、航线约束、渠道时机预测 | [算法层](docs/algorithms.md) |
-| AIGC层 | Qwen3.5-9B 本地生成、事实槽位、SVG 合成、人工审核 | [AIGC层](docs/aigc.md) |
-| 应用层 | 七页营销流程、活动与素材持久化、频控、模拟触达 | [应用层](docs/application.md) |
-| 评估层 | 时间切分、固定测试、基线比较、后续行为及历史漏斗 | [评估层](docs/evaluation.md) |
+| 个人旅客 | `/personal/` | 保存出游意向与个人偏好，生成、保存、导出自己的旅行方案 |
+| 营销人员 | `/marketing/#trips` | 旅行方案、活动总览、需求洞察、画像、航线、创意、模拟触达、复盘 |
 
-总体关系见[五层架构](docs/architecture.md)，训练及验收证据见[实验记录](experiments/results/local-demo-2026-10-12/README.md)。
+首页 `/` 选择入口。个人端以本次主动填写为依据，按独立浏览器会话保存偏好版本与历史方案。日期、天数、预算未确定时可仅保存意向；确定出游后支持2至8天、具体景点、住宿侧重、日期弹性、备选许可和超预算处理。
 
-## 数据与效果边界
+营销端服务全部10,000名模拟旅客，旅行规划不受营销名单限额或退订状态删减。逐人提供去返历史航线参考、逐日活动、住宿条件、预算、备选与核验清单；默认国庆历史场景中10,000人均有规划及往返参考，569人有目标日历史直飞。历史参考不等于当前可售机票。
 
-训练覆盖 3,970,000 条模拟日行为，10,000 名旅客、41 个目的地。航班和价格为 2024 年历史记录，旅客行为、营销反馈及订单为模拟数据。模型分数表示后续关注代理，不能解释为真实购票概率、当前库存或实际新增收入。
+界面使用直接功能名称，去除宣传式步骤说明、画像截至和规划范围公共栏。问卷只作后台补充，收集工具与空白问卷保留，不在网站单独设置统计页或导航入口。原始答卷、整理后逐人数据和个人方案不提交仓库。
 
-Qwen 权重来自官方基础模型的 Unsloth GGUF 量化版本，未用旅客数据微调；视觉是 SVG 合成示意，不是扩散图像或景点实拍。没有实时旅游知识库、真实投放或因果业务增益验证。
+## 本地运行
 
-## 检查
+1. 下载或克隆本仓库，解压至D盘，安装Python 3.11或以上。
+2. 双击根目录的“准备并启动Demo.cmd”。
+3. 自动下载、校验并恢复原有数据与模型后，访问 `http://127.0.0.1:8765/`。
 
-    python scripts/validate_framework.py
-    python scripts/validate_dataset.py
-    cd 航旅智策应用
-    python -m unittest test_core test_marketing test_local_generation test_distribution -v
+现有[发布资产](https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/tag/demo-2026-10-12)提供三份模拟/历史原始Excel、需求模型和Qwen3.5-9B量化权重；最新网站源码以本仓库主分支为准。完整本地语言模型推理使用Windows x64与NVIDIA CUDA；仅准备网站数据时，在应用目录运行 `./Prepare-Demo.ps1 -DataOnly`。
 
-GitHub CI 验证源码、五层文档、数据与发布清单及发布包安全测试；全量业务测试需先还原数据和模型。
+后续通过应用目录中的“启动本地测试版.cmd”和“停止本地测试版.cmd”管理服务。网站无需云端模型密钥，不调用收费模型或真实营销平台。详见[应用使用说明](航旅智策应用/README.md)。
 
-## 目录
+## 数据与模型
 
-| 目录 | 用途 |
+- 原模拟行为模型使用3,970,000条过程记录、10,000名旅客、41个目的地，按时间划分训练、验证和冻结测试。
+- 营销候选先满足历史产品条件，再按名单配额选择；同次行程预算、原始航班日期、素材审核、业务资格、退订与跨活动频控分别核验。
+- 本地Qwen解释已有结构化事实，生成可编辑建议、文案及SVG海报；没有用真实答卷微调Qwen权重。
+- 问卷导入与偏好模型独立保存。最新人工整理版模型未超过热门基线，保留为对照；线上采用主动偏好、预算与航线约束，样本热度只作并列参考。
+- 没有真实购票、实时库存、真实渠道授权和因果增益标签，不报告实际收入或转化提升。
+
+真实问卷属于可选私有补充；其他使用者未导入问卷时，网站仍按用户主动选择与既有规则运行。问卷同意研究与复访不等于营销授权。方法和汇总结果见[问卷补充与验证](docs/survey-evidence.md)。
+
+## 验证
+
+```powershell
+python scripts/validate_framework.py
+python scripts/validate_dataset.py
+cd 航旅智策应用
+python -m unittest test_core test_marketing test_decisions test_travel_planner test_personal test_survey_evidence test_local_generation test_distribution -v
+node entry_browser_check.cjs
+node travel_browser_check.cjs
+node decision_browser_check.cjs
+```
+
+先还原数据与模型再执行完整业务检查。三个浏览器脚本顺序执行，各自使用8769隔离服务与临时活动库，需要Chrome及Playwright；脚本支持本机运行时路径，未把无数据CI当作业务验收。
+
+本次同步仓库源码在本机已核验的数据与模型上通过87项后端检查；开发版通过94项。双入口、逐页简化、活动状态、旅行与问卷、执行资格等浏览器验收通过。详情见[本次更新验收](experiments/results/local-demo-2026-10-15/README.md)。
+
+## 五层及目录
+
+| 层 | 说明 |
 | --- | --- |
-| 航旅智策应用/ | 网站源码、启动脚本和测试 |
-| 数据集/ | 原始工作簿还原位置、字段及来源说明 |
-| distribution/ | 发布清单与模型许可 |
-| docs/ | 当前五层实现说明 |
-| experiments/ | 训练、验收和发布校验记录 |
-| scripts/ | 仓库校验、打包和迁移验证工具 |
-| configs/ | 当前场景和五层状态 |
+| 数据层 | [来源、字段与校验](docs/data-contracts.md) |
+| 算法层 | [动态画像与约束推荐](docs/algorithms.md) |
+| AIGC层 | [本地模型、事实及人工审核](docs/aigc.md) |
+| 应用层 | [入口、操作与保存](docs/application.md) |
+| 评估层 | [时间切分、代理标签及边界](docs/evaluation.md) |
+
+`航旅智策应用/`包含网站与启动脚本；`问卷资料/`只包含空白收集工具与字段说明；`distribution/`保存发布清单与许可；`experiments/`保存训练及验收记录；`scripts/`提供仓库与发布校验。`runtime/`、数据库、下载缓存、密钥与真实逐人答卷均留在本机。

@@ -63,7 +63,8 @@ class BusinessTests(unittest.TestCase):
   with patch.object(app,'build_audience',return_value=copy.deepcopy(self.insight)):return app.save_campaign(self.c,{'name':'隔离单元验收'})
  def creative(self,p):
   output={'title':'给假期留一点期待','text':'按自己的节奏安排旅程，先了解航线参考，再决定想去的方向。','palette':'teal','art':'mountain','engine':'隔离测试生成器','risk_flags':[]}
-  with patch.object(gen,'generate',return_value=output):return app.generate_creative(self.c,p['id'],{'user_id':p['audience'][0]['user_id']})
+  representative=next((r for r in p['audience'] if r.get('business_ready')),p['audience'][0])
+  with patch.object(gen,'generate',return_value=output):return app.generate_creative(self.c,p['id'],{'user_id':representative['user_id']})
  def approve(self,p,m):return app.update_creative(p['id'],m['id'],{'action':'approve','checks':['facts','historical','synthetic']})
 
  def test_unsubscribed_users_and_exact_historical_constraints(self):
@@ -73,6 +74,13 @@ class BusinessTests(unittest.TestCase):
    if r['flight']:
     f=r['flight'];self.assertEqual((f['出发日'],f['出发城市'],f['到达城市']),(r['travel_date'],r['usual_departure_city'],r['destination']))
     if r['budget'] is not None:self.assertLessEqual(f['机票票价'],r['budget'])
+
+ def test_product_pool_is_filtered_before_the_campaign_quota(self):
+  self.assertEqual(self.insight['audience_count'],30)
+  self.assertEqual(self.insight['matched_flights'],30)
+  self.assertTrue(self.insight['candidate_coverage']['meets_target'])
+  self.assertGreater(self.insight['selection_funnel']['eligible_before_cap'],30)
+  self.assertGreater(self.insight['selection_funnel']['interest_qualified'],self.insight['selection_funnel']['product_qualified'])
 
  def test_early_holiday_replay_does_not_borrow_future_model(self):
   early=app.trained_snapshot('2024-04-03');self.assertFalse(early['learned'])
@@ -101,7 +109,8 @@ class BusinessTests(unittest.TestCase):
    self.assertTrue(8<=int(d['scheduled_at'][11:13])<22)
   second=self.campaign();self.approve(second,self.creative(second))
   result2=app.launch(self.c,second['id'],{'confirm':True});self.assertEqual(result2['last_launch']['sent'],0)
-  self.assertEqual(len(result2['last_launch']['blocked']),len(result['deliveries']))
+  repeated={r['user_id'] for r in result2['last_launch']['blocked'] if any(x['key']=='frequency' and not x['passed'] for x in r['checks'])}
+  self.assertEqual(repeated,{r['user_id'] for r in result['deliveries']})
 
  def test_delete_restore_preserves_records_and_global_frequency(self):
   p=self.campaign();other=self.campaign();m=self.creative(p);self.approve(p,m)

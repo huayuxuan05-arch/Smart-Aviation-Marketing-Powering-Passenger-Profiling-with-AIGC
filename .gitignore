@@ -23,3 +23,8 @@ node_modules/
 *.exe
 *.dll
 *.zip
+
+# 用户提供的真实逐人问卷仅保留本机，不提交
+/问卷资料/航旅智策问卷_V2_CHOICES30_1000份.xlsx
+/问卷资料/outputs/
+/问卷资料/*1000份*.xlsx

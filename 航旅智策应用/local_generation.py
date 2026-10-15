@@ -1,6 +1,6 @@
 """本地Qwen推理与受限视觉配方；只在本机运行，不调用云端API。"""
 from pathlib import Path
-import subprocess,urllib.request,urllib.error,json,time,threading,re,html,math,socket,os
+import base64,subprocess,urllib.request,urllib.error,json,time,threading,re,html,math,socket,os
 from aigc_config import ROOT,PORT,MODEL_FILE,MODEL_NAME,REVISION,RUNTIME_DIR,ALIAS
 _PROC=None;_LOCK=threading.Lock()
 
@@ -65,10 +65,38 @@ def generate(destination,holiday,theme,tone='轻松亲切',variant=1):
   risks=risk_flags(title+text)
   return {'title':title,'text':text,'palette':parsed['palette'],'art':parsed['art'],'engine':MODEL_NAME+' / 本地GPU生成（CUDA）','generation_seconds':round(time.time()-started,2),'prompt':instruction,'risk_flags':risks,'visual_mode':'语言模型选择配色与抽象主题，本地SVG合成；非扩散文生图，非景点实拍','model_revision':REVISION,'model_alias':result['model'],'thinking':False,'context':8192,'quantizer':'Unsloth','usage':result.get('usage',{}),'timings':result.get('timings',{})}
 
+def explain_trip(plan):
+ """在既有结构化规划上生成可编辑说明，不让模型改写航班、日期或费用。"""
+ with _LOCK:
+  ensure()
+  schema={'type':'object','properties':{'summary':{'type':'string'},'reasons':{'type':'array','items':{'type':'string'},'minItems':2,'maxItems':4},'practical_tips':{'type':'array','items':{'type':'string'},'minItems':3,'maxItems':5}},'required':['summary','reasons','practical_tips'],'additionalProperties':False}
+  facts={k:plan[k] for k in ['origin','destination','days','party','theme','pace','date_basis','personalization','checklist']}
+  facts['activities']=[{'day':x['day'],'activities':[b['activity'] for b in x['blocks']]} for x in plan['daily_itinerary']]
+  if plan.get('preference_constraints'):
+   facts['preference_constraints']=plan['preference_constraints']
+   facts['lodging_conditions']=plan['lodging']
+   facts['priority_rule']='本次明确选择优先；样本城市关注率只作并列参考，不得描述成该旅客个人意愿。日期、目的地、预算及备选调整均须旅客确认。'
+  instruction='根据以下旅行方案，为旅客写中文个性化说明。summary解释旅行节奏和主题，reasons解释为何适合该同行方式和兴趣，practical_tips提供具体可操作的行前准备。只使用给定地点与条件，不修改或增补景点、酒店、航班、时刻、价格、优惠、天气、库存或已预订状态。不得将其他日期的历史航线说成指定日期可售。建议写成待旅客确认的草稿。不要出现保证、已预订、余票充足、最低价这几个词，即使是否定或提醒也不要使用；用建议、可选、需核实表达，不作健康、舒适或出行结果承诺。summary不超过220字，每条理由和建议不超过100字。只输出JSON。\n'+json.dumps(facts,ensure_ascii=False)
+  body={'model':ALIAS,'messages':[{'role':'system','content':'你是旅行规划编辑，只解释已给定的结构化方案，不编造旅行事实。'},{'role':'user','content':instruction}],'max_tokens':1100,'temperature':.3,'top_p':.8,'seed':20261014,'response_format':{'type':'json_schema','json_schema':{'name':'trip_explanation','strict':True,'schema':schema}},'chat_template_kwargs':{'enable_thinking':False},'reasoning_effort':'none','stream':False}
+  started=time.time();result=rpc('/v1/chat/completions',body);choice=result['choices'][0]
+  if result.get('model')!=ALIAS:raise ValueError('推理服务返回了其他模型，已拒绝保存')
+  if choice.get('finish_reason')!='stop':raise ValueError('旅行说明输出未完整结束，请重试')
+  try:parsed=json.loads(choice['message'].get('content') or '')
+  except (ValueError,TypeError) as e:raise ValueError('旅行说明未返回有效JSON') from e
+  if not isinstance(parsed,dict) or set(parsed)!={'summary','reasons','practical_tips'}:raise ValueError('旅行说明字段不完整')
+  if not isinstance(parsed['summary'],str) or not 1<=len(parsed['summary'])<=500:raise ValueError('旅行说明长度异常')
+  for key,minimum,maximum in [('reasons',2,4),('practical_tips',3,5)]:
+   if not isinstance(parsed[key],list) or not minimum<=len(parsed[key])<=maximum or any(not isinstance(v,str) or not 1<=len(v)<=250 for v in parsed[key]):raise ValueError('旅行说明条目异常')
+  combined=parsed['summary']+''.join(parsed['reasons']+parsed['practical_tips'])
+  if any(word in combined for word in ['保证','已预订','余票充足','最低价']):raise ValueError('旅行说明含无依据承诺，请重新生成')
+  return {**parsed,'engine':MODEL_NAME+' / 本地GPU旅行说明','model_alias':ALIAS,'model_revision':REVISION,'generation_seconds':round(time.time()-started,2),'usage':result.get('usage',{}),'prompt':instruction,'status':'待人工核验的可编辑建议'}
+
+
 def poster(creative,row):
+ logo_data=base64.b64encode((Path(__file__).resolve().parent/'web/assets/huayi-chaoyang-logo.png').read_bytes()).decode('ascii')
  e=lambda x:html.escape(str(x),quote=True);palettes={'indigo':('#101c48','#8274e9','#b7abff'),'teal':('#073d43','#29b49a','#b1e8c8'),'sunset':('#4a233e','#e99d73','#f7dfb4')};bg,mid,light=palettes.get(creative.get('palette'),palettes['indigo']);art=creative.get('art','mountain');scene=''
  if art=='mountain':scene=f'<path d="M0 820L160 600L270 710L430 440L600 670L720 530L900 780V1120H0Z" fill="{mid}"/><path d="M0 900L250 710L440 900L660 660L900 900V1200H0Z" fill="{light}" opacity=".55"/>'
  elif art=='coast':scene=f'<path d="M0 720Q230 570 450 720T900 700V1200H0Z" fill="{mid}"/><path d="M0 850Q230 690 450 840T900 820V1200H0Z" fill="{light}" opacity=".65"/><path d="M500 1200Q600 850 900 850V1200Z" fill="#ebd6b0"/>'
  else:scene=f'<g fill="{mid}"><path d="M0 1000V740H95V1000M120 1000V660H230V1000M260 1000V720H360V1000M390 1000V550H460V1000M490 1000V680H620V1000M650 1000V770H760V1000M790 1000V640H900V1000"/></g><path d="M0 1080Q300 880 900 1060V1200H0Z" fill="{light}" opacity=".55"/>'
  title=creative['title'];line_count=max(1,min(3,math.ceil(len(title)/13)));width=math.ceil(len(title)/line_count);lines=[title[i:i+width] for i in range(0,len(title),width)];font_size=min(58,math.floor(760/width))
- return f'<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200"><rect width="900" height="1200" fill="{bg}"/><circle cx="760" cy="190" r="150" fill="{mid}" opacity=".25"/><circle cx="740" cy="570" r="80" fill="{light}" opacity=".8"/>{scene}<g fill="white" font-family="Microsoft YaHei, sans-serif"><text x="65" y="85" font-size="22" letter-spacing="4">AEROLENS / 航旅智策</text><text x="65" y="170" font-size="20" fill="{light}">{e(creative["holiday_name"])} · {e(creative["theme"])}主题</text>{"".join(f"<text x=\"65\" y=\"{270+i*76}\" font-size=\"{font_size}\" font-weight=\"600\">{e(line)}</text>" for i,line in enumerate(lines))}<text x="65" y="540" font-size="26">{e(row["usual_departure_city"])} → {e(row["destination"])}</text><text x="65" y="590" font-size="20">{e(row["travel_date"])} · {e(row["date_basis"])}</text><rect x="65" y="1005" width="290" height="65" rx="32" fill="white"/><text x="103" y="1048" font-size="24" fill="{bg}">了解旅游航线参考 ↗</text><text x="65" y="1130" font-size="16">本地营销演示 · 历史航班参考 · 非真实预订</text><text x="65" y="1160" font-size="14" opacity=".7">AI主题与配色 / 矢量合成插画，非目的地实拍</text></g></svg>'
+ return f'<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200"><rect width="900" height="1200" fill="{bg}"/><circle cx="760" cy="190" r="150" fill="{mid}" opacity=".25"/><circle cx="740" cy="570" r="80" fill="{light}" opacity=".8"/>{scene}<image x="55" y="30" width="72" height="72" href="data:image/png;base64,{logo_data}"/><g fill="white" font-family="Microsoft YaHei, sans-serif"><text x="145" y="85" font-size="26" letter-spacing="4">华翼朝阳</text><text x="65" y="170" font-size="20" fill="{light}">{e(creative["holiday_name"])} · {e(creative["theme"])}主题</text>{"".join(f"<text x=\"65\" y=\"{270+i*76}\" font-size=\"{font_size}\" font-weight=\"600\">{e(line)}</text>" for i,line in enumerate(lines))}<text x="65" y="540" font-size="26">{e(row["usual_departure_city"])} → {e(row["destination"])}</text><text x="65" y="590" font-size="20">{e(row["travel_date"])} · {e(row["date_basis"])}</text><rect x="65" y="1005" width="290" height="65" rx="32" fill="white"/><text x="103" y="1048" font-size="24" fill="{bg}">了解旅游航线参考 ↗</text><text x="65" y="1130" font-size="16">本地营销演示 · 历史航班参考 · 非真实预订</text><text x="65" y="1160" font-size="14" opacity=".7">AI主题与配色 / 矢量合成插画，非目的地实拍</text></g></svg>'

@@ -7,6 +7,7 @@ import numpy as np
 from data_layer import RUNTIME,ClosingConnection,connect,VERSION
 from algorithm_layer import HOLIDAYS,profile,flight_search
 import marketing_ml as ml
+import decision_logic as decision
 from aigc_config import LABEL as AIGC_LABEL
 
 _LOCK=threading.RLock();_SNAPS={}
@@ -51,48 +52,59 @@ def settings(raw=None):
  asof=raw.get('asof') or max('2023-12-31',(datetime.fromisoformat(holiday['start'])-timedelta(days=1)).strftime('%Y-%m-%d'))
  if asof<'2023-12-31' or asof>'2024-12-24':raise ValueError('画像日期须位于2023-12-31至2024-12-24，保留完整7天标签窗口')
  if asof>=holiday['end']:raise ValueError('洞察日期须早于假期结束')
- result={'holiday':holiday['id'],'holiday_name':holiday['name'],'asof':asof,'province':raw.get('province',''),'destination':raw.get('destination',''),'segment':str(raw.get('segment','')),'min_score':float(raw.get('min_score',.35)),'limit':int(raw.get('limit',300)),'budget':float(raw.get('budget',1000)),'unit_cost':float(raw.get('unit_cost',.5)),'require_flight':str(raw.get('require_flight',False)).lower() in ('true','1')}
+ result={'holiday':holiday['id'],'holiday_name':holiday['name'],'asof':asof,'province':raw.get('province',''),'destination':raw.get('destination',''),'segment':str(raw.get('segment','')),'min_score':float(raw.get('min_score',.35)),'limit':int(raw.get('limit',300)),'budget':float(raw.get('budget',1000)),'unit_cost':float(raw.get('unit_cost',.5)),'require_flight':str(raw.get('require_flight',True)).lower() in ('true','1')}
  if not all(math.isfinite(result[k]) for k in ['min_score','budget','unit_cost']):raise ValueError('请填写有效条件')
  if not 0<=result['min_score']<=1 or not 1<=result['limit']<=5000 or not 0<=result['budget']<=1000000 or not .01<=result['unit_cost']<=100:raise ValueError('分数需0—1、人数1—5000、预算0—100万元、单次费用0.01—100元')
  return result
 
 def build_audience(c,raw=None):
- cfg=settings(raw);h=next(h for h in HOLIDAYS if h['id']==cfg['holiday']);s=trained_snapshot(cfg['asof']);a,users,objects,dests=ml.load_data();n=len(users);ids=np.arange(n);names=segment_names() if s['learned'] else {i:SEGMENT_THEMES[i]+'客群 · 历史规则' for i in range(5)}
- chosen=np.argmax(s['scores'],axis=1)
+ cfg=settings(raw);h=next(h for h in HOLIDAYS if h['id']==cfg['holiday']);s=trained_snapshot(cfg['asof']);a,users,objects,dests=ml.load_data();n=len(users);names=segment_names() if s['learned'] else {i:SEGMENT_THEMES[i]+'客群 · 历史规则' for i in range(5)}
  if cfg['destination']:
   if cfg['destination'] not in dests:raise ValueError('目的地不在41个行为目的地中')
-  chosen.fill(dests.index(cfg['destination']))
- scores=s['scores'][ids,chosen];unsub={r[0] for r in c.execute('SELECT DISTINCT user_id FROM events WHERE feedback_type="unsubscribe" AND event_time_cst<=?',(cfg['asof']+' 23:59:59',))}
- rows=[];date_set=set()
+ ordered=np.argsort(-s['scores'],axis=1,kind='stable')
+ unsub={r[0] for r in c.execute('SELECT DISTINCT user_id FROM events WHERE feedback_type="unsubscribe" AND event_time_cst<=?',(cfg['asof']+' 23:59:59',))}
+ candidate_sets=[];date_set=set()
  for i,u in enumerate(users):
-  d=dests[chosen[i]]
   if cfg['province'] and u['residence_province']!=cfg['province']:continue
   if cfg['segment'] and str(s['clusters'][i])!=cfg['segment']:continue
-  if scores[i]<cfg['min_score']:continue
-  selected_plan=None
-  for z in range(s['day'],max(-1,s['day']-30),-1):
-   if a['dest'][z,i]==chosen[i] and a['travel'][z,i]>s['day']:
-    day=(ml.BASE_DATE+timedelta(days=int(a['travel'][z,i]))).strftime('%Y-%m-%d')
-    if h['start']<=day<=h['end']:selected_plan=day;break
-  travel_date=selected_plan or max(h['start'],(datetime.fromisoformat(cfg['asof'])+timedelta(days=1)).strftime('%Y-%m-%d'))
+  candidates=[dests.index(cfg['destination'])] if cfg['destination'] else [int(j) for j in ordered[i] if s['count'][60][i,j]>0][:3]
+  candidates=[j for j in candidates if s['scores'][i,j]>=cfg['min_score']]
+  if not candidates:continue
   time_bucket=int(s['time_ids'][i]);valid_hours=[h for h in range(8,22) if h//4==time_bucket]
   hour=max(valid_hours,key=lambda h:s['hours'][i,h]) if valid_hours else max(range(8,22),key=lambda h:s['hours'][i,h])
-  r={**u,'destination':d,'score':round(float(scores[i]),4),'fare_score':round(float(s['fare'][i,chosen[i]]),4),'favorite_score':round(float(s['favorite'][i,chosen[i]]),4),'segment':int(s['clusters'][i]),'segment_name':names[int(s['clusters'][i])],'channel':ml.CHANNELS[int(s['channel_ids'][i])],'hour':hour,'travel_date':travel_date,'date_basis':'截点前明确计划' if selected_plan else '营销假期情景假设','budget':round(float(s['budget'][i]),2) if s['budget_n'][i]>0 else None,'budget_evidence':int(s['budget_n'][i]),'unsubscribed':u['user_id'] in unsub,'theme':SEGMENT_THEMES[int(np.argmax(s['cluster'][i,:5]))],'recent_share':round(float(s['X'][i,chosen[i],0]),3),'long_share':round(float(s['X'][i,chosen[i],2]),3),'favorites':int(s['favdest'][i,chosen[i]])}
-  date_set.add(travel_date);rows.append(r)
+  choices=[]
+  for rank,j in enumerate(candidates,1):
+   intent=decision.trip_intent(a,i,j,cfg['asof'],h)
+   r={**u,'destination':dests[j],'score':round(float(s['scores'][i,j]),4),'fare_score':round(float(s['fare'][i,j]),4),'favorite_score':round(float(s['favorite'][i,j]),4),'segment':int(s['clusters'][i]),'segment_name':names[int(s['clusters'][i])],'channel':ml.CHANNELS[int(s['channel_ids'][i])],'hour':int(hour),'travel_date':intent['travel_date'],'date_basis':intent['date_basis'],'budget':intent['budget'],'budget_evidence':intent['budget_evidence'],'intent':intent,'preference_rank':rank,'unsubscribed':u['user_id'] in unsub,'theme':SEGMENT_THEMES[int(np.argmax(s['cluster'][i,:5]))],'recent_share':round(float(s['X'][i,j,0]),3),'long_share':round(float(s['X'][i,j,2]),3),'favorites':int(s['favdest'][i,j])}
+   choices.append(r);date_set.add(r['travel_date'])
+  candidate_sets.append(choices)
  quotes={}
  for day in date_set:
   for f in c.execute('SELECT rowid AS source_row,* FROM flights WHERE 出发日=? ORDER BY 机票票价,rowid',(day,)):
    key=(day,f['出发城市'],f['到达城市'])
    if key not in quotes:quotes[key]=dict(f)
- for r in rows:
-  f=quotes.get((r['travel_date'],r['usual_departure_city'],r['destination']));r['flight']=None
-  if f and (r['budget'] is None or f['机票票价']<=r['budget']):r['flight']={**f,'candidate_id':'FLIGHT_ROW_'+str(f['source_row']+1)}
-  r['flight_reason']='日期与城市、已知预算满足历史条件' if r['flight'] else '当前日期、城市或预算无匹配历史候选'
+ rows=[]
+ for choices in candidate_sets:
+  for r in choices:
+   f=quotes.get((r['travel_date'],r['usual_departure_city'],r['destination']));r['flight']=None
+   if f and f['机票票价']>0 and (r['budget'] is None or f['机票票价']<=r['budget']):r['flight']={**f,'candidate_id':'FLIGHT_ROW_'+str(f['source_row']+1)}
+   r['flight_reason']='城市、日期与已确认预算满足历史条件' if r['flight'] and r['budget'] is not None else '有历史候选，日期或本次预算仍需确认' if r['flight'] else '当前日期、城市或明确预算无匹配历史候选'
+  r=decision.select_candidate(choices)
+  r['primary_destination']=choices[0]['destination'];r['primary_flight_matched']=bool(choices[0]['flight'])
+  r['selection_reason']='保留关注首选目的地' if r['preference_rank']==1 else f"首选{choices[0]['destination']}执行条件不足，选用第{r['preference_rank']}偏好{r['destination']}，保持原始出发地及各自计划条件"
+  r['alternatives']=[{'destination':x['destination'],'score':x['score'],'preference_rank':x['preference_rank'],'travel_date':x['travel_date'],'budget':x['budget'],'budget_status':x['intent']['budget_status'],'plan_status':x['intent']['plan_status'],'flight_matched':bool(x['flight']),'business_ready':decision.business_ready(x),'reason':x['flight_reason']} for x in choices]
+  r['business_ready']=decision.business_ready(r);r['defer_reasons']=[x['reason'] for x in decision.business_checks(r) if not x['passed']]
+  r['suggested_action']='航线比较 · 待核验执行资格' if r['business_ready'] else '暂不触达 · 先确认条件'
+  rows.append(r)
+ interest_qualified=len(rows);product_qualified=sum(bool(r['flight']) for r in rows)
  if cfg['require_flight']:rows=[r for r in rows if r['flight']]
  rows.sort(key=lambda r:(r['unsubscribed'],-r['score'],r['user_id']))
  pool=len(rows);cap=min(cfg['limit'],int(cfg['budget']/cfg['unit_cost']));eligible=[r for r in rows if not r['unsubscribed']];audience=eligible[:cap]
  hotspots=Counter(r['destination'] for r in rows);regions=Counter(r['residence_province'] for r in rows);segments=Counter(r['segment_name'] for r in rows);channels=Counter(r['channel'] for r in audience);matched=sum(bool(r['flight']) for r in audience)
- return clean({'settings':cfg,'holiday':h,'model':s['model'],'learned':s['learned'],'population':n,'potential':pool,'unsubscribe_blocked':sum(r['unsubscribed'] for r in rows),'audience':audience,'audience_count':len(audience),'eligible_before_cap':len(eligible),'matched_flights':matched,'estimated_cost':round(len(audience)*cfg['unit_cost'],2),'hotspots':[{'name':k,'count':v} for k,v in hotspots.most_common(12)],'regions':[{'name':k,'count':v} for k,v in regions.most_common(12)],'segments':[{'name':name,'id':i,'count':sum(r['segment']==i for r in rows)} for i,name in names.items()],'channels':[{'name':k,'count':v} for k,v in channels.most_common()],'basis':'未来7天关注代理；场景费用是假设，不是实付费用；访问渠道与时段不代表最优转化。','source_version':VERSION})
+ comparison={'scope':'当前冻结名单，同一兴趣候选和当次约束；非随机营销实验','users':len(audience),'primary_matched':sum(r['primary_flight_matched'] for r in audience),'selected_matched':matched,'recovered_matches':sum(bool(r['flight']) and not r['primary_flight_matched'] for r in audience),'alternative_selected':sum(r['preference_rank']>1 for r in audience)}
+ funnel={'interest_qualified':interest_qualified,'product_qualified':product_qualified,'eligible_before_cap':len(eligible),'selected':len(audience),'requested':cfg['limit'],'budget_capacity':cap,'shortfall':max(0,cap-len(audience)),'mode':'先筛历史产品，再按兴趣选名单' if cfg['require_flight'] else '全部兴趣探索，允许缺少产品候选'}
+ coverage={'matched':matched,'users':len(audience),'rate':matched/len(audience) if audience else None,'target':.9,'meets_target':bool(audience) and matched/len(audience)>=.9,'scope':'最终名单中的历史候选覆盖，不代表当前可售或已确认行程'}
+ return clean({'settings':cfg,'holiday':h,'model':s['model'],'learned':s['learned'],'population':n,'potential':pool,'unsubscribe_blocked':sum(r['unsubscribed'] for r in rows),'audience':audience,'audience_count':len(audience),'eligible_before_cap':len(eligible),'matched_flights':matched,'business_ready_count':sum(r['business_ready'] for r in audience),'decision_version':decision.DECISION_VERSION,'strategy_comparison':comparison,'selection_funnel':funnel,'candidate_coverage':coverage,'estimated_cost':round(len(audience)*cfg['unit_cost'],2),'hotspots':[{'name':k,'count':v} for k,v in hotspots.most_common(12)],'regions':[{'name':k,'count':v} for k,v in regions.most_common(12)],'segments':[{'name':name,'id':i,'count':sum(r['segment']==i for r in rows)} for i,name in names.items()],'channels':[{'name':k,'count':v} for k,v in channels.most_common()],'basis':'未来7天关注代理；营销名单默认先筛选历史产品候选再截取人数；本次明确预算才作硬约束；访问习惯不代表可触达或最优转化。','source_version':VERSION})
 
 def metadata(c):
  report=ml.model_pack()['report'];users=[dict(r) for r in c.execute('SELECT * FROM users')]
@@ -122,7 +134,9 @@ def get_campaign(cid):
   if not row:raise ValueError('活动不存在')
   p=json.loads(row[0])
   if p.get('deleted_at'):raise ValueError('活动已删除，请先从已删除活动中恢复')
-  p['creatives']=[json.loads(r[0]) for r in c.execute("SELECT payload FROM creatives WHERE campaign=? AND json_extract(payload,'$.deleted_at') IS NULL ORDER BY rowid DESC",(cid,))];p['deliveries']=[json.loads(r[0]) for r in c.execute('SELECT payload FROM deliveries WHERE campaign=?',(cid,))];p['audit']=[dict(r) for r in c.execute('SELECT * FROM campaign_audit WHERE campaign=? ORDER BY id DESC',(cid,))];return p
+  p['creatives']=[json.loads(r[0]) for r in c.execute("SELECT payload FROM creatives WHERE campaign=? AND json_extract(payload,'$.deleted_at') IS NULL ORDER BY rowid DESC",(cid,))];p['deliveries']=[json.loads(r[0]) for r in c.execute('SELECT payload FROM deliveries WHERE campaign=?',(cid,))];p['audit']=[dict(r) for r in c.execute('SELECT * FROM campaign_audit WHERE campaign=? ORDER BY id DESC',(cid,))]
+  with connect() as source:p['execution']=decision.execution_readiness(p,source,c)
+  return p
 
 def save_campaign(c,body):
  insight=build_audience(c,body);p={**insight,'id':'MKT_'+uuid.uuid4().hex[:10],'name':str(body.get('name') or insight['holiday']['name']+'旅游航线营销')[:80],'revision':1,'status':'名单就绪','created_at':datetime.now().isoformat(timespec='seconds')}
@@ -146,6 +160,7 @@ def compose(creative,row):
  if row['flight']:
   f=row['flight'];text+=f"\n历史表记录：{f['航班号']}，{f['出发时间']} 起飞，历史参考价格 ¥{f['机票票价']:,.0f}。该历史报价不代表当前可售价格，库存与税费未知。"
  else:text+='\n当前条件暂无匹配历史航班，建议先确认出发地、日期及预算。'
+ if row.get('intent'):text+='\n预算依据：'+row['intent']['budget_basis']+'。'
  return text+'\n本地模拟营销内容，仅供旅游航线规划参考，不提供真实预订。'
 
 def generate_creative(c,cid,body):
@@ -206,12 +221,17 @@ def revise_audience(cid,body):
  if any(uid not in valid for uid in requested):raise ValueError('只能从当前已冻结名单中选择')
  p['audience']=[r for r in p['audience'] if r['user_id'] in set(requested)];p['audience_count']=len(p['audience']);p['matched_flights']=sum(bool(r['flight']) for r in p['audience']);p['estimated_cost']=round(p['audience_count']*p['settings']['unit_cost'],2);p['revision']+=1;p['status']='名单就绪'
  p['channels']=[{'name':k,'count':v} for k,v in Counter(r['channel'] for r in p['audience']).most_common()]
- for key in ['creatives','deliveries','audit','evaluation','last_launch']:p.pop(key,None)
+ p['business_ready_count']=sum(decision.business_ready(r) for r in p['audience'])
+ if p.get('candidate_coverage'):p['candidate_coverage'].update(matched=p['matched_flights'],users=p['audience_count'],rate=p['matched_flights']/p['audience_count'],meets_target=p['matched_flights']/p['audience_count']>=p['candidate_coverage']['target'])
+ if p.get('selection_funnel'):p['selection_funnel'].update(selected=p['audience_count'],shortfall=max(0,p['selection_funnel']['budget_capacity']-p['audience_count']))
+ if p.get('strategy_comparison'):
+  p['strategy_comparison'].update(users=p['audience_count'],primary_matched=sum(bool(r.get('primary_flight_matched')) for r in p['audience']),selected_matched=p['matched_flights'],recovered_matches=sum(bool(r['flight']) and not r.get('primary_flight_matched') for r in p['audience']),alternative_selected=sum(r.get('preference_rank',1)>1 for r in p['audience']))
+ for key in ['creatives','deliveries','audit','evaluation','last_launch','execution']:p.pop(key,None)
  with db() as c:c.execute('UPDATE campaigns SET payload=? WHERE id=?',(json.dumps(p,ensure_ascii=False),cid));audit(c,cid,'更新名单','版本'+str(p['revision'])+'；旧素材审批失效')
  return get_campaign(cid)
 
 def delivery_plan(p):
- approved={(m['destination'],m['theme']):m for m in reversed(p['creatives']) if m['status']=='已审核' and m['campaign_revision']==p['revision'] and m.get('review',{}).get('revision')==m['revision']}
+ approved=decision.approved_materials(p)
  ready=[];waiting=[]
  for r in p['audience']:
   m=approved.get((r['destination'],r['theme']))
@@ -230,15 +250,23 @@ def launch(c,cid,body):
   current=json.loads(state.execute('SELECT payload FROM campaigns WHERE id=?',(cid,)).fetchone()[0])
   if current.get('deleted_at'):raise ValueError('活动已删除，不能继续触达')
   if current['revision']!=p['revision']:raise ValueError('活动名单刚刚变更，请刷新并重新核对触达计划')
+  # Readiness is recomputed inside the same write transaction as the frequency ledger.
+  p['creatives']=[json.loads(row[0]) for row in state.execute("SELECT payload FROM creatives WHERE campaign=? AND json_extract(payload,'$.deleted_at') IS NULL ORDER BY rowid DESC",(cid,))]
+  readiness=decision.execution_readiness(p,c,state);qualification={item['user_id']:item for item in readiness['items']}
+  ready,waiting=delivery_plan(p)
+  for r in p['audience']:
+   item=qualification[r['user_id']]
+   if not item['eligible']:blocked.append({'user_id':r['user_id'],'reason':'；'.join(item['blockers']),'checks':item['checks']})
   for r,m in ready:
+   if not qualification[r['user_id']]['eligible']:continue
    latest=json.loads(state.execute('SELECT payload FROM creatives WHERE id=?',(m['id'],)).fetchone()[0])
    if latest['status']!='已审核' or latest['revision']!=m['revision'] or latest.get('review',{}).get('revision')!=m['revision']:raise ValueError('素材刚刚修改，请重新审核后执行')
    if r['unsubscribed'] or not 8<=r['hour']<22:blocked.append({'user_id':r['user_id'],'reason':'退订或安静时段'});continue
    if state.execute('SELECT 1 FROM deliveries WHERE user_id=? AND day=?',(r['user_id'],day)).fetchone():blocked.append({'user_id':r['user_id'],'reason':'同一旅客同一情景日已模拟触达，频次上限1次'});continue
    record={'id':'LOCAL_'+uuid.uuid4().hex[:12],'campaign':cid,'campaign_revision':p['revision'],'user_id':r['user_id'],'destination':r['destination'],'channel':r['channel'] if m['channel']=='跟随旅客策略' else m['channel'],'scheduled_at':f'{day} {r["hour"]:02}:00:00','creative':m['id'],'creative_revision':m['revision'],'title':m['title'],'text':compose(m,r),'status':'本地模拟触达完成','is_synthetic':True,'exposure':None,'click':None,'payment':None,'source_version':VERSION,'estimated_cost':p['settings']['unit_cost']}
    state.execute('INSERT INTO deliveries VALUES(?,?,?,?,?)',(record['id'],cid,r['user_id'],day,json.dumps(record,ensure_ascii=False)));sent.append(record)
-  p['status']='本地触达完成';p['last_launch']={'sent':len(sent),'waiting_for_material':len(waiting),'blocked':blocked,'at':datetime.now().isoformat(timespec='seconds')}
-  for key in ['creatives','deliveries','audit']:p.pop(key,None)
+  p['status']='本地触达完成' if sent else '暂不触达';p['last_launch']={'sent':len(sent),'waiting_for_material':len(waiting),'blocked':blocked,'at':datetime.now().isoformat(timespec='seconds'),'qualification_version':decision.DECISION_VERSION}
+  for key in ['creatives','deliveries','audit','execution']:p.pop(key,None)
   state.execute('UPDATE campaigns SET payload=? WHERE id=?',(json.dumps(p,ensure_ascii=False),cid));audit(state,cid,'本地模拟触达',f'新增{len(sent)}条；待素材{len(waiting)}人；频控等阻止{len(blocked)}人。未生成曝光、点击或订单。')
  return get_campaign(cid)
 
@@ -251,7 +279,7 @@ def evaluate_campaign(cid):
  end=(datetime.fromisoformat(p['settings']['asof'])+timedelta(days=7)).strftime('%Y-%m-%d')
  evaluation={'scope':'当前版本已模拟触达名单' if delivered else '当前名单离线回测（尚未触达）','users':len(rows),'window':[p['settings']['asof'],end],'outcomes':dict(counts),'baseline_continue':baseline,'campaign_revision':p['revision'],'label':'未来7天行为代理标签；来源02_用户行为.xlsx，截点后记录仅用于此处评估','attribution':'不能将后续关注解释为触达造成；没有新活动的真实曝光、点击、支付或退款','feedback_update':{'asof':end,'available':True,'description':'后续行为到达后可查看更新画像；不倒填原预测特征'}}
  p['evaluation']=evaluation
- for key in ['creatives','deliveries','audit']:p.pop(key,None)
+ for key in ['creatives','deliveries','audit','execution']:p.pop(key,None)
  with db() as c:c.execute('UPDATE campaigns SET payload=? WHERE id=?',(json.dumps(p,ensure_ascii=False),cid));audit(c,cid,'未来窗口复盘',f'{len(rows)}人，7天完整窗口至{end}，不归因新触达')
  return evaluation
 

@@ -1,0 +1,53 @@
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+module.exports=async function surveyChecks(page,out,pass){
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const q=JSON.parse(await page.locator('#schema').textContent());
+ assert.equal(q.questions.length,30);assert.ok(q.questions.every(x=>['single','multi'].includes(x.type)));
+ assert.equal(await page.locator('#survey input:not([type=radio]):not([type=checkbox]),#survey textarea,#survey select').count(),0);
+ pass('Questionnaire has exactly 30 questions and every answer is a radio or checkbox');
+ await page.locator('#Q01 input[value="2"]').check();assert.equal(await page.locator('#Q13').isVisible(),false);
+ await page.locator('#Q01 input[value="1"]').check();await page.locator('#Q02 input[value="1"]').check();await page.locator('#Q03 input[value="1"]').check();assert.equal(await page.locator('#Q04').isVisible(),false);
+ pass('Consent, adult eligibility and lack of flight experience keep their skip logic');
+ for(const x of q.questions.filter(x=>x.required))await page.locator(`#${x.id} input[value="1"]`).check();
+ await page.locator('#Q11 input[value="2"]').check();await page.locator('#Q12 input[value="7"]').check();
+ // Hangzhou is the eighth city; its West Lake option is the fifteenth scenic choice.
+ await page.locator('#Q13 input[value="1"]').uncheck();await page.locator('#Q13 input[value="8"]').check();
+ assert.equal(await page.locator('#Q14 input[value="1"]').isVisible(),false);assert.equal(await page.locator('#Q14 input[value="15"]').isVisible(),true);
+ await page.locator('#Q14 input[value="15"]').check();await page.locator('#Q18 input[value="3"]').check();
+ // An exclusive "not traveling" option must clear cities, and deselect stale attractions.
+ await page.locator('#Q13 input[value="19"]').check();assert.deepEqual(await page.locator('#Q13 input:checked').evaluateAll(xs=>xs.map(x=>x.value)),['19']);
+ assert.equal(await page.locator('#Q14 input:checked').count(),0);await page.locator('#Q13 input[value="8"]').check();await page.locator('#Q14 input[value="15"]').check();
+ await page.locator('#Q10 input[value="2"]').check();await page.locator('#Q10 input[value="3"]').check();await page.locator('#Q10 input[value="4"]').check();
+ await page.locator('#survey [type=submit]').click();assert.ok((await page.locator('#form-status').innerText()).includes('Q10最多选择3项'));
+ await page.locator('#Q10 input[value="4"]').uncheck();
+ pass('City choices filter scenic choices; mutually exclusive answers and multi-select limits are enforced');
+ const exportFile=async(button,name)=>{const promise=page.waitForEvent('download');await page.locator(button).click();const download=await promise,filename=path.join(out,name);await download.saveAs(filename);return [filename,JSON.parse(fs.readFileSync(filename,'utf8'))];};
+ const [firstFile,first]=await exportFile('#survey [type=submit]','survey-baseline-v2.json');
+ assert.equal(Object.keys(first.answers).length,30);assert.equal(first.answers.Q04,null);assert.equal(first.answers.Q11,2);assert.equal(first.answers.Q12,7);assert.equal(first.answers.Q18,3);
+ assert.match(first.respondent_code,/^TR_[0-9a-f]{12}$/);assert.equal(first.submitted_at_basis,'participant_device_clock');
+ pass('Baseline exports 30 coded answers, skipped nulls and an automatic research code without typed answers');
+ await page.locator('#wave').selectOption('followup');assert.equal(await page.locator('[data-question]:visible').count(),10);
+ await page.locator('#survey [type=submit]').click();assert.ok((await page.locator('#form-status').innerText()).includes('先导入上次答卷'));
+ await page.locator('#reuse-code').setInputFiles(firstFile);await page.waitForFunction(()=>document.querySelector('#reuse-status').textContent.includes('已沿用'));
+ await page.locator('#Q13 input[value="8"]').uncheck();await page.locator('#Q13 input[value="9"]').check();
+ await page.locator('#Q14 input[value="17"]').check();await page.locator('#Q18 input[value="4"]').check();
+ const [secondFile,second]=await exportFile('#survey [type=submit]','survey-followup-v2.json');
+ assert.equal(second.respondent_code,first.respondent_code);assert.notEqual(second.response_id,first.response_id);assert.equal(second.measured_questions.length,10);assert.equal(second.answers.Q06,null);
+ pass('Follow-up uses 10 choice questions and reuses a code from a file without manual entry');
+ await page.locator('#researcher summary').click();await page.locator('#imports').setInputFiles([firstFile,secondFile]);await page.waitForFunction(()=>document.querySelector('#analysis').textContent.includes('2份独立答卷'));
+ await page.locator('#imports').setInputFiles(firstFile);await page.waitForFunction(()=>document.querySelector('#analysis').textContent.includes('重复1'));
+ const [,profiles]=await exportFile('#export-profiles','survey-profiles-v2.json');
+ assert.equal(profiles.response_count,2);assert.equal(profiles.longitudinal_respondents,1);
+ const p=profiles.profiles[0];assert.equal(p.history.length,2);assert.equal(p.holiday_year,2027);assert.equal(p.holiday_id,'national');assert.deepEqual(p.effective.cities,['苏州']);assert.deepEqual(p.effective.attractions,['苏州 拙政园']);
+ assert.equal(p.effective.budget_band.lower,6000);assert.equal(p.effective.budget_band.upper,10000);assert.equal(p.effective.total_budget_per_adult,null);
+ assert.equal(p.effective.stage,0);assert.equal(p.field_observed_at.stage,first.submitted_at);assert.ok(p.changes[0].changed_fields.includes('cities'));
+ pass('Dynamic profiles retain both waves, budget intervals and prior unmeasured fields without inventing exact values');
+ // A genuine legacy fixture keeps V1 fields separate and remains readable.
+ const legacy={schema_version:'TRAVEL_SURVEY_20261014_V1',response_id:'LEGACY_COMPAT_TEST',respondent_code:'LEGACY_CODE',submitted_at:'2026-10-01T00:00:00.000Z',wave:'baseline',data_origin:'self_report',answers:{Q01:1,Q02:1,Q51:[{holiday_id:'national',holiday_label:'国庆',holiday_year:2027,cities:['杭州'],attractions:['杭州西湖'],total_budget_per_adult:4500,stage:2}]}};
+ const legacyPath=path.join(out,'survey-legacy-compat.json');fs.writeFileSync(legacyPath,JSON.stringify(legacy));await page.locator('#imports').setInputFiles(legacyPath);await page.waitForFunction(()=>document.querySelector('#analysis').textContent.includes('3份独立答卷'));
+ const [,mixed]=await exportFile('#export-profiles','survey-mixed-versions.json');assert.equal(mixed.responses.find(r=>r.response_id==='LEGACY_COMPAT_TEST').answers.Q51[0].total_budget_per_adult,4500);assert.equal(mixed.profiles.find(p=>p.respondent_code==='LEGACY_CODE').effective.total_budget_per_adult,4500);
+ pass('Legacy 55-question responses stay readable with original version and raw answers preserved');
+ await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:path.join(out,'survey30-desktop.png')});await page.setViewportSize({width:390,height:844});await page.locator('#Q13').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(out,'survey30-mobile.png')});
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(errors,[]);
+ pass('Thirty-question form fits mobile and has no JavaScript errors');
+};
