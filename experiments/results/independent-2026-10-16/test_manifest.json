@@ -1,0 +1,115 @@
+{
+  "version": "annual-independent-v1",
+  "seed": 20261016,
+  "split": "test",
+  "anchor": "2026-10-16",
+  "users": 10000,
+  "behavior_days": 365,
+  "behavior_rows": 3650000,
+  "behavior_start": "2025-10-16",
+  "behavior_end": "2026-10-15",
+  "candidate_destinations": [
+    "三亚",
+    "上海",
+    "丽江",
+    "乌鲁木齐",
+    "兰州",
+    "北京",
+    "南京",
+    "南宁",
+    "南昌",
+    "厦门",
+    "合肥",
+    "呼和浩特",
+    "哈尔滨",
+    "大连",
+    "天津",
+    "太原",
+    "广州",
+    "张家界",
+    "成都",
+    "拉萨",
+    "昆明",
+    "杭州",
+    "桂林",
+    "武汉",
+    "沈阳",
+    "济南",
+    "海口",
+    "深圳",
+    "石家庄",
+    "福州",
+    "苏州",
+    "西双版纳",
+    "西宁",
+    "西安",
+    "贵阳",
+    "郑州",
+    "重庆",
+    "银川",
+    "长春",
+    "长沙",
+    "青岛"
+  ],
+  "scenarios": {
+    "预算变化": 1667,
+    "广泛探索": 1666,
+    "稳定关注": 1667,
+    "多目的地比较": 1666,
+    "逐步迁移": 1667,
+    "临近出游变化": 1667
+  },
+  "original_user_overlap": 0,
+  "source": "independently simulated; no copied original behavior rows",
+  "holiday_source": "https://www.beijing.gov.cn/cs/gncs/zcwj/202603/t20260327_4568275.html",
+  "route_scope": [
+    [
+      "北京",
+      "杭州"
+    ],
+    [
+      "上海",
+      "成都"
+    ],
+    [
+      "广州",
+      "西安"
+    ],
+    [
+      "深圳",
+      "厦门"
+    ],
+    [
+      "成都",
+      "三亚"
+    ],
+    [
+      "北京",
+      "重庆"
+    ],
+    [
+      "广州",
+      "上海"
+    ],
+    [
+      "上海",
+      "北京"
+    ]
+  ],
+  "flight_scope": "8 representative domestic routes × 2 departure dates × 2 trip lengths; shared queries, not 10000 independent flight observations",
+  "original_model_sha256": "e729fccdac96dd149880fce00f2bdc39500b41e663683490688aafed92a58bf3",
+  "files": {
+    "users.jsonl": {
+      "sha256": "1882c0ceb920c0a21407a1e321782169733b74679b506b2b771fffb36c4f27a8",
+      "bytes": 4122595
+    },
+    "behavior_arrays.npz": {
+      "sha256": "a0862a984e745a48abfa44a846516efaf7a28c8c6f0a6e79a66b179128b356cf",
+      "bytes": 34641514
+    },
+    "behaviors.csv.gz": {
+      "sha256": "afc4862e3596708d03740b2ed21ac18a0733d37bee72e50cb9bff1d33530cbfb",
+      "bytes": 96287911
+    }
+  }
+}

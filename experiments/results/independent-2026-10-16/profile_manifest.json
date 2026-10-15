@@ -1,0 +1,21 @@
+{
+  "users": 10000,
+  "cutoffs": [
+    "2025-12-14",
+    "2026-01-13",
+    "2026-02-12",
+    "2026-03-14",
+    "2026-04-13",
+    "2026-05-13",
+    "2026-06-12",
+    "2026-07-12",
+    "2026-08-11",
+    "2026-09-10",
+    "2026-10-10",
+    "2026-10-15"
+  ],
+  "rows": 120000,
+  "source_sha256": "f7a8071fff3f66eceb5ee4373424d2e878842e18a45ca62380fea11087fed806",
+  "artifact_sha256": "5e1807e5f338d903ebfc46baeee37c8b3fb0229206fecaa62ea3bfb5bf21f752",
+  "note": "Observed synthetic events only; no hidden generator preferences or model labels in profiles"
+}

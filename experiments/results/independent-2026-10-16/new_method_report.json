@@ -1,0 +1,259 @@
+{
+  "protocol": {
+    "method": "constraint-first recommendation + preference ranking",
+    "training_users": 6000,
+    "validation_users": 2000,
+    "fresh_confirmation_users": 10000,
+    "training_dates": [
+      "2026-01-18",
+      "2026-02-17",
+      "2026-03-19",
+      "2026-04-18",
+      "2026-05-18",
+      "2026-06-17"
+    ],
+    "validation_dates": [
+      "2026-07-17",
+      "2026-08-16",
+      "2026-09-15"
+    ],
+    "confirmation_dates": [
+      "2026-08-09",
+      "2026-09-08",
+      "2026-10-08"
+    ],
+    "candidates": [
+      "pairwise SGD ranking",
+      "new-data gradient boosting",
+      "three fixed rank-decay blends",
+      "frozen model",
+      "four rules"
+    ],
+    "choose": "validation NDCG@3 maximum subject to Recall@3 no worse than original by 0.005",
+    "promotion": "confirmation NDCG delta >=0.005 and paired 95% CI lower bound >0",
+    "old_test_reused_for_tuning": false,
+    "frozen_model_sha256": "e729fccdac96dd149880fce00f2bdc39500b41e663683490688aafed92a58bf3",
+    "confirmation_manifest_sha256": "b0175887a8b9373d89bf4239f465e0db1a3b314bf60d6150f6752cdcc621b8b4",
+    "note": "feasibility is evaluated separately; interest ranking cannot make an over-budget flight feasible"
+  },
+  "selected_method": "新数据梯度提升",
+  "validation": {
+    "原冻结模型": {
+      "recall_at_3": 0.9204398447606728,
+      "ndcg_at_3": 0.9083785089593791,
+      "eligible_snapshots": 5411,
+      "no_relevant_snapshots": 589
+    },
+    "成对学习排序": {
+      "recall_at_3": 0.9265385326187396,
+      "ndcg_at_3": 0.9084847896720024,
+      "eligible_snapshots": 5411,
+      "no_relevant_snapshots": 589
+    },
+    "新数据梯度提升": {
+      "recall_at_3": 0.9257992977268527,
+      "ndcg_at_3": 0.9118253518014031,
+      "eligible_snapshots": 5411,
+      "no_relevant_snapshots": 589
+    },
+    "近30天频次": {
+      "recall_at_3": 0.9245056366660507,
+      "ndcg_at_3": 0.9103954812885482,
+      "eligible_snapshots": 5411,
+      "no_relevant_snapshots": 589
+    },
+    "14天衰减": {
+      "recall_at_3": 0.9250600628349658,
+      "ndcg_at_3": 0.9116824595005307,
+      "eligible_snapshots": 5411,
+      "no_relevant_snapshots": 589
+    },
+    "近7天频次": {
+      "recall_at_3": 0.896445512228177,
+      "ndcg_at_3": 0.8842584949565845,
+      "eligible_snapshots": 5411,
+      "no_relevant_snapshots": 589
+    },
+    "短期变化规则": {
+      "recall_at_3": 0.9160044354093513,
+      "ndcg_at_3": 0.9048268168967148,
+      "eligible_snapshots": 5411,
+      "no_relevant_snapshots": 589
+    },
+    "排序与衰减融合0.25": {
+      "recall_at_3": 0.9248752541119941,
+      "ndcg_at_3": 0.9116439246964788,
+      "eligible_snapshots": 5411,
+      "no_relevant_snapshots": 589
+    },
+    "排序与衰减融合0.5": {
+      "recall_at_3": 0.9258917020883386,
+      "ndcg_at_3": 0.9096553620061365,
+      "eligible_snapshots": 5411,
+      "no_relevant_snapshots": 589
+    },
+    "排序与衰减融合0.75": {
+      "recall_at_3": 0.9261689151727962,
+      "ndcg_at_3": 0.9082339628120684,
+      "eligible_snapshots": 5411,
+      "no_relevant_snapshots": 589
+    }
+  },
+  "confirmation": {
+    "原冻结模型": {
+      "recall_at_3": 0.9216420664206642,
+      "ndcg_at_3": 0.9101953393373509,
+      "eligible_snapshots": 27100,
+      "no_relevant_snapshots": 2900
+    },
+    "成对学习排序": {
+      "recall_at_3": 0.9247232472324723,
+      "ndcg_at_3": 0.906196825288827,
+      "eligible_snapshots": 27100,
+      "no_relevant_snapshots": 2900
+    },
+    "新数据梯度提升": {
+      "recall_at_3": 0.9245141451414514,
+      "ndcg_at_3": 0.9109944084880514,
+      "eligible_snapshots": 27100,
+      "no_relevant_snapshots": 2900
+    },
+    "近30天频次": {
+      "recall_at_3": 0.9237453874538746,
+      "ndcg_at_3": 0.9100592693239506,
+      "eligible_snapshots": 27100,
+      "no_relevant_snapshots": 2900
+    },
+    "14天衰减": {
+      "recall_at_3": 0.9244280442804428,
+      "ndcg_at_3": 0.9117183831658993,
+      "eligible_snapshots": 27100,
+      "no_relevant_snapshots": 2900
+    },
+    "近7天频次": {
+      "recall_at_3": 0.8996986469864698,
+      "ndcg_at_3": 0.8891264405976772,
+      "eligible_snapshots": 27100,
+      "no_relevant_snapshots": 2900
+    },
+    "短期变化规则": {
+      "recall_at_3": 0.9183825338253382,
+      "ndcg_at_3": 0.9076038463117962,
+      "eligible_snapshots": 27100,
+      "no_relevant_snapshots": 2900
+    },
+    "排序与衰减融合0.25": {
+      "recall_at_3": 0.9242619926199263,
+      "ndcg_at_3": 0.911694982093303,
+      "eligible_snapshots": 27100,
+      "no_relevant_snapshots": 2900
+    },
+    "排序与衰减融合0.5": {
+      "recall_at_3": 0.9242066420664207,
+      "ndcg_at_3": 0.9080059891080129,
+      "eligible_snapshots": 27100,
+      "no_relevant_snapshots": 2900
+    },
+    "排序与衰减融合0.75": {
+      "recall_at_3": 0.92420049200492,
+      "ndcg_at_3": 0.9059938426028571,
+      "eligible_snapshots": 27100,
+      "no_relevant_snapshots": 2900
+    }
+  },
+  "paired_ndcg_delta": 6.332319458795167e-05,
+  "paired_ndcg_delta_95pct": [
+    -0.0015034565796466853,
+    0.001600075918961314
+  ],
+  "subgroups": {
+    "稳定关注": {
+      "新数据梯度提升": {
+        "recall_at_3": 0.9958341665000332,
+        "ndcg_at_3": 0.9941761935901855,
+        "eligible_snapshots": 5001,
+        "no_relevant_snapshots": 0
+      },
+      "原冻结模型": {
+        "recall_at_3": 0.9884356462040924,
+        "ndcg_at_3": 0.9828801303105744,
+        "eligible_snapshots": 5001,
+        "no_relevant_snapshots": 0
+      }
+    },
+    "逐步迁移": {
+      "新数据梯度提升": {
+        "recall_at_3": 0.9952009598080384,
+        "ndcg_at_3": 0.9917399491771786,
+        "eligible_snapshots": 5001,
+        "no_relevant_snapshots": 0
+      },
+      "原冻结模型": {
+        "recall_at_3": 0.9954009198160368,
+        "ndcg_at_3": 0.9932064546160173,
+        "eligible_snapshots": 5001,
+        "no_relevant_snapshots": 0
+      }
+    },
+    "临近出游变化": {
+      "新数据梯度提升": {
+        "recall_at_3": 0.9941678331000466,
+        "ndcg_at_3": 0.9586563689231326,
+        "eligible_snapshots": 5001,
+        "no_relevant_snapshots": 0
+      },
+      "原冻结模型": {
+        "recall_at_3": 0.990368592948077,
+        "ndcg_at_3": 0.9734742767136465,
+        "eligible_snapshots": 5001,
+        "no_relevant_snapshots": 0
+      }
+    },
+    "预算变化": {
+      "新数据梯度提升": {
+        "recall_at_3": 0.9949323197972927,
+        "ndcg_at_3": 0.993891971444021,
+        "eligible_snapshots": 4999,
+        "no_relevant_snapshots": 2
+      },
+      "原冻结模型": {
+        "recall_at_3": 0.9876308595052342,
+        "ndcg_at_3": 0.983215319630787,
+        "eligible_snapshots": 4999,
+        "no_relevant_snapshots": 2
+      }
+    },
+    "广泛探索": {
+      "新数据梯度提升": {
+        "recall_at_3": 0.07317460317460317,
+        "ndcg_at_3": 0.05189520926996162,
+        "eligible_snapshots": 2100,
+        "no_relevant_snapshots": 2898
+      },
+      "原冻结模型": {
+        "recall_at_3": 0.07968253968253967,
+        "ndcg_at_3": 0.056877005839486364,
+        "eligible_snapshots": 2100,
+        "no_relevant_snapshots": 2898
+      }
+    },
+    "多目的地比较": {
+      "新数据梯度提升": {
+        "recall_at_3": 1.0,
+        "ndcg_at_3": 0.9773300188768382,
+        "eligible_snapshots": 4998,
+        "no_relevant_snapshots": 0
+      },
+      "原冻结模型": {
+        "recall_at_3": 1.0,
+        "ndcg_at_3": 0.9765915830096343,
+        "eligible_snapshots": 4998,
+        "no_relevant_snapshots": 0
+      }
+    }
+  },
+  "promotion_gate_passed": false,
+  "training_seconds": 1.73,
+  "original_artifact_unchanged": true,
+  "recommendation": "versioned new-cohort method only; keep 2024 replay model and test labels unchanged"
+}

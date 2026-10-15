@@ -1,0 +1,350 @@
+{
+  "protocol": {
+    "version": "annual-new-user-eval-v1",
+    "anchor": "2026-10-16",
+    "seed": 20261016,
+    "training_cutoffs": [
+      "2026-01-18",
+      "2026-02-17",
+      "2026-03-19",
+      "2026-04-18",
+      "2026-05-18",
+      "2026-06-17"
+    ],
+    "validation_cutoffs": [
+      "2026-07-17",
+      "2026-08-16",
+      "2026-09-15"
+    ],
+    "test_cutoffs": [
+      "2026-08-09",
+      "2026-09-08",
+      "2026-10-08"
+    ],
+    "horizon_days": 7,
+    "features": [
+      "近7天关注占比",
+      "近30天关注占比",
+      "近60天关注占比",
+      "14天衰减关注占比",
+      "最近关注距今天数",
+      "重复访问占比",
+      "收藏对象数",
+      "目的地信息占比",
+      "景区内容占比",
+      "酒店内容占比",
+      "机票查询占比",
+      "攻略内容占比",
+      "目的地停留强度",
+      "近期关注变化",
+      "明确假期计划占比",
+      "明确出行计划占比",
+      "近期预算均值",
+      "预算证据数",
+      "全局机票查询占比",
+      "全局攻略访问占比",
+      "全局重复访问占比",
+      "当前假期临近度",
+      "用户内容停留强度"
+    ],
+    "test_users": 10000,
+    "test_rows": 3650000,
+    "outcome": "future 7-day repeated destination attention, not bookings",
+    "selection": "validation users only; final test evaluated once after selection",
+    "retrain_trigger": "original validation NDCG@3 trails best rule by >0.005, or Recall@3 by >0.01",
+    "replacement": "best validation NDCG@3 with Recall@3 no worse than original by 0.005",
+    "uncertainty": "paired bootstrap of users; each user retains all 3 snapshots",
+    "synthetic_limit": "generated retrospective behavior is not actual year-long observation",
+    "flights": "independent current feasibility checks, never a feature or future-attention label",
+    "original_model_sha256": "e729fccdac96dd149880fce00f2bdc39500b41e663683490688aafed92a58bf3",
+    "frozen_test_manifest_sha256": "f7a8071fff3f66eceb5ee4373424d2e878842e18a45ca62380fea11087fed806"
+  },
+  "cohort": {
+    "version": "annual-independent-v1",
+    "seed": 20261016,
+    "split": "test",
+    "anchor": "2026-10-16",
+    "users": 10000,
+    "behavior_days": 365,
+    "behavior_rows": 3650000,
+    "behavior_start": "2025-10-16",
+    "behavior_end": "2026-10-15",
+    "candidate_destinations": [
+      "三亚",
+      "上海",
+      "丽江",
+      "乌鲁木齐",
+      "兰州",
+      "北京",
+      "南京",
+      "南宁",
+      "南昌",
+      "厦门",
+      "合肥",
+      "呼和浩特",
+      "哈尔滨",
+      "大连",
+      "天津",
+      "太原",
+      "广州",
+      "张家界",
+      "成都",
+      "拉萨",
+      "昆明",
+      "杭州",
+      "桂林",
+      "武汉",
+      "沈阳",
+      "济南",
+      "海口",
+      "深圳",
+      "石家庄",
+      "福州",
+      "苏州",
+      "西双版纳",
+      "西宁",
+      "西安",
+      "贵阳",
+      "郑州",
+      "重庆",
+      "银川",
+      "长春",
+      "长沙",
+      "青岛"
+    ],
+    "scenarios": {
+      "预算变化": 1667,
+      "广泛探索": 1666,
+      "稳定关注": 1667,
+      "多目的地比较": 1666,
+      "逐步迁移": 1667,
+      "临近出游变化": 1667
+    },
+    "original_user_overlap": 0,
+    "source": "independently simulated; no copied original behavior rows",
+    "holiday_source": "https://www.beijing.gov.cn/cs/gncs/zcwj/202603/t20260327_4568275.html",
+    "route_scope": [
+      [
+        "北京",
+        "杭州"
+      ],
+      [
+        "上海",
+        "成都"
+      ],
+      [
+        "广州",
+        "西安"
+      ],
+      [
+        "深圳",
+        "厦门"
+      ],
+      [
+        "成都",
+        "三亚"
+      ],
+      [
+        "北京",
+        "重庆"
+      ],
+      [
+        "广州",
+        "上海"
+      ],
+      [
+        "上海",
+        "北京"
+      ]
+    ],
+    "flight_scope": "8 representative domestic routes × 2 departure dates × 2 trip lengths; shared queries, not 10000 independent flight observations",
+    "original_model_sha256": "e729fccdac96dd149880fce00f2bdc39500b41e663683490688aafed92a58bf3",
+    "files": {
+      "users.jsonl": {
+        "sha256": "1882c0ceb920c0a21407a1e321782169733b74679b506b2b771fffb36c4f27a8",
+        "bytes": 4122595
+      },
+      "behavior_arrays.npz": {
+        "sha256": "a0862a984e745a48abfa44a846516efaf7a28c8c6f0a6e79a66b179128b356cf",
+        "bytes": 34641514
+      },
+      "behaviors.csv.gz": {
+        "sha256": "afc4862e3596708d03740b2ed21ac18a0733d37bee72e50cb9bff1d33530cbfb",
+        "bytes": 96287911
+      }
+    }
+  },
+  "selection": {
+    "method": "14天衰减",
+    "validation": {
+      "原冻结模型": {
+        "recall_at_3": 0.9204398447606728,
+        "ndcg_at_3": 0.9083785089593791,
+        "eligible_snapshots": 5411,
+        "no_relevant_snapshots": 589
+      },
+      "近30天频次": {
+        "recall_at_3": 0.9245056366660507,
+        "ndcg_at_3": 0.9103954812885482,
+        "eligible_snapshots": 5411,
+        "no_relevant_snapshots": 589
+      },
+      "14天衰减": {
+        "recall_at_3": 0.9250600628349658,
+        "ndcg_at_3": 0.9116824595005307,
+        "eligible_snapshots": 5411,
+        "no_relevant_snapshots": 589
+      },
+      "近7天频次": {
+        "recall_at_3": 0.896445512228177,
+        "ndcg_at_3": 0.8842584949565845,
+        "eligible_snapshots": 5411,
+        "no_relevant_snapshots": 589
+      },
+      "短期变化规则": {
+        "recall_at_3": 0.9160044354093513,
+        "ndcg_at_3": 0.9048268168967148,
+        "eligible_snapshots": 5411,
+        "no_relevant_snapshots": 589
+      }
+    },
+    "retraining": {
+      "performed": false
+    },
+    "frozen_protocol_sha256": "cb13e76fa0e213114d9866fa8a2041b66352e583990a3a3cd1751a06f8b14315",
+    "test_access": "not yet scored"
+  },
+  "test": {
+    "原冻结模型": {
+      "recall_at_3": 0.9233971280080789,
+      "ndcg_at_3": 0.9118072388726294,
+      "eligible_snapshots": 27066,
+      "no_relevant_snapshots": 2934
+    },
+    "近30天频次": {
+      "recall_at_3": 0.9263590236212714,
+      "ndcg_at_3": 0.9116589495954472,
+      "eligible_snapshots": 27066,
+      "no_relevant_snapshots": 2934
+    },
+    "14天衰减": {
+      "recall_at_3": 0.9262728146013448,
+      "ndcg_at_3": 0.913402766382868,
+      "eligible_snapshots": 27066,
+      "no_relevant_snapshots": 2934
+    },
+    "近7天频次": {
+      "recall_at_3": 0.9020973422990713,
+      "ndcg_at_3": 0.8908536301524763,
+      "eligible_snapshots": 27066,
+      "no_relevant_snapshots": 2934
+    },
+    "短期变化规则": {
+      "recall_at_3": 0.9208601197073819,
+      "ndcg_at_3": 0.909385970186609,
+      "eligible_snapshots": 27066,
+      "no_relevant_snapshots": 2934
+    }
+  },
+  "selected_method": "14天衰减",
+  "paired_ndcg_delta": 0.00161612456593454,
+  "paired_ndcg_delta_95pct": [
+    0.00012277821825976232,
+    0.002835916151982723
+  ],
+  "subgroups": {
+    "稳定关注": {
+      "原冻结模型": {
+        "recall_at_3": 0.9892978595719144,
+        "ndcg_at_3": 0.9833095258438582,
+        "eligible_snapshots": 4999,
+        "no_relevant_snapshots": 2
+      },
+      "14天衰减": {
+        "recall_at_3": 0.9955991198239648,
+        "ndcg_at_3": 0.9937308406789361,
+        "eligible_snapshots": 4999,
+        "no_relevant_snapshots": 2
+      }
+    },
+    "逐步迁移": {
+      "原冻结模型": {
+        "recall_at_3": 0.9949343464640404,
+        "ndcg_at_3": 0.9931132076598207,
+        "eligible_snapshots": 5001,
+        "no_relevant_snapshots": 0
+      },
+      "14天衰减": {
+        "recall_at_3": 0.9951343064720388,
+        "ndcg_at_3": 0.9912978535265636,
+        "eligible_snapshots": 5001,
+        "no_relevant_snapshots": 0
+      }
+    },
+    "临近出游变化": {
+      "原冻结模型": {
+        "recall_at_3": 0.9945344264480438,
+        "ndcg_at_3": 0.9758604370707122,
+        "eligible_snapshots": 5001,
+        "no_relevant_snapshots": 0
+      },
+      "14天衰减": {
+        "recall_at_3": 0.9965340265280278,
+        "ndcg_at_3": 0.9638778171860473,
+        "eligible_snapshots": 5001,
+        "no_relevant_snapshots": 0
+      }
+    },
+    "预算变化": {
+      "原冻结模型": {
+        "recall_at_3": 0.98833099953324,
+        "ndcg_at_3": 0.9828342109197228,
+        "eligible_snapshots": 4999,
+        "no_relevant_snapshots": 2
+      },
+      "14天衰减": {
+        "recall_at_3": 0.9952323798092952,
+        "ndcg_at_3": 0.9939552347034672,
+        "eligible_snapshots": 4999,
+        "no_relevant_snapshots": 2
+      }
+    },
+    "广泛探索": {
+      "原冻结模型": {
+        "recall_at_3": 0.07696647324306899,
+        "ndcg_at_3": 0.058821140025647006,
+        "eligible_snapshots": 2068,
+        "no_relevant_snapshots": 2930
+      },
+      "14天衰减": {
+        "recall_at_3": 0.07736943907156674,
+        "ndcg_at_3": 0.05885461291883429,
+        "eligible_snapshots": 2068,
+        "no_relevant_snapshots": 2930
+      }
+    },
+    "多目的地比较": {
+      "原冻结模型": {
+        "recall_at_3": 1.0,
+        "ndcg_at_3": 0.976739270183075,
+        "eligible_snapshots": 4998,
+        "no_relevant_snapshots": 0
+      },
+      "14天衰减": {
+        "recall_at_3": 1.0,
+        "ndcg_at_3": 0.9776253932237198,
+        "eligible_snapshots": 4998,
+        "no_relevant_snapshots": 0
+      }
+    }
+  },
+  "shuffled_user_negative_control": {
+    "recall_at_3": 0.10605556787112982,
+    "ndcg_at_3": 0.08657324170750536,
+    "eligible_snapshots": 27066,
+    "no_relevant_snapshots": 2934
+  },
+  "old_model_unchanged": true,
+  "result_scope": "independent synthetic new users; not real behavior, sales, conversion or ROI",
+  "deployment": "original 2024 replay model preserved; recommended method versioned for new-cohort evaluation"
+}

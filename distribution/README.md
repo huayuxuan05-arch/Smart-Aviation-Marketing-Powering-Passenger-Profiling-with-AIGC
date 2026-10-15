@@ -16,3 +16,6 @@ Qwen权重由发布任务从固定Unsloth源版本取回并校验后上传GitHub
 发布流程位于 `.github/workflows/publish-demo.yml`，只用GitHub Actions自带的仓库令牌上传当前仓库Release，不要求用户提供密钥。发布成功前，请勿将Release描述为已可下载。GitHub负责文件分发，Python服务与模型仍在本地运行。
 
 首次发布的源分卷为临时组装材料；后续重新执行发布任务优先复用已经发布并校验的Release数据包，避免依赖临时对象的长期保存。
+
+
+新增全年独立测试数据的版本、模拟标记、许可状态和SHA256记录在[independent-test-2026-10-16.json](independent-test-2026-10-16.json)，结果见[独立年度验收](../docs/independent-evaluation-2026-10-16.md)。当前这些大文件仅保存在项目runtime，尚未另行发布为GitHub Release附件；该清单不改原始七项发布契约。

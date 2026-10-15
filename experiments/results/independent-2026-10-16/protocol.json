@@ -1,0 +1,60 @@
+{
+  "version": "annual-new-user-eval-v1",
+  "anchor": "2026-10-16",
+  "seed": 20261016,
+  "training_cutoffs": [
+    "2026-01-18",
+    "2026-02-17",
+    "2026-03-19",
+    "2026-04-18",
+    "2026-05-18",
+    "2026-06-17"
+  ],
+  "validation_cutoffs": [
+    "2026-07-17",
+    "2026-08-16",
+    "2026-09-15"
+  ],
+  "test_cutoffs": [
+    "2026-08-09",
+    "2026-09-08",
+    "2026-10-08"
+  ],
+  "horizon_days": 7,
+  "features": [
+    "近7天关注占比",
+    "近30天关注占比",
+    "近60天关注占比",
+    "14天衰减关注占比",
+    "最近关注距今天数",
+    "重复访问占比",
+    "收藏对象数",
+    "目的地信息占比",
+    "景区内容占比",
+    "酒店内容占比",
+    "机票查询占比",
+    "攻略内容占比",
+    "目的地停留强度",
+    "近期关注变化",
+    "明确假期计划占比",
+    "明确出行计划占比",
+    "近期预算均值",
+    "预算证据数",
+    "全局机票查询占比",
+    "全局攻略访问占比",
+    "全局重复访问占比",
+    "当前假期临近度",
+    "用户内容停留强度"
+  ],
+  "test_users": 10000,
+  "test_rows": 3650000,
+  "outcome": "future 7-day repeated destination attention, not bookings",
+  "selection": "validation users only; final test evaluated once after selection",
+  "retrain_trigger": "original validation NDCG@3 trails best rule by >0.005, or Recall@3 by >0.01",
+  "replacement": "best validation NDCG@3 with Recall@3 no worse than original by 0.005",
+  "uncertainty": "paired bootstrap of users; each user retains all 3 snapshots",
+  "synthetic_limit": "generated retrospective behavior is not actual year-long observation",
+  "flights": "independent current feasibility checks, never a feature or future-attention label",
+  "original_model_sha256": "e729fccdac96dd149880fce00f2bdc39500b41e663683490688aafed92a58bf3",
+  "frozen_test_manifest_sha256": "f7a8071fff3f66eceb5ee4373424d2e878842e18a45ca62380fea11087fed806"
+}

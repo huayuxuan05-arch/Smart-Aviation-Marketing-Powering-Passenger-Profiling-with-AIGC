@@ -25,7 +25,7 @@ CLUSTER_FEATURES=['目的地信息','景区关注','酒店关注','机票查询'
 _CACHE=None
 _LOCK=threading.Lock()
 
-def day_index(value):return (datetime.fromisoformat(str(value)[:10])-BASE_DATE).days
+def day_index(value,base_date=BASE_DATE):return (datetime.fromisoformat(str(value)[:10])-base_date).days
 
 def load_data():
  global _CACHE
@@ -55,10 +55,10 @@ def load_data():
  _CACHE=(a,users,objects,destinations)
  return _CACHE
 
-def snapshot(asof):
+def snapshot(asof,*,dataset=None,base_date=BASE_DATE,holidays=HOLIDAYS):
  """截至北京时间当天末尾；对尚未完成的访问/收藏按子事件截断。"""
- a,users,objects,dests=load_data();t=day_index(asof);n=len(users);k=len(dests);ids=np.arange(n);end=(t+1)*86400-1
- if not 30<=t<397:raise ValueError('营销画像截点须位于2023-12-31至2024-12-31')
+ a,users,objects,dests=load_data() if dataset is None else dataset;t=day_index(asof,base_date);n=len(users);k=len(dests);ids=np.arange(n);end=(t+1)*86400-1
+ if not 30<=t<len(a['dest']):raise ValueError('画像截点须在数据范围内且保留至少30天历史')
  count={w:np.zeros((n,k),np.float32) for w in [7,30,60]};decay=np.zeros((n,k),np.float32);recency=np.full((n,k),61,np.float32);typ=np.zeros((n,k,5),np.float32);dwell=np.zeros((n,k),np.float32);repeat=np.zeros((n,k),np.float32);explicit=np.zeros((n,k),np.float32);holiday=np.zeros((n,k),np.float32)
  budget_sum=np.zeros(n,np.float32);budget_n=np.zeros(n,np.float32);ctypes=np.zeros((n,5),np.float32);channels=np.zeros((n,6),np.float32);hours=np.zeros((n,24),np.float32)
  for age in range(min(60,t+1)):
@@ -70,8 +70,8 @@ def snapshot(asof):
    visited=a['visit'][z]<=end;complete=np.maximum(0,np.minimum(a['dwell'][z],end-a['visit'][z]))
    typ[ids,d,a['type'][z]]+=1;ctypes[ids,a['type'][z]]+=1;dwell[ids,d]+=complete/300;repeat[ids,d]+=a['repeat'][z]*visited
    plans=a['travel'][z]>t;explicit[ids,d]+=plans
-   for h in HOLIDAYS:
-    valid=plans&(a['travel'][z]>=day_index(h['start']))&(a['travel'][z]<=day_index(h['end']))
+   for h in holidays:
+    valid=plans&(a['travel'][z]>=day_index(h['start'],base_date))&(a['travel'][z]<=day_index(h['end'],base_date))
     holiday[ids,d]+=valid
    good=~np.isnan(a['budget'][z]);budget_sum+=np.nan_to_num(a['budget'][z]);budget_n+=good
    channels[ids,a['channel'][z]]+=1;hours[ids,a['hour'][z]]+=1
@@ -83,15 +83,15 @@ def snapshot(asof):
  for oidx,o in enumerate(objects):favdest[:,didx[o['destination']]]+=fav[:,oidx]
  def tile(v):return np.broadcast_to(v[:,None],(n,k))
  meanbudget=np.divide(budget_sum,budget_n,out=np.zeros(n,np.float32),where=budget_n>0)
- proximity=min((max(0,(datetime.fromisoformat(h['start'])-datetime.fromisoformat(asof[:10])).days) for h in HOLIDAYS if h['end']>=asof[:10]),default=90)
+ proximity=min((max(0,(datetime.fromisoformat(h['start'])-datetime.fromisoformat(asof[:10])).days) for h in holidays if h['end']>=asof[:10]),default=90)
  values=[count[7]/7,count[30]/30,count[60]/min(60,t+1),decay/max(1,sum(2**(-i/14) for i in range(min(60,t+1)))),recency/61,repeat/30,np.log1p(favdest),*[typ[:,:,i]/30 for i in range(5)],dwell/30,count[7]/7-count[30]/30,holiday/30,explicit/30,tile(meanbudget/5000),tile(budget_n/30),tile(ctypes[:,3]/30),tile(ctypes[:,4]/30),tile(np.sum(repeat,axis=1)/30),np.full((n,k),max(0,1-proximity/30),np.float32),tile(np.sum(dwell,axis=1)/30)]
  X=np.stack(values,axis=-1).astype(np.float32)
  cluster=np.column_stack([ctypes/30,np.sum(repeat,axis=1)/30,np.sum((a['action'][max(0,t-29):t+1]>0)&(a['favtime'][max(0,t-29):t+1]<=end),axis=0)/30,np.sum(explicit,axis=1)/30,budget_n/30,np.sum(dwell,axis=1)/30,np.mean(a['type'][t-6:t+1]==3,axis=0),np.mean(a['type'][t-6:t+1]==4,axis=0)]).astype(np.float32)
  return {'X':X,'count':count,'cluster':cluster,'channels':channels,'hours':hours,'budget':meanbudget,'budget_n':budget_n,'favdest':favdest,'asof':asof,'day':t}
 
-def targets(t,horizon=7):
- a,users,objects,dests=load_data();n=len(users);k=len(dests);counts=np.zeros((n,k),np.int8);fare=np.zeros((n,k),np.int8);fav=np.zeros((n,k),np.int8);ids=np.arange(n)
- if t+horizon>=397:raise ValueError('标签窗口不完整')
+def targets(t,horizon=7,*,dataset=None):
+ a,users,objects,dests=load_data() if dataset is None else dataset;n=len(users);k=len(dests);counts=np.zeros((n,k),np.int8);fare=np.zeros((n,k),np.int8);fav=np.zeros((n,k),np.int8);ids=np.arange(n)
+ if t+horizon>=len(a['dest']):raise ValueError('标签窗口不完整')
  for z in range(t+1,t+horizon+1):
   d=a['dest'][z];counts[ids,d]+=1;fare[ids,d]+=a['type'][z]==3;fav[ids,d]+=(a['action'][z]>0)&(a['favtime'][z]<=(t+horizon+1)*86400-1)
  return {'continue':(counts>=2).astype(np.uint8),'fare':(fare>0).astype(np.uint8),'favorite':(fav>0).astype(np.uint8),'attention':(counts>0).astype(np.uint8)}

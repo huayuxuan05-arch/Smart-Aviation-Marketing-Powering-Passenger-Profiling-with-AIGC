@@ -95,3 +95,10 @@
 依赖固定到 Farello 提交7adb330及flights 0.9.0，安装沿用Prepare-Demo.ps1中的HTTPS代理。查询请求逐次显式指定HTTPS_PROXY/https_proxy；不运行上游自动直连和代理探测。无代理时不发出外部查询。后台仅发送机场、出行日期、成人数及舱位条件。
 
 观测保存在runtime/flight_quotes.sqlite3，包含成功、无结果及失败记录，不自动删除较早批次。价格变化仅反映实际采集记录。每段原始响应和查询条件保留在本机，不提交Git。网页自动重试与刷新，仅渲染有效报价，不展示失败状态卡片。测试：python -m unittest test_flight_quotes -v；node flight_browser_check.cjs（明确的模拟报价，用于交互验收，不代表实时票价实测）。
+
+
+## 独立全年测试与约束优先方案（2026-10-16）
+
+`independent_cohort.py`生成新的全年模拟用户，`independent_evaluation.py`读取明确传入的数据与日历，原2024索引和模型保持不变。`new_method_evaluation.py`在独立开发用户上训练成对排序与梯度提升，再用另建确认用户评价；`constraint_planner.py`先筛选航班与预算可行性，`feasibility_benchmark.py`对照实际采集的日期/目的地备选。新方法目前作为独立评估流程，网站不会因执行评估而切换数据源或覆盖模型。
+
+数据、指标、局限及重现命令见[独立年度测试](../docs/independent-evaluation-2026-10-16.md)。新增专项：`python -m unittest test_independent_evaluation test_constraint_planner -v`。原始航班响应与大数据文件保存在runtime，不提交Git；SHA256与版本见distribution独立数据清单。
