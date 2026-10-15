@@ -182,7 +182,7 @@ body.wd-template {
 .marketing-page .empty,.marketing-page #app>.table-tools,.marketing-page #audience-table{background:var(--marketing-surface);border:0;border-radius:var(--wd-radius)}
 .marketing-page #app>.table-tools{padding:18px}
 .marketing-page #audience-table{padding:16px}
-.marketing-page :is(.card,.empty,.route-card,.segment-card,.intent-card,.metric-grid,.workflow,.overview-status,.topbar,.page-head,#audience-table),.marketing-page #app>.table-tools{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.marketing-page :is(.card,.empty,.route-card,.segment-card,.intent-card,.metric-grid,.workflow,.overview-status,.topbar,#audience-table),.marketing-page #app>.table-tools{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .marketing-page .main-shell{margin-left:232px}
 .marketing-page #sidebar .brand{padding:29px 23px 24px;color:#fff;font-size:22px}
 .marketing-page #sidebar .brand small{color:#b6ccc8}
@@ -204,9 +204,9 @@ body.wd-template {
 .marketing-page .breadcrumb strong{color:#244b50}
 .marketing-page .operator{color:#375e45;background:#e1eadb}
 .marketing-page main{padding:28px 32px 40px}
-.marketing-page .page-head{margin-bottom:24px;padding:12px 18px;border:0;border-radius:var(--wd-inner-radius);background:#f4f7edd1}
+.marketing-page .page-head{margin-bottom:24px;padding:4px 0;border:0;border-radius:0;background:none;box-shadow:none}
 .marketing-page .page-head h1{color:#183746;font-weight:600}
-.marketing-page .section:not(.card)>.section-head{padding:10px 14px;border-radius:var(--wd-inner-radius);background:#f4f7edd1}
+.marketing-page .section:not(.card)>.section-head{padding:0;border:0;border-radius:0;background:none;box-shadow:none}
 .marketing-page .section:not(.card)>.section-head h2,.marketing-page .section:not(.card)>.section-head .text-button{color:#244b50}
 .marketing-page .page-head>.text-button{color:#176b60}
 .marketing-page .overview-status{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,.9fr) auto;align-items:center;gap:32px;padding:22px 26px;background:#dfe7d9eb;border:0;border-radius:var(--wd-radius)}
