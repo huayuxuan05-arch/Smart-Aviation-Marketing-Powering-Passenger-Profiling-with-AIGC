@@ -11,6 +11,7 @@ import uuid
 from data_layer import RUNTIME, ClosingConnection, CST
 import travel_planner as planner
 import survey_evidence as evidence
+import flight_quotes
 
 THEMES=['城市初访','自然与景区','舒适休闲','交通与预算','文化与攻略']
 PARTIES=['独行','情侣','朋友','亲子','长者同行']
@@ -107,10 +108,11 @@ def make_plan(source,prefs):
     candidates=[]
     for destination in choices:
         if destination==origin or destination=='苏州' and origin in ('上海','南京'):continue
-        outbound=routes.route(origin,destination,start)
-        if outbound:
-            back=routes.route(outbound['gateway'],origin,end)
-            candidates.append((destination,outbound,back))
+        def pending(day,gateway):
+            return {'flights':[],'gateway':gateway,'destination':gateway,'target_date':day,
+                    'kind':'当前航班','status':'','exact_date':False,'ground_transfer':None,
+                    'reference_fare':0,'date_gap':0}
+        candidates.append((destination,pending(start,destination),pending(end,origin)))
     if not candidates:raise ValueError('当前条件缺少航线网络参考，请调整目的地；不会改写历史航班日期')
     prior=evidence.destination_prior()
     def cost_order(candidate):
@@ -118,7 +120,7 @@ def make_plan(source,prefs):
         # 下界是情景比较，不是实时报价；先保往返与用户约束，再用样本先验打破并列。
         floor=(o['reference_fare']+(b['reference_fare'] if b else 0)+(prefs['days']-1)*120+prefs['days']*160+200)*1.1
         direct=len(o['flights'])==1 and not o['ground_transfer'] and b is not None and len(b['flights'])==1 and not b['ground_transfer']
-        return (not b,prefs['fallback_policy']=='只接受直飞' and not direct,max(0,o['reference_fare']-cap) if cap else 0,max(0,floor-total) if total else 0,-prior.get(d,0),o['reference_fare']+(b['reference_fare'] if b else 0))
+        return (-prior.get(d,0),choices.index(d))
     if prefs['destination']=='为我推荐':candidates.sort(key=cost_order)
     destination,outbound,back=candidates[0]
     pace=prefs['pace'] if prefs['pace']!='按同行方式安排' else ('轻松' if prefs['party'] in ('亲子','长者同行') or prefs['theme']=='舒适休闲' else '均衡')
@@ -157,7 +159,7 @@ def make_plan(source,prefs):
     else:plan['backup_options'].insert(0,{'name':'预算变化时的处理顺序','advice':f'你选择：{prefs["overbudget_policy"]}。出现费用差异时先说明，再由你确认。'})
     plan['basis']='依据当前旅客主动填写的偏好生成，不套用模拟旅客画像。航班引用2024年历史样本，非机票费用为情景估算，需按实际出行日核验。'
     plan['budget']['basis']='按每名成人估算，未采集同行人数；全程预算与单程机票上限分开，历史票价和情景费用不等于实时报价。'
-    return plan
+    return flight_quotes.latest_only(plan)
 
 
 def record_preferences(c,owner,prefs,expected_revision=None):
@@ -196,6 +198,21 @@ def get_plan(owner,plan_id):
     return json.loads(row[0])
 
 
+def apply_flight_quote(owner,body):
+    import flight_quotes
+    if body.get('confirmed') is not True:raise ValueError('请确认报价与预算后保存')
+    original=get_plan(owner,body['plan_id'])
+    plan=flight_quotes.preview(owner,original,body)
+    with db() as c:
+        c.execute('BEGIN IMMEDIATE')
+        current=c.execute('SELECT revision FROM personal_sessions WHERE owner=?',(owner,)).fetchone()
+        if not current or body.get('expected_revision')!=current['revision']:
+            raise ValueError('偏好已在另一个页面更新，请刷新后重试')
+        plan.update(id='PERSONAL_'+uuid.uuid4().hex,created_at=now(),parent_plan_id=original['id'])
+        c.execute('INSERT INTO personal_plans VALUES(?,?,?,?,?)',(plan['id'],owner,plan['created_at'],plan['profile_revision'],json.dumps(plan,ensure_ascii=False)))
+    return plan
+
+
 def explain(owner,plan_id):
     import local_generation
     plan=get_plan(owner,plan_id);plan['ai_explanation']=local_generation.explain_trip(plan)
@@ -215,7 +232,8 @@ def state(owner):
 
 
 def bootstrap(source,owner):
+    import content_generation
     network=planner.network(source)
     return {**state(owner),'cities':sorted(network.outgoing),'destinations':sorted(planner.PLACES),'themes':THEMES,'parties':PARTIES,'paces':PACES,
             'date_flexibilities':FLEXIBILITY,'lodging_priorities':LODGING,'fallback_policies':FALLBACKS,'overbudget_policies':OVERBUDGET,
-            'attractions':{d:attraction_options(d) for d in planner.PLACES},'planning_stages':STAGES}
+            'attractions':{d:attraction_options(d) for d in planner.PLACES},'planning_stages':STAGES,'generation':content_generation.configuration()}

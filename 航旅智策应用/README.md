@@ -1,8 +1,16 @@
 # 华翼朝阳本地应用（航旅智策项目）
 
+本地启动默认采用模板模式，暂不下载或接入大模型。个人及营销端的旅行方案、偏好保存和导出可用，AI细化按钮显示未接入；营销文案使用模板与SVG合成。需要模型时才显式使用 Start-Local.ps1 -GenerationMode local-model 或 Prepare-Demo.ps1 -EnableLocalModel。
+
+2026-10-15需求协商更新：个人页顶部可输入旅行想法，或针对当前方案描述“行程太赶、酒店太贵、日期不变”。先查看提取字段、回答缺失问题，再看同一规划工具算出的新旧情景费用；勾选核对并确认后才保存偏好版本与新方案，旧方案保留。放弃草稿不改变偏好。首次需求不套用表单默认日期或同行；多人总预算要求澄清每名成人口径，假期名称要求确认具体日期。金额未确定可明确留空。仅规则覆盖范围内的表达可解析，其他需求使用表单。会话草稿与确认依据存于既有personal.sqlite3，不包含外部发送操作。
+
+当前部署保持规则/模板模式，大模型未接入。结构化Qwen提取适配器已有模拟协议测试，实际模型推理尚未在本次优化中验证；不得把规则解析称为大模型效果。专项检查：`python -m unittest test_personal_assistant -v`；`node entry_browser_check.cjs`包含澄清、确认、反馈对比、放弃及旧版本阻止，均写入隔离目录。
+
+本次本机验证：完整后端113项通过（需求协商专项22项），入口与协商浏览器22项通过，五层框架及数据清单通过。浏览器验收使用隔离会话，包含追问表单与原偏好表单互不影响、390px布局和零JavaScript异常。
+
 2026-10-15独立入口更新：网站首页 `/` 为“个性化旅游定制”入口选择页。个人旅客从 `/personal/` 填写自己的出发地、目的地、日期、同行、兴趣和预算，生成、保存及导出自己的旅行方案；支持保存偏好、查看偏好更新及用本地Qwen细化说明。个人端不读取模拟旅客画像，偏好和方案存放独立的 `runtime/personal.sqlite3`，不同浏览器会话分别访问自己的方案。
 
-营销人员从 `/marketing/#trips` 使用全量旅客规划、需求洞察和活动管理，页面中的“营销工作台”已改为“个性化旅游定制”，并标注营销人员端。两端均有切换入口。旧 `/#trips` 等工作区链接会转到对应营销页；活动、审核和原始数据保留。
+营销人员从 `/marketing/#trips` 使用全量旅客规划、需求洞察和活动管理，界面统一使用“节假日航空智慧决策系统”，包括浏览器标题、侧栏和顶部导航，并标注营销人员端。两端均有切换入口。旧 `/#trips` 等工作区链接会转到对应营销页；活动、审核和原始数据保留。
 
 
 网站品牌为 **华翼朝阳**，使用用户提供的飞机与旅客图标。界面标题、导航、问卷页及新生成的海报统一使用该品牌。
@@ -21,9 +29,9 @@
 
 ## 首次准备与日常运行
 
-将仓库解压到 D 盘，安装 Python 3.11 或以上，双击根目录的“准备并启动Demo.cmd”。自动建立项目虚拟环境，下载并校验三份 Excel、训练模型及 Qwen 权重，重建 SQLite 索引，无需重新训练。
+将仓库解压到 D 盘，安装 Python 3.11 或以上，双击根目录的“准备并启动Demo.cmd”。自动建立项目虚拟环境，下载并校验三份 Excel 与需求模型，重建 SQLite 索引，无需重新训练。
 
-也可执行 ./Prepare-Demo.ps1；仅准备画像、航线和需求模型时加 -DataOnly。当前完整推理程序为 Windows x64 CUDA 版，需要兼容驱动及本地内存、显存。运行网站不需要 Node 或云端 API 密钥。
+也可执行 ./Prepare-Demo.ps1；默认及 -DataOnly 均仅准备数据和需求模型。当前完整推理程序为 Windows x64 CUDA 版，需要兼容驱动及本地内存、显存。运行网站不需要 Node 或云端 API 密钥。
 
 完成后双击“启动本地测试版.cmd”，访问 http://127.0.0.1:8765/ 。重复启动复用服务；关闭浏览器不会停止。双击“停止本地测试版.cmd”停止网站和本地模型，保留数据。其他网站端口用 ./Start-Local.ps1 -Port 8766。
 
@@ -55,7 +63,7 @@
 
 完整后端测试：
 
-    python -m unittest test_core test_marketing test_decisions test_travel_planner test_personal test_survey_evidence test_local_generation test_distribution -v
+    python -m unittest test_core test_marketing test_decisions test_travel_planner test_personal test_personal_assistant test_survey_evidence test_local_generation test_content_generation test_distribution -v
 
 浏览器验收需 Node、Playwright 和 Chrome；运行 marketing_browser_check.cjs、campaign_delete_browser_check.cjs、creative_delete_browser_check.cjs。可用 AEROLENS_TEST_URL 指定独立验收服务，PLAYWRIGHT_MODULE 指定已有模块路径，CHROME_PATH 指定浏览器，PYTHON 指定清理测试活动所用解释器。
 
@@ -79,3 +87,11 @@
 验收：`python -m unittest test_core test_marketing test_decisions test_travel_planner test_personal test_survey_evidence test_local_generation test_distribution -q`；设置AEROLENS_TEST_LOCAL_AI=1运行entry_browser_check.cjs可调用实际本地Qwen。模型协议及最新数字见docs/survey-evidence.md（同步仓库）。
 
 当前同步仓库源码完整后端87项已在本机原始数据与模型上通过；开发版含保留的旧接口测试共94项。最新界面无问卷统计导航、宣传式步骤介绍和画像日期公共栏，仅具体活动页显示活动名与状态。空白问卷及字段说明可发布，真实答卷与整理结果不上传。
+
+## 当前航班接入（2026-10-15）
+
+现有方案页自动后台匹配往返航班，查询默认一名成人，可调整至1—9人。往返价为两张单程查询报价组合；选中后先预览按人数均摊的每名成人预算，确认才另存新方案，原偏好及旧版本保留。最终价格、税费、行李与退改以预订页为准。2024航班仅保留用于训练和离线评估，网页不显示其航班或票价。原始工作簿、训练权重、活动及原方案不删除。
+
+依赖固定到 Farello 提交7adb330及flights 0.9.0，安装沿用Prepare-Demo.ps1中的HTTPS代理。查询请求逐次显式指定HTTPS_PROXY/https_proxy；不运行上游自动直连和代理探测。无代理时不发出外部查询。后台仅发送机场、出行日期、成人数及舱位条件。
+
+观测保存在runtime/flight_quotes.sqlite3，包含成功、无结果及失败记录，不自动删除较早批次。价格变化仅反映实际采集记录。每段原始响应和查询条件保留在本机，不提交Git。网页自动重试与刷新，仅渲染有效报价，不展示失败状态卡片。测试：python -m unittest test_flight_quotes -v；node flight_browser_check.cjs（明确的模拟报价，用于交互验收，不代表实时票价实测）。

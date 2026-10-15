@@ -5,7 +5,7 @@ const out=path.join(__dirname,'runtime/tmp/travel-qa');fs.mkdirSync(out,{recursi
 process.env.TEMP=out;process.env.TMP=out;process.env.TMPDIR=out;
 let server;process.on('exit',()=>server?.kill());
 (async()=>{
- const base='http://127.0.0.1:8769';
+ const base=process.env.AEROLENS_TEST_URL||'http://127.0.0.1:8769';
  try{await fetch(base+'/api/health');throw Error('QA port 8769 is already occupied');}catch(e){if(e.message.includes('occupied'))throw e;}
  const localPython=path.join(__dirname,'.venv/Scripts/python.exe');
  const python=process.env.AEROLENS_PYTHON||(fs.existsSync(localPython)?localPython:path.join(process.env.USERPROFILE,'.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe'));
@@ -17,12 +17,12 @@ let server;process.on('exit',()=>server?.kill());
  try{
   await page.goto(base+'/marketing/',{waitUntil:'networkidle'});await page.locator('[data-trip-detail]').waitFor({timeout:60000});
   assert.equal(await page.locator('[data-trip-day]').count(),3);assert.ok((await page.locator('.metric-grid').innerText()).includes('10,000'));
-  assert.ok((await page.locator('[data-trip-detail]').innerText()).includes('原始记录日期'));pass('Default homepage offers full-population travel plans with original flight dates');
+  assert.equal(await page.locator('[data-flight-reference]').count(),0);pass('Default homepage offers full-population travel plans with automatic current flight matching and no historical flight cards');
   const first=await page.locator('[data-trip-detail] h2').innerText();await page.locator('[data-action=trip-view]').nth(1).click();await page.waitForFunction(t=>document.querySelector('[data-trip-detail] h2').textContent!==t,first);
   pass('Different travelers have individual plans and route references');
   await page.locator('#trip-settings-form [name=days]').selectOption('5');await page.locator('#trip-settings-form [name=trip_budget]').fill('100');await page.locator('#trip-settings-form [type=submit]').click();
   await page.waitForFunction(()=>document.querySelectorAll('[data-trip-day]').length===5,{timeout:60000});
-  assert.ok((await page.locator('[data-trip-detail]').innerText()).includes('当前情景高出'));pass('Duration and budget updates regenerate the itinerary and disclose an infeasible budget');
+  assert.ok((await page.locator('[data-trip-detail]').innerText()).includes('非机票预算'));pass('Duration and budget updates regenerate the itinerary and keep airfare incomplete until a current quote is selected');
   let download=page.waitForEvent('download');await page.locator('[data-action=trip-export]').click();let file=await download;await file.saveAs(path.join(out,'plan.json'));const plan=JSON.parse(fs.readFileSync(path.join(out,'plan.json'),'utf8'));
   assert.equal(plan.days,5);assert.equal(plan.bookable,false);assert.equal(plan.daily_itinerary.length,5);assert.equal(plan.backup_options.length,3);pass('Complete export preserves flight provenance, budget assumptions and backup options');
   await page.screenshot({path:path.join(out,'trip-desktop.png')});await page.setViewportSize({width:390,height:844});await page.screenshot({path:path.join(out,'trip-mobile.png')});

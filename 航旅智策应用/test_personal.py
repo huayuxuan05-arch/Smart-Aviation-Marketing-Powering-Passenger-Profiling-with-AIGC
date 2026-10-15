@@ -63,7 +63,8 @@ class PersonalTests(unittest.TestCase):
     def test_save_only_and_overbudget_disclosure(self):
         saved=app.save_preferences(self.source,self.owner,{'preferences':self.prefs,'expected_revision':0})
         self.assertEqual(saved['revision'],1);self.assertEqual(app.state(self.owner)['plans'],[])
-        plan=self.create(trip_budget=100)['plan'];self.assertGreater(plan['budget']['difference'],0)
+        plan=self.create(trip_budget=100)['plan'];self.assertIsNone(plan['budget']['difference'])
+        self.assertIsNone(plan['budget']['estimated_total'])
         self.assertEqual(plan['budget']['specified_total'],100)
     def test_invalid_preferences_do_not_silently_relax(self):
         for changes in [{'origin':'未知城市'},{'destination':'未知景点'},{'destination':'北京'},{'trip_budget':'nan'},{'days':1},{'days':3.5},{'start_date':'bad'},{'theme':'随便编造'}]:

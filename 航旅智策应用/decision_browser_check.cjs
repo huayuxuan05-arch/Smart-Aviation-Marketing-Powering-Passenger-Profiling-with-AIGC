@@ -19,7 +19,7 @@ process.on('exit',()=>server?.kill());
  const fixture=JSON.parse(fs.readFileSync(path.join(out,'fixture.json'),'utf8'));
  const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
  const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage();
- const base='http://127.0.0.1:8769',errors=[],checks=[];
+ const base=process.env.AEROLENS_TEST_URL||'http://127.0.0.1:8769',errors=[],checks=[];
  page.on('pageerror',e=>errors.push(e.message));
  const pass=message=>{checks.push(message);console.log('PASS '+message);};
  const nav=async name=>{await page.locator(`nav [data-nav=${name}]`).click();await page.waitForFunction(name=>location.hash==='#'+name,name);};

@@ -1,5 +1,7 @@
 # 华翼朝阳 · 个性化旅游定制
 
+本地启动默认采用模板模式，暂不下载或接入大模型。个人及营销端的旅行方案、偏好保存和导出可用，AI细化按钮显示未接入；营销文案使用模板与SVG合成。需要模型时才显式使用 Start-Local.ps1 -GenerationMode local-model 或 Prepare-Demo.ps1 -EnableLocalModel。
+
 航旅智策——节假日航空智慧营销决策系统的当前实现，保留数据、算法、AIGC、应用、评估五层。
 
 <img src="航旅智策应用/web/assets/huayi-chaoyang-logo.png" alt="华翼朝阳" width="76">
@@ -12,6 +14,8 @@
 | 营销人员 | `/marketing/#trips` | 旅行方案、活动总览、需求洞察、画像、航线、创意、模拟触达、复盘 |
 
 首页 `/` 选择入口。个人端以本次主动填写为依据，按独立浏览器会话保存偏好版本与历史方案。日期、天数、预算未确定时可仅保存意向；确定出游后支持2至8天、具体景点、住宿侧重、日期弹性、备选许可和超预算处理。
+
+个人端新增文字需求协商：输入旅行想法或对当前方案的意见，先生成草稿、追问缺失条件，调用既有航线与预算工具展示预览及费用差异，逐项确认后保存新方案和偏好版本。节假日日期、多人总预算及往返机票金额不自动猜测或折算。默认使用明确标注的本地规则解析，不调用大模型；显式启用本地模型时，可由Qwen提供结构化槽位建议，仍由程序核验、本人确认。规则解析仅覆盖受支持的表达，未识别需求可使用表单。详见[应用与确认边界](docs/application.md)。
 
 营销端服务全部10,000名模拟旅客，旅行规划不受营销名单限额或退订状态删减。逐人提供去返历史航线参考、逐日活动、住宿条件、预算、备选与核验清单；默认国庆历史场景中10,000人均有规划及往返参考，569人有目标日历史直飞。历史参考不等于当前可售机票。
 
@@ -43,7 +47,7 @@
 python scripts/validate_framework.py
 python scripts/validate_dataset.py
 cd 航旅智策应用
-python -m unittest test_core test_marketing test_decisions test_travel_planner test_personal test_survey_evidence test_local_generation test_distribution -v
+python -m unittest test_core test_marketing test_decisions test_travel_planner test_personal test_personal_assistant test_survey_evidence test_local_generation test_content_generation test_distribution -v
 node entry_browser_check.cjs
 node travel_browser_check.cjs
 node decision_browser_check.cjs
@@ -51,7 +55,9 @@ node decision_browser_check.cjs
 
 先还原数据与模型再执行完整业务检查。三个浏览器脚本顺序执行，各自使用8769隔离服务与临时活动库，需要Chrome及Playwright；脚本支持本机运行时路径，未把无数据CI当作业务验收。
 
-本次同步仓库源码在本机已核验的数据与模型上通过87项后端检查；开发版通过94项。双入口、逐页简化、活动状态、旅行与问卷、执行资格等浏览器验收通过。详情见[本次更新验收](experiments/results/local-demo-2026-10-15/README.md)。
+本次需求协商优化在本机原始数据与训练产物上通过113项后端检查（含22项需求协商专项）、22项入口与协商浏览器检查，五层框架及数据清单校验通过。浏览器结果存于本机runtime/tmp/entry-qa/checks.json。未启动大模型，结构化提取适配器仅完成模拟协议测试，没有真实推理质量评估。
+
+此前入口更新的87项后端及相关浏览器验收记录见[已有更新验收](experiments/results/local-demo-2026-10-15/README.md)，不作为本次新增功能的实测结果。
 
 ## 五层及目录
 
@@ -64,3 +70,5 @@ node decision_browser_check.cjs
 | 评估层 | [时间切分、代理标签及边界](docs/evaluation.md) |
 
 `航旅智策应用/`包含网站与启动脚本；`问卷资料/`只包含空白收集工具与字段说明；`distribution/`保存发布清单与许可；`experiments/`保存训练及验收记录；`scripts/`提供仓库与发布校验。`runtime/`、数据库、下载缓存、密钥与真实逐人答卷均留在本机。
+
+2026-10-15 航班接入更新：网页现有旅行方案区域自动查询 Google Flights 当前报价，支持成人人数、直飞/中转、预算比较和确认后另存新方案，不新增页面或导航。2024航班保留为训练与离线评估数据，不再用于个人方案的航班选择或网页机票预算。尚无有效报价时只展示非机票费用，不回填旧票价。报价记录从实际采集日起追加保存，不能补造更早的价格。

@@ -1,6 +1,6 @@
 {
   "project_name": "航旅智策——节假日航空智慧营销决策系统",
-  "framework_version": "4.1",
+  "framework_version": "4.2",
   "updated_date": "2026-10-15",
   "delivery_scope": "local_interactive_demo_and_trained_synthetic_models",
   "scenario": {
@@ -46,10 +46,11 @@
       "modules": [
         "结构化事实引用",
         "个性化文案",
-        "SVG视觉合成"
+        "SVG视觉合成",
+        "受限结构化需求理解（默认规则，可选本地模型）"
       ],
       "spec": "docs/aigc.md",
-      "status": "local_qwen35_9b_cuda_reviewed_copy_and_svg"
+      "status": "rules_and_templates_default_optional_local_qwen_structured_proposals"
     },
     {
       "id": "application",
@@ -57,7 +58,8 @@
       "modules": [
         "个人旅客入口",
         "营销人员入口",
-        "偏好版本与方案保存"
+        "偏好版本与方案保存",
+        "需求澄清、工具预览与本人确认"
       ],
       "spec": "docs/application.md",
       "status": "dual_entry_personal_planner_and_eight_page_marketing_demo"
@@ -101,5 +103,11 @@
     "asset_checksums_verified": true
   },
   "website_brand": "华翼朝阳",
-  "private_survey_data_in_git": false
+  "private_survey_data_in_git": false,
+  "flight_data_policy": {
+    "training": "2024 historical flights retained for training and offline evaluation",
+    "website": "current Google Flights observations only; explicit HTTPS proxy; no historical-price fallback",
+    "storage": "runtime/flight_quotes.sqlite3 append-only observations including empty and failed attempts",
+    "source_commit": "7adb330fc167029e5874799e26c36c25aba019e9"
+  }
 }

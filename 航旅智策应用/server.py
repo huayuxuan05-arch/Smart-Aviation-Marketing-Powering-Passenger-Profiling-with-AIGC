@@ -5,6 +5,7 @@ from pathlib import Path
 import argparse
 import json
 import mimetypes
+import os
 import traceback
 from data_layer import BASE, DB, connect, build
 from algorithm_layer import profile
@@ -12,6 +13,8 @@ from evaluation_layer import marketing
 import marketing_app as mkt
 import travel_planner as planner
 import personal_app as personal
+import personal_assistant as assistant
+import flight_quotes as flights
 
 from http.cookies import SimpleCookie, CookieError
 
@@ -28,6 +31,7 @@ class Handler(BaseHTTPRequestHandler):
         return owner
 
     def send_json(self, data, status=200):
+        data = flights.public_payload(data)
         raw = json.dumps(data,ensure_ascii=False,allow_nan=False).encode()
         self.send_response(status)
         self.send_header('Content-Type','application/json; charset=utf-8')
@@ -63,6 +67,15 @@ class Handler(BaseHTTPRequestHandler):
                 return
             with connect() as c:
                 path = url.path
+                if path.startswith(('/api/personal/flights/','/api/mkt/flights/')):
+                    owner=self.personal_owner() if path.startswith('/api/personal/') else 'marketing'
+                    tail=path.split('/flights/',1)[1]
+                    if tail=='status':return self.send_json(flights.configuration())
+                    if tail.startswith('queries/'):return self.send_json(flights.get(owner,tail.split('/')[1]))
+                    if tail=='history':
+                        plan=personal.get_plan(owner,q['plan_id']) if owner!='marketing' else q
+                        return self.send_json(flights.history(owner,flights.query_for(plan,q)))
+                    return self.send_json({'error':'接口不存在'},404)
                 if path.startswith('/api/personal/'):
                     owner=self.personal_owner()
                     tail=path.removeprefix('/api/personal/')
@@ -96,7 +109,7 @@ class Handler(BaseHTTPRequestHandler):
                         return self.send_json(marketing(c,None,'2024-12-31'))
                     return self.send_json({'error':'接口不存在'},404)
                 if path == '/api/health':
-                    return self.send_json({'application':'aerolens','status':'ok','database':DB.exists(),'host':'127.0.0.1'})
+                    return self.send_json({'application':'aerolens','status':'ok','database':DB.exists(),'host':'127.0.0.1','process_id':os.getpid(),'generation':mkt.content_generation.configuration()})
                 return self.send_json({'error':'接口不存在'},404)
         except (ValueError,KeyError,TypeError) as e:
             self.send_json({'error':str(e)},400)
@@ -115,6 +128,17 @@ class Handler(BaseHTTPRequestHandler):
                 raise ValueError('请求大小不合法')
             body = json.loads(self.rfile.read(size))
             path = urlsplit(self.path).path
+            if path.startswith(('/api/personal/flights/','/api/mkt/flights/')):
+                if not isinstance(body,dict):raise ValueError('请求参数须为对象')
+                owner=self.personal_owner() if path.startswith('/api/personal/') else 'marketing'
+                tail=path.split('/flights/',1)[1]
+                if owner!='marketing':plan=personal.get_plan(owner,body['plan_id'])
+                else:
+                    with connect() as c:plan=planner.make_plan(c,body['user_id'],body.get('settings',{}))
+                if tail=='queries':return self.send_json(flights.submit(owner,plan,body),202)
+                if tail=='preview':return self.send_json(flights.preview(owner,plan,body))
+                if tail=='apply' and owner!='marketing':return self.send_json(personal.apply_flight_quote(owner,body),201)
+                return self.send_json({'error':'接口不存在'},404)
             if path.startswith('/api/personal/'):
                 if not isinstance(body,dict):raise ValueError('请求参数须为对象')
                 owner=self.personal_owner()
@@ -122,7 +146,12 @@ class Handler(BaseHTTPRequestHandler):
                 with connect() as c:
                     if tail=='preferences':return self.send_json(personal.save_preferences(c,owner,body))
                     if tail=='plans':return self.send_json(personal.create_plan(c,owner,body),201)
+                    if tail=='assistant/drafts':return self.send_json(assistant.create(c,owner,body),201)
                     parts=tail.split('/')
+                    if len(parts)==4 and parts[:2]==['assistant','drafts']:
+                        if parts[3]=='clarify':return self.send_json(assistant.clarify(c,owner,parts[2],body))
+                        if parts[3]=='confirm':return self.send_json(assistant.confirm(c,owner,parts[2],body))
+                        if parts[3]=='cancel':return self.send_json(assistant.cancel(owner,parts[2],body))
                     if len(parts)==3 and parts[0]=='plans' and parts[2]=='explain':return self.send_json(personal.explain(owner,parts[1]))
                 return self.send_json({'error':'接口不存在'},404)
             if path.startswith('/api/mkt/'):
@@ -176,6 +205,7 @@ if __name__ == '__main__':
     parser.add_argument('--port',type=int,default=8765)
     args = parser.parse_args()
     build()
+    flights.recover_interrupted()
     server = ThreadingHTTPServer(('127.0.0.1',args.port),Handler)
     print(f'航旅智策 本地测试版 http://127.0.0.1:{args.port}',flush=True)
     try:

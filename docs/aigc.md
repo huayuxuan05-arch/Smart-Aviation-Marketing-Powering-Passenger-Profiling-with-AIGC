@@ -1,4 +1,10 @@
-# AIGC层：本地文案与视觉内容
+# AIGC层：需求理解、文案与视觉内容
+
+默认部署为规则/模板模式，**大模型未接入**。`content_generation.py`提供模板营销文案，`personal_assistant.py`使用受限规则提取旅行条件并提出澄清问题；这些不作为大模型推理或模型增益证据。现有文案和旅行说明仅在显式启用local-model时调用Qwen。
+
+需求协商将模型作用扩展到旅行条件的结构化理解。显式启用时，`local_generation.extract_preferences`只输出field/value/evidence建议；证据必须逐字来自本次输入，字段和枚举受白名单限制。数字、日期、城市还必须能由程序独立提取，含糊口径保留为澄清问题。模型不拥有保存、订票、触达或改写航班事实的工具权限。程序负责调用既有规划器、比较预算和版本检查，本人逐项确认后才创建新方案与偏好版本。模型协议测试使用隔离模拟响应，本次未部署模型或执行真实推理。
+
+这是对既有本地航班参考和情景规划工具的受限调用流程，尚无外部实时旅游知识库RAG。规则无法理解任意自然语言；未识别或冲突表述由本人补充或改用表单。
 
 local_generation.py 调用 Qwen3.5-9B-Q4_K_M，使用固定 llama.cpp b11565 CUDA 运行时。版本、来源、字节数及 SHA256 见 aigc_config.py 和[发布清单](../distribution/manifest.json)，许可见[模型来源说明](../distribution/MODEL-NOTICE.txt)。
 

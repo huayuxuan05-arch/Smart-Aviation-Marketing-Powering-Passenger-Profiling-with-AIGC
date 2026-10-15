@@ -7,16 +7,25 @@ from unittest.mock import patch
 import marketing_app as app
 import local_generation as gen
 import personal_app as personal
+import flight_quotes as flights
 from data_layer import connect
 from server import Handler, ThreadingHTTPServer
 
 
 def main():
-    qa = Path(__file__).resolve().parent / 'runtime/tmp/decision-qa'
+    port=int(__import__('os').environ.get('AEROLENS_QA_PORT','8769'))
+    qa = Path(__file__).resolve().parent / 'runtime/tmp' / ('decision-qa' if port==8769 else f'decision-qa-{port}')
     qa.mkdir(parents=True, exist_ok=True)
     app.RUNTIME = qa / ('state-' + uuid.uuid4().hex[:12])
     app.RUNTIME.mkdir()
     personal.RUNTIME = app.RUNTIME
+    flights.RUNTIME = app.RUNTIME
+    # 常规浏览器验收不访问外部航班源；专项夹具也不冒充真实报价。
+    if __import__('os').environ.get('AEROLENS_TEST_FLIGHT_FIXTURE')=='1':
+        from test_flight_quotes import fixture_result
+        flights._search=fixture_result
+    else:
+        flights._search=lambda query:{'options':[],'source':'QA / no external requests'}
     with connect() as source:
         campaign = app.save_campaign(source, {'name': '行程决策隔离浏览器验收', 'limit': 300})
         ready = next(row for row in campaign['audience'] if row['business_ready'])
@@ -30,7 +39,7 @@ def main():
                   'comparison': campaign['strategy_comparison'], 'business_ready': campaign['business_ready_count']}
         (qa / 'fixture.json').write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
     print(json.dumps(result, ensure_ascii=False), flush=True)
-    server = ThreadingHTTPServer(('127.0.0.1', 8769), Handler)
+    server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
     try:
         server.serve_forever()
     finally:

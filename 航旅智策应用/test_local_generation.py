@@ -1,10 +1,12 @@
 """模型服务异常不得保存为有效创意；不启动推理或访问网络。"""
-import json,unittest
+import json,os,unittest
 from unittest.mock import patch
 import local_generation as gen
 from aigc_config import ALIAS,MODEL_NAME,ROOT,MODEL_FILE
 
 class GenerationTests(unittest.TestCase):
+ def setUp(self):
+  self.mode=patch.dict(os.environ,{'AEROLENS_GENERATION_MODE':'local-model'});self.mode.start();self.addCleanup(self.mode.stop)
  def response(self,**changes):
   result={'model':ALIAS,'choices':[{'finish_reason':'stop','message':{'content':json.dumps({'title':'给假期留一段从容时光','text':'按自己的节奏安排旅程，先了解航线参考，再决定出发的方向。','palette':'teal','art':'coast'})}}],'usage':{'completion_tokens':75}}
   result.update(changes);return result
