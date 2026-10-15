@@ -25,6 +25,8 @@ def fixture_result(query, variants=False):
             'inbound':leg('CAN','SHA',query['return_date'],1000,'TEST101')}
     options=[option]
     if variants:
+        option['outbound']['segments'][0].update(airline='Spring Airlines',airline_zh=None,flight_number='9C8801')
+        option['outbound']['airlines']=['Spring Airlines']
         # Same outbound, distinct return flights; the provider also repeats
         # its first combination with a different rank/link payload.
         duplicate=copy.deepcopy(option);duplicate.update(rank=2,purchase_links={'label':'duplicate source entry'})
@@ -116,6 +118,29 @@ class FlightQuoteTests(unittest.TestCase):
         original=copy.deepcopy(old);public=quotes.public_payload(old)
         self.assertIsNone(public['flight']);self.assertFalse(public['business_ready']);self.assertEqual(old,original)
         self.assertEqual(quotes.public_payload([1,None,[None,2]]),[1,None,[None,2]])
+    def test_spring_airlines_translation_covers_cached_results_without_changing_source(self):
+        q=self.quote()
+        with quotes.db() as c:
+            payload=json.loads(c.execute('SELECT result_json FROM flight_observations WHERE id=?',(q['id'],)).fetchone()[0])
+            segment=payload['options'][0]['outbound']['segments'][0]
+            segment.update(airline='Spring Airlines',airline_zh=None,flight_number='9C8801')
+            c.execute('UPDATE flight_observations SET result_json=? WHERE id=?',(json.dumps(payload),q['id']))
+        cached=quotes.get(self.owner,q['id']);before=copy.deepcopy(cached)
+        public=quotes.public_payload(cached)
+        shown=public['options'][0]['outbound']['segments'][0]
+        self.assertEqual(shown['airline_zh'],'春秋航空');self.assertEqual(shown['airline'],'Spring Airlines')
+        self.assertEqual(cached,before);self.assertEqual(quotes.get(self.owner,q['id']),before)
+        selected=quotes.preview(self.owner,self.plan,{'query_id':q['id'],'option_index':0})
+        self.assertEqual(quotes.latest_only(selected)['live_flights']['option']['outbound']['segments'][0]['airline_zh'],'春秋航空')
+    def test_translation_preserves_existing_chinese_and_distinct_carriers(self):
+        for segment,expected in [
+                ({'airline':'  spring   airlines ','airline_zh':'Spring Airlines'},'春秋航空'),
+                ({'airline':'9C'},'春秋航空'),
+                ({'flight_number':'9C 8801'},'春秋航空'),
+                ({'airline':'Spring Airlines Japan','flight_number':'IJ100'},'Spring Airlines Japan'),
+                ({'airline':'Unknown Carrier','flight_number':'XX100'},'Unknown Carrier'),
+                ({'airline':'Spring Airlines','airline_zh':'已核验中文航司'},'已核验中文航司')]:
+            with self.subTest(segment=segment):self.assertEqual(quotes.airline_display_name(segment),expected)
     def test_proxy_is_required_and_never_guessed(self):
         with patch.dict(os.environ,{'HTTPS_PROXY':'','https_proxy':''}):
             with self.assertRaises(ValueError):quotes.configured_proxy()

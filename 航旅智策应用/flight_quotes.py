@@ -28,6 +28,24 @@ _pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix='flight-quotes')
 _slots = threading.BoundedSemaphore(6)
 _lock = threading.Lock()
 
+# Supplements omissions in the provider's Chinese carrier dictionary.
+AIRLINE_NAMES_ZH = {'spring airlines': '春秋航空', '9c': '春秋航空'}
+
+
+def airline_display_name(segment):
+    existing = str(segment.get('airline_zh') or '').strip()
+    if re.search(r'[\u3400-\u9fff]', existing):
+        return existing
+    for value in (segment.get('airline'), existing, segment.get('airline_code')):
+        name = ' '.join(str(value or '').split()).casefold()
+        if name in AIRLINE_NAMES_ZH:
+            return AIRLINE_NAMES_ZH[name]
+    if not segment.get('airline') and not existing:
+        number = re.sub(r'\s+', '', str(segment.get('flight_number') or '')).upper()
+        if re.fullmatch(r'9C\d+[A-Z]?', number):
+            return '春秋航空'
+    return existing or segment.get('airline')
+
 
 def now():
     return datetime.now(timezone.utc).isoformat(timespec='seconds')
@@ -290,6 +308,7 @@ def latest_only(plan):
     p = copy.deepcopy(plan)
     live = p.get('live_flights')
     if live and is_fresh(live.get('observed_at')):
+        p['live_flights'] = public_payload(live)
         return p
     p.pop('live_flights', None)
     p.pop('ai_explanation', None)
@@ -339,6 +358,10 @@ def public_payload(value):
     if 'source' in value and ('01_航班信息.xlsx' in str(value['source']) or '历史航班' in str(value['source'])):
         return None
     result = {k: public_payload(v) for k, v in value.items()}
+    if 'flight_number' in value:
+        name = airline_display_name(value)
+        if name:
+            result['airline_zh'] = name
     if 'flight' in value and result.get('flight') is None:
         result.update(business_ready=False,flight_reason='',primary_flight_matched=False,
                       defer_reasons=['按本次出行条件确认航班'])
