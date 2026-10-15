@@ -65,8 +65,7 @@ body.wd-template {
 .portal-page .entry-top{position:static;margin:0 0 15px}
 .portal-page .entry-icon,.portal-page .personal .entry-icon{display:grid;width:38px;height:38px;place-items:center;background:#284c56;color:#c2e5d0;border-radius:8px}
 .portal-page .entry-icon svg{width:22px;height:22px}
-.portal-page .entry-card h2{padding:0;margin:0;font-size:23px;font-weight:600}
-.portal-page .entry-card p,.portal-page .personal p{margin:7px 0 20px;color:#c1d2cc;font-size:15px;line-height:1.65}
+.portal-page .entry-card h2{padding:0;margin:0 0 20px;font-size:23px;font-weight:600}
 .portal-page .entry-action,.portal-page .personal .entry-action{width:auto;min-height:44px;padding:11px 15px;margin-top:auto;gap:13px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid #b6e2c9;background:#b6e2c9;color:#123e37}
 .portal-page .staff .entry-action{background:#f5efe2;color:#183746;border-color:#f5efe2}
 .portal-page .entry-action:hover{background:#d3efdd;color:#123e37}
@@ -268,8 +267,7 @@ body.wd-template {
  .portal-page .entry-grid{grid-template-columns:1fr;gap:22px}
  .portal-page .entry-card,.portal-page .entry-card.personal{display:grid;grid-template-columns:38px minmax(0,1fr);column-gap:15px;padding-top:18px}
  .portal-page .entry-top{grid-row:1/4;margin:0}
- .portal-page .entry-card h2,.portal-page .entry-card p,.portal-page .entry-action{grid-column:2}
- .portal-page .entry-card p{margin:5px 0 14px}
+ .portal-page .entry-card h2,.portal-page .entry-action{grid-column:2}
  .portal-page .entry-action{justify-self:start}
 }
 @media(max-width:900px){
