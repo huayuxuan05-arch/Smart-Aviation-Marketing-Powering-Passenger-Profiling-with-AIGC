@@ -1,0 +1,24 @@
+// Uses a private QA database; live user activities and plans are untouched.
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),{spawn}=require('node:child_process');
+const {chromium}=require(path.join(process.env.USERPROFILE,'.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright'));
+const base='http://127.0.0.1:8774',out=path.join(__dirname,'runtime/tmp/trip-update-qa');fs.mkdirSync(out,{recursive:true});let server,browser,pid;
+function stop(){if(pid){try{process.kill(pid)}catch{}pid=null;}server?.kill();}process.on('exit',stop);
+(async()=>{
+ try{await fetch(base+'/api/health');throw Error('QA port occupied')}catch(e){if(e.message==='QA port occupied')throw e;}
+ server=spawn(path.join(__dirname,'.venv/Scripts/python.exe'),['-u','decision_qa_server.py'],{cwd:__dirname,windowsHide:true,stdio:'ignore',env:{...process.env,PYTHONUTF8:'1',PYTHONDONTWRITEBYTECODE:'1',AEROLENS_QA_PORT:'8774',AEROLENS_GENERATION_MODE:'template'}});
+ for(let i=0;i<90;i++){try{const r=await fetch(base+'/api/health');if(r.ok){pid=(await r.json()).process_id;break}}catch{}if(server.exitCode!==null)throw Error('QA server exited');await new Promise(r=>setTimeout(r,500));}assert.ok(pid);
+ browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});const p=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];p.on('pageerror',e=>errors.push(e.message));
+ const pass=s=>console.log('PASS '+s);
+ try{
+  await p.goto(base+'/marketing/#trips');await p.locator('[data-trip-detail]').waitFor({timeout:120000});
+  await p.locator('[data-action=trip-view]').nth(1).click();const uid=await p.evaluate(()=>tripPlan.user_id);
+  await p.locator('#trip-settings-form [name=days]').selectOption('5');await p.locator('#trip-settings-form [name=pace]').selectOption('充实');await p.locator('#trip-settings-form [name=trip_budget]').fill('2000');await p.locator('#trip-settings-form [name=start_date]').fill('2026-11-15');
+  let release;const gate=new Promise(r=>release=r);await p.route('**/api/mkt/travel-plans?**',async r=>{await gate;await r.continue()},{times:1});
+  await p.locator('#trip-settings-form [type=submit]').click();await p.waitForFunction(()=>document.querySelector('#trip-settings-form [type=submit]').disabled&&document.querySelector('#trip-settings-form [type=submit]').textContent==='正在生成…');pass('Updating immediately displays progress and disables duplicate submission');release();
+  await p.waitForFunction(()=>tripPlan?.days===5&&!tripLoading,{timeout:120000});const actual=await p.evaluate(()=>({uid:tripPlan.user_id,days:tripPlan.days,pace:tripPlan.pace,date:tripPlan.start_date,budget:tripPlan.budget.specified_total}));assert.deepEqual(actual,{uid,days:5,pace:'充实',date:'2026-11-15',budget:2000});assert.equal(await p.locator('#toast').textContent(),'旅行方案已更新');assert.ok((await p.locator('[data-trip-budget]').textContent()).includes('2,000'));pass('Updates selected traveler, dates, days, pace and visible budget with success feedback');
+  await p.locator('#trip-settings-form [name=asof]').fill('2026-10-16');let sent=0;const count=r=>{if(r.url().includes('/api/mkt/travel-plans'))sent++};p.on('request',count);await p.locator('#trip-settings-form [type=submit]').click();assert.ok((await p.locator('#trip-settings-error').textContent()).includes('画像参考日期支持'));assert.equal(await p.locator('#trip-settings-form [name=days]').inputValue(),'5');assert.equal(sent,0);p.off('request',count);pass('Unsupported historical cutoff explains validation and preserves edits');
+  await p.locator('#trip-settings-form [name=asof]').fill('2024-09-30');await p.route('**/api/mkt/travel-plans?**',r=>r.fulfill({status:400,contentType:'application/json',body:JSON.stringify({error:'验收：更新请求失败'})}),{times:1});await p.locator('#trip-settings-form [type=submit]').click();await p.waitForFunction(()=>!tripLoading&&tripError==='验收：更新请求失败');assert.equal(await p.locator('#trip-settings-form [type=submit]').isEnabled(),true);assert.ok((await p.locator('.notice.amber').allTextContents()).some(t=>t.includes('验收：更新请求失败')));pass('Server failure remains visible and permits retry');
+  await p.locator('#trip-settings-form [type=submit]').click();await p.waitForFunction(()=>!tripLoading&&!tripError&&tripPlan?.user_id===tripList.items[1].user_id,{timeout:120000});pass('Retry succeeds and retains selected traveler');
+  for(const width of [1440,390]){await p.setViewportSize({width,height:1000});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await p.evaluate(()=>scrollTo(0,0));await p.screenshot({path:path.join(out,`updated-${width}.png`)});}assert.deepEqual(errors,[]);pass('Desktop and mobile have no overflow or JavaScript errors');
+ }finally{await browser.close();stop()}
+})().catch(e=>{console.error(e);stop();process.exitCode=1});
