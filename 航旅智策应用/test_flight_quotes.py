@@ -13,7 +13,7 @@ import personal_app as personal
 from data_layer import CST, connect
 
 
-def fixture_result(query):
+def fixture_result(query, variants=False):
     if query['adults']==9:raise TimeoutError('QA simulated provider failure')
     def leg(origin,destination,day,amount,number):
         segment={'flight_number':number,'airline':'测试航空','airline_zh':'测试航空',
@@ -23,8 +23,22 @@ def fixture_result(query):
                 'arrival_time':segment['arrival_time'],'airlines':['测试航空'],'layovers':[],'stop_count':0}
     option={'total_price_cny':1800,'outbound':leg('SHA','CAN',query['departure'],800,'TEST100'),
             'inbound':leg('CAN','SHA',query['return_date'],1000,'TEST101')}
+    options=[option]
+    if variants:
+        # Same outbound, distinct return flights; the provider also repeats
+        # its first combination with a different rank/link payload.
+        duplicate=copy.deepcopy(option);duplicate.update(rank=2,purchase_links={'label':'duplicate source entry'})
+        options.append(duplicate)
+        for i in (1,2):
+            other=copy.deepcopy(option)
+            other['inbound']=leg('CAN','SHA',query['return_date'],1000+i*200,'TEST10'+str(i+1))
+            other['inbound']['segments'][0]['departure_time']=query['return_date']+f'T{12+i*2}:00:00'
+            other['inbound']['segments'][0]['arrival_time']=query['return_date']+f'T{14+i*2}:00:00'
+            other['inbound'].update(departure_time=other['inbound']['segments'][0]['departure_time'],arrival_time=other['inbound']['segments'][0]['arrival_time'])
+            other['total_price_cny']=1800+i*200
+            options.append(other)
     return {'source':'QA fixture / not live','fare_basis':'测试夹具，不是真实票价',
-            'options':[option],'leg_observations':[],'upstream_commit':quotes.UPSTREAM_COMMIT}
+            'options':options,'leg_observations':[],'upstream_commit':quotes.UPSTREAM_COMMIT}
 
 
 class FlightQuoteTests(unittest.TestCase):

@@ -23,7 +23,7 @@ def main():
     # 常规浏览器验收不访问外部航班源；专项夹具也不冒充真实报价。
     if __import__('os').environ.get('AEROLENS_TEST_FLIGHT_FIXTURE')=='1':
         from test_flight_quotes import fixture_result
-        flights._search=fixture_result
+        flights._search=lambda query:fixture_result(query,variants=True)
     else:
         flights._search=lambda query:{'options':[],'source':'QA / no external requests'}
     with connect() as source:
