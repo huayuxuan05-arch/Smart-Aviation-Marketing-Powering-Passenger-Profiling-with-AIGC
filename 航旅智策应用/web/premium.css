@@ -74,7 +74,6 @@ body.wd-template {
 .portal-page .entry-action:hover{background:#d3efdd;color:#123e37}
 .portal-page .staff .entry-action:hover{background:#fff8e8;color:#183746;border-color:#fff8e8}
 .portal-page .entry-action:focus-visible{outline:3px solid #d4a66a;outline-offset:5px}
-.portal-page>footer{width:calc(100% - 80px);max-width:1200px;margin:auto auto 0;padding:19px 0 26px;border-top:1px solid #86aea342;color:#c1d2cc}
 
 /* Personal: a landscape arrival and a paper-like planning surface. */
 .personal-page.wd-template{position:relative;isolation:isolate;background:#eef1e9}
@@ -107,7 +106,6 @@ body.wd-template {
 .personal-page .personal-history button.active{background:#fff;border-color:#729b7d}
 .personal-page .personal-history .personal-plan-delete{background:transparent;border-color:transparent;color:#a0443c}
 .personal-page .personal-profile p{color:#405e55}
-.personal-page .personal-footer{padding:24px 32px;color:#526b73}
 .personal-page .personal-disclosure>summary{min-height:38px}
 .personal-page .personal-layout>aside .personal-disclosure>summary :is(h2,h3){font-size:18px}
 .personal-page .personal-disclosure-body{padding-top:20px}
@@ -241,7 +239,6 @@ body.wd-template {
 .marketing-page .route-cities{color:#2a5556}
 .marketing-page .route-card .price{color:#176b60}
 .marketing-page .creative-strip button.active{background:#e3eedb;border-color:#99b58e;color:#315c35}
-.marketing-page footer{border:0;color:#526b73}
 .wd-template .intent-card{background:#f5f8ef;border-color:#d5dfcd}
 .wd-template .intent-grid strong{color:#2c684e}
 .wd-template .profile-head{margin:-34px -34px 24px;padding:28px 76px 25px 30px;background:#e7eddf;border-bottom:1px solid #cbd9c4}
@@ -292,7 +289,6 @@ body.wd-template {
  .portal-page .portal-choices{grid-column:1;grid-row:2;margin:0}
  .portal-page .entry-grid{grid-template-columns:minmax(0,1fr);gap:24px}
  .portal-page .entry-card h2{font-size:22px}
- .portal-page>footer{width:calc(100% - 48px);padding:18px 0 22px}
  .personal-page .personal-header{padding:18px;background:#f6f8efeb}
  .personal-page .personal-shell{padding:0 18px 30px}
  .personal-page .personal-heading{min-height:150px;padding:24px 0;gap:12px;align-items:center}
