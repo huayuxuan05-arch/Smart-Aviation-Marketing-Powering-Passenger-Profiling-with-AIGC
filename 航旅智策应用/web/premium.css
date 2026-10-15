@@ -199,11 +199,9 @@ body.wd-template {
 .marketing-page main{padding:28px 32px 40px}
 .marketing-page .page-head{margin-bottom:24px;padding-bottom:19px;border-bottom:1px solid #d3dccd}
 .marketing-page .page-head h1{color:#24434c;font-weight:600}
-.marketing-page .overview-grid{grid-template-columns:minmax(0,1fr) 280px;gap:24px}
-.marketing-page .hero{position:relative;overflow:hidden;min-height:250px;padding:32px;border-radius:14px;background:linear-gradient(90deg,#102f40ed,#102f4070 65%,#102f4020),url('/assets/marketing-airport-background.png') center / cover}
-.marketing-page .hero h2{color:#f7f6eb;font-size:34px;font-weight:600}
-.marketing-page .hero .primary{color:#163f36;background:#c2e3cd;margin-top:24px}
-.marketing-page .hero .primary:hover{background:#d9efde}
+.marketing-page .overview-grid{grid-template-columns:minmax(0,1fr) 280px;align-items:center;gap:24px}
+.marketing-page .hero{display:block;position:relative;overflow:hidden;min-height:0;padding:0;border-radius:14px;background:#102f40}
+.marketing-page .overview-image{display:block;width:100%;height:auto;aspect-ratio:1672/941;object-fit:contain}
 .marketing-page .overview-aside{background:#e4e9dc;border:0;border-radius:12px;padding:26px}
 .marketing-page .overview-aside h3{color:#284b40}
 .marketing-page .overview-aside .number-circle{display:none}
@@ -314,7 +312,6 @@ body.wd-template {
  .marketing-page #sidebar{padding-inline:18px}
  .marketing-page .topbar{padding:14px 18px}.marketing-page main{padding:23px 18px 30px}
  .marketing-page .overview-grid{grid-template-columns:minmax(0,1fr);gap:18px}
- .marketing-page .hero{min-height:220px;padding:26px}.marketing-page .hero h2{font-size:28px}
  .marketing-page .overview-aside{padding:22px}
  .marketing-page .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:0}
  .marketing-page .metric{padding:20px 18px}.marketing-page .metric:nth-child(2n){border-right:0}
