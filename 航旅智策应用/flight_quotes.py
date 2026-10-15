@@ -303,15 +303,22 @@ def _search_leg(origin, destination, departure_date, adults, cabin_class, observ
         raise RuntimeError(type(exc).__name__) from None
 
 
+def retain_current_explanation(plan):
+    if plan.get('ai_explanation'):
+        from local_generation import explanation_matches_plan
+        if not explanation_matches_plan(plan):
+            plan.pop('ai_explanation', None)
+    return plan
+
+
 def latest_only(plan):
     """Web投影不改写原始数据或已保存的旧版本；历史票价不进入网页预算。"""
     p = copy.deepcopy(plan)
     live = p.get('live_flights')
     if live and is_fresh(live.get('observed_at')):
         p['live_flights'] = public_payload(live)
-        return p
+        return retain_current_explanation(p)
     p.pop('live_flights', None)
-    p.pop('ai_explanation', None)
     p['flight_numbers'] = []
     p['flight_reference_fare'] = None
     p['flight_date_exact'] = False
@@ -341,7 +348,7 @@ def latest_only(plan):
     for alternative in p.get('alternatives', []):
         alternative.update(reference_fare=None, kind='', status='按所选日期比较')
     p['bookable'] = False
-    return p
+    return retain_current_explanation(p)
 
 
 def public_payload(value):

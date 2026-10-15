@@ -113,6 +113,40 @@ class FlightQuoteTests(unittest.TestCase):
         p['live_flights']['observed_at']='2024-01-01T00:00:00+00:00'
         public=quotes.latest_only(p)
         self.assertNotIn('live_flights',public);self.assertIsNone(public['budget']['estimated_total'])
+    def ai_for(self,plan):
+        import local_generation as gen
+        response={'model':gen.ALIAS,'choices':[{'finish_reason':'stop','message':{'content':json.dumps({
+            'summary':'按同行需求留出休息时间。','reasons':['围绕所选兴趣安排','保留亲子休息空间'],
+            'practical_tips':['提前核对预约','准备轻便行李','确认集合地点']})}}]}
+        with patch.dict(os.environ,{'AEROLENS_GENERATION_MODE':'local-model'}),patch.object(gen,'ensure'),patch.object(gen,'rpc',return_value=response):
+            return gen.explain_trip(plan)
+    def test_ai_suggestions_survive_web_projection_without_a_selected_flight(self):
+        plan=copy.deepcopy(self.plan);plan['ai_explanation']=self.ai_for(plan)
+        original=copy.deepcopy(plan)
+        for _ in range(2):
+            plan=quotes.public_payload(plan)
+            self.assertEqual(plan['ai_explanation'],original['ai_explanation'])
+            self.assertIsNone(plan['budget']['estimated_total']);self.assertEqual(plan['outbound']['flights'],[])
+        self.assertEqual(self.plan.get('ai_explanation'),None)
+        changed=copy.deepcopy(plan);changed['start_date']='2027-01-01'
+        self.assertNotIn('ai_explanation',quotes.public_payload(changed))
+    def test_quote_expiry_does_not_erase_itinerary_suggestions(self):
+        q=self.quote();plan=quotes.preview(self.owner,self.plan,{'query_id':q['id'],'option_index':0})
+        plan['ai_explanation']=self.ai_for(plan)
+        self.assertIn('ai_explanation',quotes.public_payload(plan))
+        plan['live_flights']['observed_at']='2024-01-01T00:00:00+00:00'
+        public=quotes.public_payload(plan)
+        self.assertNotIn('live_flights',public);self.assertIsNone(public['budget']['estimated_total'])
+        self.assertEqual(public['ai_explanation'],plan['ai_explanation'])
+    def test_legacy_suggestions_require_matching_current_input_facts(self):
+        import local_generation as gen
+        plan=copy.deepcopy(self.plan);facts=gen.trip_explanation_facts(plan);facts.pop('travel_dates')
+        plan['ai_explanation']={'summary':'已有有效建议','prompt':'说明\n'+json.dumps(facts)}
+        self.assertIn('ai_explanation',quotes.public_payload(plan))
+        facts['checklist'].append('按2024历史航班安排')
+        plan['ai_explanation']['prompt']='说明\n'+json.dumps(facts)
+        self.assertNotIn('ai_explanation',quotes.public_payload(plan))
+        self.assertIn('ai_explanation',plan)
     def test_raw_training_flights_are_not_returned_by_web_projection(self):
         old={'flight':{'航班号':'OLD100','出发日':'2024-10-01','机票票价':777},'business_ready':True}
         original=copy.deepcopy(old);public=quotes.public_payload(old)

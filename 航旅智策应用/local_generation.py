@@ -1,6 +1,6 @@
 """本地Qwen推理与受限视觉配方；只在本机运行，不调用云端API。"""
 from pathlib import Path
-import base64,subprocess,urllib.request,urllib.error,json,time,threading,re,html,math,socket,os
+import base64,subprocess,urllib.request,urllib.error,json,time,threading,re,html,math,socket,os,hashlib
 from aigc_config import ROOT,PORT,MODEL_FILE,MODEL_NAME,REVISION,RUNTIME_DIR,ALIAS
 import content_generation
 _PROC=None;_LOCK=threading.Lock()
@@ -70,17 +70,44 @@ def generate(destination,holiday,theme,tone='轻松亲切',variant=1):
   risks=risk_flags(title+text)
   return {'title':title,'text':text,'palette':parsed['palette'],'art':parsed['art'],'engine':MODEL_NAME+' / 本地GPU生成（CUDA）','generation_seconds':round(time.time()-started,2),'prompt':instruction,'risk_flags':risks,'visual_mode':'语言模型选择配色与抽象主题，本地SVG合成；非扩散文生图，非景点实拍','model_revision':REVISION,'model_alias':result['model'],'thinking':False,'context':8192,'quantizer':'Unsloth','usage':result.get('usage',{}),'timings':result.get('timings',{})}
 
+def trip_explanation_facts(plan):
+ facts={k:plan[k] for k in ['origin','destination','days','party','theme','pace','date_basis','personalization','checklist']}
+ facts['activities']=[{'day':x['day'],'activities':[b['activity'] for b in x['blocks']]} for x in plan['daily_itinerary']]
+ if plan.get('preference_constraints'):
+  facts['preference_constraints']=plan['preference_constraints']
+  facts['lodging_conditions']=plan['lodging']
+  facts['priority_rule']='本次明确选择优先；样本城市关注率只作并列参考，不得描述成该旅客个人意愿。日期、目的地、预算及备选调整均须旅客确认。'
+ # Bind suggestions to the actual dates too, even though they contain no fares.
+ facts['travel_dates']=[plan.get('start_date'),plan.get('end_date')]
+ return facts
+
+
+def trip_explanation_fingerprint(plan):
+ return hashlib.sha256(json.dumps(trip_explanation_facts(plan),ensure_ascii=False,sort_keys=True,separators=(',',':')).encode('utf-8')).hexdigest()
+
+
+def explanation_matches_plan(plan):
+ explanation=plan.get('ai_explanation')
+ if not isinstance(explanation,dict):return False
+ if explanation.get('context_sha256'):
+  return explanation['context_sha256']==trip_explanation_fingerprint(plan)
+ # Existing locally generated suggestions retain their recorded input facts.
+ # Restore those only when the facts match the current visible itinerary.
+ try:
+  recorded=json.loads(explanation.get('prompt','').rsplit('\n',1)[-1])
+ except (ValueError,TypeError,AttributeError):return False
+ current=trip_explanation_facts(plan);current.pop('travel_dates')
+ return recorded==current
+
+
 def explain_trip(plan):
  """在既有结构化规划上生成可编辑说明，不让模型改写航班、日期或费用。"""
  with _LOCK:
   ensure()
   schema={'type':'object','properties':{'summary':{'type':'string'},'reasons':{'type':'array','items':{'type':'string'},'minItems':2,'maxItems':4},'practical_tips':{'type':'array','items':{'type':'string'},'minItems':3,'maxItems':5}},'required':['summary','reasons','practical_tips'],'additionalProperties':False}
-  facts={k:plan[k] for k in ['origin','destination','days','party','theme','pace','date_basis','personalization','checklist']}
-  facts['activities']=[{'day':x['day'],'activities':[b['activity'] for b in x['blocks']]} for x in plan['daily_itinerary']]
-  if plan.get('preference_constraints'):
-   facts['preference_constraints']=plan['preference_constraints']
-   facts['lodging_conditions']=plan['lodging']
-   facts['priority_rule']='本次明确选择优先；样本城市关注率只作并列参考，不得描述成该旅客个人意愿。日期、目的地、预算及备选调整均须旅客确认。'
+  import flight_quotes
+  plan=flight_quotes.latest_only(plan)
+  facts=trip_explanation_facts(plan)
   instruction='根据以下旅行方案，为旅客写中文个性化说明。summary解释旅行节奏和主题，reasons解释为何适合该同行方式和兴趣，practical_tips提供具体可操作的行前准备。只使用给定地点与条件，不修改或增补景点、酒店、航班、时刻、价格、优惠、天气、库存或已预订状态。不得将其他日期的历史航线说成指定日期可售。建议写成待旅客确认的草稿。不要出现保证、已预订、余票充足、最低价这几个词，即使是否定或提醒也不要使用；用建议、可选、需核实表达，不作健康、舒适或出行结果承诺。summary不超过220字，每条理由和建议不超过100字。只输出JSON。\n'+json.dumps(facts,ensure_ascii=False)
   body={'model':ALIAS,'messages':[{'role':'system','content':'你是旅行规划编辑，只解释已给定的结构化方案，不编造旅行事实。'},{'role':'user','content':instruction}],'max_tokens':1100,'temperature':.3,'top_p':.8,'seed':20261014,'response_format':{'type':'json_schema','json_schema':{'name':'trip_explanation','strict':True,'schema':schema}},'chat_template_kwargs':{'enable_thinking':False},'reasoning_effort':'none','stream':False}
   started=time.time();result=rpc('/v1/chat/completions',body);choice=result['choices'][0]
@@ -94,7 +121,7 @@ def explain_trip(plan):
    if not isinstance(parsed[key],list) or not minimum<=len(parsed[key])<=maximum or any(not isinstance(v,str) or not 1<=len(v)<=250 for v in parsed[key]):raise ValueError('旅行说明条目异常')
   combined=parsed['summary']+''.join(parsed['reasons']+parsed['practical_tips'])
   if any(word in combined for word in ['保证','已预订','余票充足','最低价']):raise ValueError('旅行说明含无依据承诺，请重新生成')
-  return {**parsed,'engine':MODEL_NAME+' / 本地GPU旅行说明','model_alias':ALIAS,'model_revision':REVISION,'generation_seconds':round(time.time()-started,2),'usage':result.get('usage',{}),'prompt':instruction,'status':'待人工核验的可编辑建议'}
+  return {**parsed,'engine':MODEL_NAME+' / 本地GPU旅行说明','model_alias':ALIAS,'model_revision':REVISION,'generation_seconds':round(time.time()-started,2),'usage':result.get('usage',{}),'prompt':instruction,'status':'待人工核验的可编辑建议','context_sha256':trip_explanation_fingerprint(plan)}
 
 
 def extract_preferences(text,cities,destinations,enums):
