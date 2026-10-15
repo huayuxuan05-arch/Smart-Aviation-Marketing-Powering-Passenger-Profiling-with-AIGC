@@ -4,6 +4,7 @@ body.wd-template {
  --wd-ink:#183746;--wd-muted:#526b73;--wd-dark:#102f40;
  --wd-accent:#176b60;--wd-accent-hover:#105247;--wd-soft:#e7f0e9;
  --wd-bg:#f0f2ec;--wd-line:#d4ded5;--wd-surface:#fff;
+ --wd-radius:22px;--wd-inner-radius:16px;
  --wd-sun:#d4a66a;--wd-warm:#f5efe2;--wd-shadow:0 10px 28px #183d3510;
  --ink:var(--wd-ink);--muted:var(--wd-muted);--purple:var(--wd-accent);
  --purple-dark:var(--wd-accent-hover);--soft:var(--wd-soft);
@@ -23,7 +24,7 @@ body.wd-template {
 .wd-template a.home-exit{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 14px;border:1px solid #c7d5cb;border-radius:8px;background:#f6f8f1;color:#183746;white-space:nowrap;font-size:14px;line-height:1.5}
 .wd-template a.home-exit:hover{background:#e1ebe1;border-color:#9fb7a6;color:#183746}
 .wd-template a.home-exit:focus-visible{outline:3px solid var(--wd-accent);outline-offset:3px}
-.wd-template .card{background:#fff;border:0;border-radius:14px;box-shadow:var(--wd-shadow)}
+.wd-template .card{background:#fff;border:0;border-radius:var(--wd-radius);box-shadow:var(--wd-shadow)}
 .wd-template :is(.card h3,.section-head h2){color:#234753}
 .wd-template .field>span{color:#49636c}
 .wd-template input:not([type="checkbox"]):not([type="radio"]),.wd-template select,.wd-template textarea{border-color:#c7d5cb;border-radius:8px}
@@ -38,7 +39,7 @@ body.wd-template {
 .wd-template .notice.amber{background:#fff5e5;color:#795420;border-color:#ead9b9}
 .wd-template .notice.red{background:#fff0ef;color:#993e3e;border-color:#eccbca}
 .wd-template .notice.green{background:#eaf4e9;color:#38613e;border-color:#cfe2cc}
-.wd-template .table-container{border-color:#d9e1d8;border-radius:9px}
+.wd-template .table-container{border-color:#d9e1d8;border-radius:var(--wd-inner-radius)}
 .wd-template th{color:#49636c;background:#edf2ec}
 .wd-template td{color:#385662;border-bottom-color:#e4eae2}
 .wd-template tr:hover td{background:#f1f6ee}
@@ -46,7 +47,7 @@ body.wd-template {
 .wd-template :is(.score i,.track){background:#e1e9df}
 .wd-template :is(.score i b,.track i,.bar-row .track i){background:#518a70}
 .wd-template .bar-row:nth-child(3n) .track i{background:#345f70}
-.wd-template dialog{border-radius:16px;box-shadow:0 24px 70px #102f4033}
+.wd-template dialog{border-radius:var(--wd-radius);box-shadow:0 24px 70px #102f4033}
 .wd-template dialog::backdrop{background:#102f4070}
 
 /* Entry: an asymmetric first screen with two real actions. */
@@ -87,7 +88,7 @@ body.wd-template {
 .personal-page .personal-role{background:#fcfcf3;color:#244e50;border:0;border-radius:6px;padding:8px 14px;box-shadow:0 5px 16px #193f3510}
 .personal-page .personal-layout{grid-template-columns:300px minmax(0,1fr);gap:28px}
 .personal-page .personal-main-column{grid-column:2;grid-row:1;display:grid;gap:24px;align-content:start;min-width:0}
-.personal-page .personal-layout>aside{grid-column:1;grid-row:1;align-self:start;min-width:0;background:#e4e9dd;border-radius:12px;padding:6px 22px}
+.personal-page .personal-layout>aside{grid-column:1;grid-row:1;align-self:start;min-width:0;background:#e4e9dd;border-radius:var(--wd-radius);padding:6px 22px}
 .personal-page .personal-layout>aside>.card{padding:22px 0;margin:0;background:none;border:0;border-bottom:1px solid #c4d0c2;border-radius:0;box-shadow:none}
 .personal-page .personal-layout>aside>.card:last-child{border-bottom:0}
 .personal-page .personal-layout>aside>.card:first-child{padding:22px 0;border-color:#c4d0c2}
@@ -142,9 +143,9 @@ body.wd-template {
 .wd-template .trip-budget td{border-bottom-color:#e7e0d2}
 .wd-template .trip-ai-summary{background:#f7faf3;color:#234b4f}
 .wd-template .trip-alternative{background:none;border-radius:0;border-bottom:1px solid #e1e7dd}
-.wd-template .assistant-changes>div{background:#eaf1e4}
+.wd-template .assistant-changes>div{background:#eaf1e4;border-radius:var(--wd-inner-radius)}
 .wd-template :is(.assistant-changes span,.assistant-metrics b){color:#30623e}
-.wd-template .assistant-metrics{border-color:#d5dfcf;background:#fcfdf8}
+.wd-template .assistant-metrics{border-color:#d5dfcf;background:#fcfdf8;border-radius:var(--wd-inner-radius)}
 .wd-template .trip-user.active{background:#e3eee0;border-color:#93b594}
 .wd-template .trip-user strong{color:#2a5553}
 
@@ -153,7 +154,7 @@ body.wd-template {
 .wd-template .current-flight-controls{gap:16px;margin-block:18px}
 .wd-template .current-flight-controls label{color:#49636c}
 .wd-template .current-flight-controls select{width:auto;min-width:78px}
-.wd-template .current-flight-option{background:#f6f8f1;border:1px solid #cddbc9;border-radius:10px;padding:20px;gap:20px}
+.wd-template .current-flight-option{background:#f6f8f1;border:1px solid #cddbc9;border-radius:var(--wd-inner-radius);padding:20px;gap:20px}
 .wd-template .current-flight-group>[data-flight-outbound]{background:#edf2e6;border-color:#b9ccb5;border-radius:6px 0 0 6px;padding:20px}
 .wd-template .current-flight-leg{gap:8px}
 .wd-template .current-flight-leg>strong{color:#1d6655;font-size:19px;font-variant-numeric:tabular-nums}
@@ -162,9 +163,9 @@ body.wd-template {
 .wd-template .current-flight-return+.current-flight-return{border-color:#cddbc9}
 .wd-template .current-flight-total{padding-top:16px;border-top:1px dashed #bdcdb8}
 .wd-template .current-flight-total>strong{font-size:20px;color:#234b4f;font-variant-numeric:tabular-nums}
-.wd-template .current-flight-selected{background:#e2f0e1;padding:22px}
+.wd-template .current-flight-selected{background:#e2f0e1;padding:22px;border-radius:var(--wd-inner-radius)}
 .wd-template .current-flight-selected>strong{font-size:21px;color:#225f38}
-.wd-template .current-flight-preview{background:#f6efdf;padding:22px;border:1px solid #e1d2b7}
+.wd-template .current-flight-preview{background:#f6efdf;padding:22px;border:1px solid #e1d2b7;border-radius:var(--wd-inner-radius)}
 .wd-template .current-flight-preview h4{color:#745326}
 .wd-template .current-flight-preview label{display:flex;gap:10px;align-items:flex-start;margin-top:16px}
 .wd-template .current-flight-preview input{flex:none;margin-top:6px}
@@ -174,9 +175,14 @@ body.wd-template {
 .wd-template .current-price-history strong{color:#2d654e;font-variant-numeric:tabular-nums}
 
 /* Marketing: an ink rail, warm canvas and varied information surfaces. */
-.marketing-page.wd-template{position:relative;isolation:isolate;background:#eef1e9}
-.marketing-page.wd-template::before{content:"";position:fixed;z-index:-1;inset:0;background:linear-gradient(90deg,#eef1e9ed 0%,#eef1e9d1 58%,#eef1e9a8 100%),linear-gradient(0deg,#eef1e9d9 0%,#eef1e900 80%),url('/assets/marketing-airport-background.png') right center / cover;pointer-events:none}
-.marketing-page #sidebar{width:232px;background:#102f40;border-right:0}
+.marketing-page.wd-template{position:relative;isolation:isolate;background:#102f40}
+.marketing-page.wd-template::before{content:"";position:fixed;z-index:-1;inset:0;background:linear-gradient(90deg,#102f4073 0%,#102f4033 60%,#102f4026 100%),linear-gradient(0deg,#102f4059 0%,#102f4000 75%),url('/assets/marketing-airport-background.png') right center / cover;filter:blur(3px);pointer-events:none}
+.marketing-page #sidebar{width:232px;background:#102f40f5;border-right:0}
+.marketing-page .card{background:#fffffff0}
+.marketing-page .empty,.marketing-page #app>.table-tools,.marketing-page #audience-table{background:#fffffff0;border:0;border-radius:var(--wd-radius)}
+.marketing-page #app>.table-tools{padding:18px}
+.marketing-page #audience-table{padding:16px}
+.marketing-page :is(.card,.empty,.route-card,.segment-card,.intent-card,.metric-grid,.workflow,.overview-status,.topbar,.page-head,#audience-table),.marketing-page #app>.table-tools{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .marketing-page .main-shell{margin-left:232px}
 .marketing-page #sidebar .brand{padding:29px 23px 24px;color:#fff;font-size:22px}
 .marketing-page #sidebar .brand small{color:#b6ccc8}
@@ -192,22 +198,25 @@ body.wd-template {
 .marketing-page .sidebar-bottom{padding-inline:25px}
 .marketing-page .sidebar-bottom :is(button,a){color:#bad0c7}
 .marketing-page .sidebar-bottom>button{border-color:#ffffff26}
-.marketing-page .topbar{min-height:80px;height:auto;padding:16px 32px;flex-wrap:wrap;background:#fcfcf7;border-bottom-color:#d9e0d4}
+.marketing-page .topbar{min-height:80px;height:auto;padding:16px 32px;flex-wrap:wrap;background:#fcfcf7f2;border-bottom-color:#d9e0d4}
 .marketing-page .top-actions{gap:12px;flex-wrap:wrap;justify-content:flex-end}
 .marketing-page .breadcrumb{color:#526b73}
 .marketing-page .breadcrumb strong{color:#244b50}
 .marketing-page .operator{color:#375e45;background:#e1eadb}
 .marketing-page main{padding:28px 32px 40px}
-.marketing-page .page-head{margin-bottom:24px;padding-bottom:19px;border-bottom:1px solid #d3dccd}
-.marketing-page .page-head h1{color:#24434c;font-weight:600}
-.marketing-page .overview-status{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,.9fr) auto;align-items:center;gap:32px;padding:22px 26px;background:#e4e9dc;border:0;border-radius:12px}
+.marketing-page .page-head{margin-bottom:24px;padding:12px 18px;border:0;border-radius:var(--wd-inner-radius);background:#102f4066}
+.marketing-page .page-head h1{color:#f5f7ee;font-weight:600}
+.marketing-page .section:not(.card)>.section-head{padding:10px 14px;border-radius:var(--wd-inner-radius);background:#102f4066}
+.marketing-page .section:not(.card)>.section-head h2,.marketing-page .section:not(.card)>.section-head .text-button{color:#f5f7ee}
+.marketing-page .page-head>.text-button{color:#f5f7ee}
+.marketing-page .overview-status{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,.9fr) auto;align-items:center;gap:32px;padding:22px 26px;background:#e4e9dce8;border:0;border-radius:var(--wd-radius)}
 .marketing-page .overview-status h3{margin:0 0 6px;color:#284b40;font-size:18px}
 .marketing-page .overview-status .muted{margin:0;color:#496350;font-size:14px}
 .marketing-page .overview-status .number-circle{display:none}
 .marketing-page .overview-status .aside-progress{margin:0;min-width:0}
 .marketing-page .overview-status .aside-progress>div{color:#496350;font-size:13px}
 .marketing-page .overview-status .primary{grid-column:auto;width:auto;min-width:172px;margin:0}
-.marketing-page .metric-grid{gap:0;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-block:24px 32px;background:#f8f9f3;border-block:1px solid #d3dccd}
+.marketing-page .metric-grid{gap:0;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-block:24px 32px;background:#f8f9f3ec;border-block:1px solid #d3dccd;border-radius:var(--wd-radius);overflow:hidden}
 .marketing-page .metric{padding:24px 26px;border:0;border-right:1px solid #d3dccd;border-radius:0;box-shadow:none;background:none}
 .marketing-page .metric:last-child{border-right:0}
 .marketing-page .metric strong{color:#183f47;font-size:36px;font-weight:600;margin-top:13px;font-variant-numeric:tabular-nums}
@@ -218,7 +227,7 @@ body.wd-template {
 .marketing-page .selection-stages>div:first-child{padding-left:0}
 .marketing-page .selection-stages>div:last-child{border-right:0}
 .marketing-page .selection-stages strong{color:#2c6d58}
-.marketing-page .workflow{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;list-style:none;margin:0;padding:28px 16px;background:#fff;border:0;border-radius:14px;box-shadow:var(--wd-shadow)}
+.marketing-page .workflow{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;list-style:none;margin:0;padding:28px 16px;background:#ffffffed;border:0;border-radius:var(--wd-radius);box-shadow:var(--wd-shadow)}
 .marketing-page .workflow::before{content:"";position:absolute;top:51px;left:10%;right:10%;height:2px;background:#c8d9c7;pointer-events:none}
 .marketing-page .workflow-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:12px;min-width:0;min-height:0;padding:0 8px;background:none;border:0;border-radius:0}
 .marketing-page .workflow-card::after{content:none;display:none}
@@ -232,17 +241,17 @@ body.wd-template {
 .marketing-page .workflow .current .workflow-title{color:#105247}
 .marketing-page .workflow .current button{background:#e3eedf;color:#164735}
 .marketing-page .workflow .current button:hover{background:#d3e5cc}
-.marketing-page .hotspot{background:#eef2e7;border:0;border-radius:7px;color:#2d6353}
+.marketing-page .hotspot{background:#eef2e7;border:0;border-radius:var(--wd-inner-radius);color:#2d6353}
 .marketing-page .hotspot span{color:#526b5d}
 .marketing-page .hotspot:hover{background:#dce9d8}
-.marketing-page .segment-card{background:#fff;box-shadow:none;border-color:#d3dccd;border-radius:9px}
+.marketing-page .segment-card{background:#fffffff0;box-shadow:none;border-color:#d3dccd;border-radius:var(--wd-radius)}
 .marketing-page .segment-card.active{background:#e0ecda;border-color:#7fa883}
 .marketing-page .segment-icon{background:#e6eedf;color:#48744f}
-.marketing-page .route-card{border-radius:10px;border-color:#d3dccd;background:#fff}
+.marketing-page .route-card{border-radius:var(--wd-radius);border-color:#d3dccd;background:#fffffff0}
 .marketing-page .route-cities{color:#2a5556}
 .marketing-page .route-card .price{color:#176b60}
 .marketing-page .creative-strip button.active{background:#e3eedb;border-color:#99b58e;color:#315c35}
-.wd-template .intent-card{background:#f5f8ef;border-color:#d5dfcd}
+.wd-template .intent-card{background:#f5f8ef;border-color:#d5dfcd;border-radius:var(--wd-radius)}
 .wd-template .intent-grid strong{color:#2c684e}
 .wd-template .profile-head{margin:-34px -34px 24px;padding:28px 76px 25px 30px;background:#e7eddf;border-bottom:1px solid #cbd9c4}
 .wd-template .profile-head h2{color:#28564a}
