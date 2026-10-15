@@ -67,6 +67,14 @@ def certificate_bundle():
                   os.environ.get('REQUESTS_CA_BUNDLE') or certifi.where())
     contents = source.read_bytes()
     directory = Path(__file__).resolve().parent.parent / 'runtime' / 'flight-certificates'
+    # curl on Windows requires an ASCII certificate filename. A project path
+    # containing Chinese characters needs a separate, project-specific cache
+    # on the same drive; copying within that path does not solve the problem.
+    if os.name == 'nt' and not str(directory).isascii():
+        project = Path(__file__).resolve().parent.parent
+        ancestor = next(p for p in project.parents if str(p).isascii())
+        project_key = hashlib.sha256(str(project).encode('utf-8')).hexdigest()[:16]
+        directory = ancestor / '.huayi-chaoyang-runtime' / project_key / 'flight-certificates'
     directory.mkdir(parents=True, exist_ok=True)
     destination = directory / (hashlib.sha256(contents).hexdigest() + '.pem')
     if not destination.exists():
