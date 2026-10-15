@@ -175,11 +175,11 @@ body.wd-template {
 .wd-template .current-price-history strong{color:#2d654e;font-variant-numeric:tabular-nums}
 
 /* Marketing: an ink rail, warm canvas and varied information surfaces. */
-.marketing-page.wd-template{position:relative;isolation:isolate;background:#102f40}
-.marketing-page.wd-template::before{content:"";position:fixed;z-index:-1;inset:0;background:linear-gradient(90deg,#102f4073 0%,#102f4033 60%,#102f4026 100%),linear-gradient(0deg,#102f4059 0%,#102f4000 75%),url('/assets/marketing-airport-background.png') right center / cover;filter:blur(3px);pointer-events:none}
+.marketing-page.wd-template{--marketing-surface:#f8faf4eb;position:relative;isolation:isolate;background:#e2e8df}
+.marketing-page.wd-template::before{content:"";position:fixed;z-index:-1;inset:0;background:linear-gradient(90deg,#e2e8dfb3 0%,#e2e8df8c 60%,#e2e8df80 100%),linear-gradient(0deg,#e2e8df66 0%,#e2e8df00 75%),url('/assets/marketing-airport-background.png') right center / cover;filter:blur(3px);pointer-events:none}
 .marketing-page #sidebar{width:232px;background:#102f40f5;border-right:0}
-.marketing-page .card{background:#fffffff0}
-.marketing-page .empty,.marketing-page #app>.table-tools,.marketing-page #audience-table{background:#fffffff0;border:0;border-radius:var(--wd-radius)}
+.marketing-page .card{background:var(--marketing-surface)}
+.marketing-page .empty,.marketing-page #app>.table-tools,.marketing-page #audience-table{background:var(--marketing-surface);border:0;border-radius:var(--wd-radius)}
 .marketing-page #app>.table-tools{padding:18px}
 .marketing-page #audience-table{padding:16px}
 .marketing-page :is(.card,.empty,.route-card,.segment-card,.intent-card,.metric-grid,.workflow,.overview-status,.topbar,.page-head,#audience-table),.marketing-page #app>.table-tools{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
@@ -204,19 +204,19 @@ body.wd-template {
 .marketing-page .breadcrumb strong{color:#244b50}
 .marketing-page .operator{color:#375e45;background:#e1eadb}
 .marketing-page main{padding:28px 32px 40px}
-.marketing-page .page-head{margin-bottom:24px;padding:12px 18px;border:0;border-radius:var(--wd-inner-radius);background:#102f4066}
-.marketing-page .page-head h1{color:#f5f7ee;font-weight:600}
-.marketing-page .section:not(.card)>.section-head{padding:10px 14px;border-radius:var(--wd-inner-radius);background:#102f4066}
-.marketing-page .section:not(.card)>.section-head h2,.marketing-page .section:not(.card)>.section-head .text-button{color:#f5f7ee}
-.marketing-page .page-head>.text-button{color:#f5f7ee}
-.marketing-page .overview-status{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,.9fr) auto;align-items:center;gap:32px;padding:22px 26px;background:#e4e9dce8;border:0;border-radius:var(--wd-radius)}
+.marketing-page .page-head{margin-bottom:24px;padding:12px 18px;border:0;border-radius:var(--wd-inner-radius);background:#f4f7edd1}
+.marketing-page .page-head h1{color:#183746;font-weight:600}
+.marketing-page .section:not(.card)>.section-head{padding:10px 14px;border-radius:var(--wd-inner-radius);background:#f4f7edd1}
+.marketing-page .section:not(.card)>.section-head h2,.marketing-page .section:not(.card)>.section-head .text-button{color:#244b50}
+.marketing-page .page-head>.text-button{color:#176b60}
+.marketing-page .overview-status{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,.9fr) auto;align-items:center;gap:32px;padding:22px 26px;background:#dfe7d9eb;border:0;border-radius:var(--wd-radius)}
 .marketing-page .overview-status h3{margin:0 0 6px;color:#284b40;font-size:18px}
 .marketing-page .overview-status .muted{margin:0;color:#496350;font-size:14px}
 .marketing-page .overview-status .number-circle{display:none}
 .marketing-page .overview-status .aside-progress{margin:0;min-width:0}
 .marketing-page .overview-status .aside-progress>div{color:#496350;font-size:13px}
 .marketing-page .overview-status .primary{grid-column:auto;width:auto;min-width:172px;margin:0}
-.marketing-page .metric-grid{gap:0;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-block:24px 32px;background:#f8f9f3ec;border-block:1px solid #d3dccd;border-radius:var(--wd-radius);overflow:hidden}
+.marketing-page .metric-grid{gap:0;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-block:24px 32px;background:var(--marketing-surface);border-block:1px solid #d3dccd;border-radius:var(--wd-radius);overflow:hidden}
 .marketing-page .metric{padding:24px 26px;border:0;border-right:1px solid #d3dccd;border-radius:0;box-shadow:none;background:none}
 .marketing-page .metric:last-child{border-right:0}
 .marketing-page .metric strong{color:#183f47;font-size:36px;font-weight:600;margin-top:13px;font-variant-numeric:tabular-nums}
@@ -227,7 +227,7 @@ body.wd-template {
 .marketing-page .selection-stages>div:first-child{padding-left:0}
 .marketing-page .selection-stages>div:last-child{border-right:0}
 .marketing-page .selection-stages strong{color:#2c6d58}
-.marketing-page .workflow{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;list-style:none;margin:0;padding:28px 16px;background:#ffffffed;border:0;border-radius:var(--wd-radius);box-shadow:var(--wd-shadow)}
+.marketing-page .workflow{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;list-style:none;margin:0;padding:28px 16px;background:var(--marketing-surface);border:0;border-radius:var(--wd-radius);box-shadow:var(--wd-shadow)}
 .marketing-page .workflow::before{content:"";position:absolute;top:51px;left:10%;right:10%;height:2px;background:#c8d9c7;pointer-events:none}
 .marketing-page .workflow-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:12px;min-width:0;min-height:0;padding:0 8px;background:none;border:0;border-radius:0}
 .marketing-page .workflow-card::after{content:none;display:none}
@@ -244,10 +244,10 @@ body.wd-template {
 .marketing-page .hotspot{background:#eef2e7;border:0;border-radius:var(--wd-inner-radius);color:#2d6353}
 .marketing-page .hotspot span{color:#526b5d}
 .marketing-page .hotspot:hover{background:#dce9d8}
-.marketing-page .segment-card{background:#fffffff0;box-shadow:none;border-color:#d3dccd;border-radius:var(--wd-radius)}
+.marketing-page .segment-card{background:var(--marketing-surface);box-shadow:none;border-color:#d3dccd;border-radius:var(--wd-radius)}
 .marketing-page .segment-card.active{background:#e0ecda;border-color:#7fa883}
 .marketing-page .segment-icon{background:#e6eedf;color:#48744f}
-.marketing-page .route-card{border-radius:var(--wd-radius);border-color:#d3dccd;background:#fffffff0}
+.marketing-page .route-card{border-radius:var(--wd-radius);border-color:#d3dccd;background:var(--marketing-surface)}
 .marketing-page .route-cities{color:#2a5556}
 .marketing-page .route-card .price{color:#176b60}
 .marketing-page .creative-strip button.active{background:#e3eedb;border-color:#99b58e;color:#315c35}
