@@ -1,0 +1,308 @@
+/* Huayi Chaoyang — boutique aviation, navy ink and sea green. */
+body.wd-template {
+  --wd-ink: #173544; --wd-muted: #5b7179; --wd-accent: #176f69;
+  --wd-accent-hover: #105a55; --wd-soft: #eaf3ef; --wd-bg: #f4f7f6;
+  --wd-line: #dce6e2; --wd-dark: #123342; --wd-teal: #176f69;
+  --ink: var(--wd-ink); --muted: var(--wd-muted); --purple: var(--wd-accent);
+  --purple-dark: var(--wd-accent-hover); --soft: var(--wd-soft);
+  --bg: var(--wd-bg); --line: var(--wd-line); --focus: #2f8179;
+  background: var(--wd-bg); color: var(--wd-ink);
+}
+.wd-template .primary { background: #176f69; font-size: 14px; font-weight: 600; border-radius: 9px; box-shadow: none; }
+.wd-template .primary:hover { background: #105a55; }
+.wd-template .primary:active { transform: translateY(1px); }
+.wd-template .secondary { background: #f2f7f4; color: #39645e; border-color: #d6e3dd; }
+.wd-template .secondary:hover { background: #e6f1eb; border-color: #adcabe; }
+.wd-template .text-button { color: #1a716b; }
+.wd-template .quiet-button { color: #526b75; }
+.wd-template .card { border: 1px solid #e0e8e4; border-radius: 15px; background: #fff; }
+.wd-template .card h3, .wd-template .section-head h2 { color: #244956; }
+.wd-template .field > span { color: #526c74; }
+.wd-template input:not([type="checkbox"]):not([type="radio"]), .wd-template select, .wd-template textarea { border-color: #d0dfd8; border-radius: 8px; }
+.wd-template input[type="checkbox"], .wd-template input[type="radio"] { accent-color: #176f69; }
+.wd-template ::selection { background: #176f69; color: #fff; }
+.wd-template .badge { background: #eef2f2; color: #516a73; }
+.wd-template .badge.purple { background: #e8f2ed; color: #296e60; }
+.wd-template .badge.green { background: #e7f3eb; color: #286a50; }
+.wd-template .badge.amber { background: #fff2db; color: #815a20; }
+.wd-template .notice { background: #eef5f1; border-color: #dce8df; color: #49685f; }
+.wd-template .notice.amber { background: #fff8ed; border-color: #eee0c8; color: #805b25; }
+.wd-template .notice.red { background: #fff2f2; border-color: #f0d5d5; color: #a14848; }
+.wd-template .notice.green { background: #edf6ef; border-color: #d4e8d9; color: #396a4d; }
+.wd-template th { background: #f5f8f6; color: #5b7278; }
+.wd-template td { color: #405d68; padding-block: 17px; }
+.wd-template tr:hover td { background: #f5faf7; }
+.wd-template .table-container { border-color: #e0e8e4; border-radius: 11px; }
+.wd-template .score { color: #2e776b; }
+.wd-template .score i { background: #e7efea; }
+.wd-template .score i b { background: #76aa93; }
+.wd-template .track { background: #e9f0eb; }
+.wd-template .track i, .wd-template .bar-row .track i { background: #6d9e8b; }
+.wd-template .bar-row:nth-child(3n) .track i { background: #6e91a0; }
+.wd-template .metric-grid { grid-template-columns: repeat(auto-fit,minmax(170px,1fr)); gap: 18px; }
+.wd-template .metric { border: 1px solid #e0e8e4; border-radius: 13px; box-shadow: none; padding: 23px 25px; }
+.wd-template .metric strong { color: #163f4c; font-size: 35px; font-weight: 600; margin-top: 15px; }
+.wd-template .metric-label { color: #58727a; font-size: 12px; }
+.wd-template .metric-icon { background: #edf5ef; color: #719988; }
+.wd-template .metric-foot { color: #5f767d; font-size: 12px; }
+.wd-template .section-head h2 { font-size: 19px; }
+
+/* A real visual focal point, with the two functional entrances beneath it. */
+.portal-page.wd-template { display: block; background: #f6f8f7; }
+.portal-page > header { max-width: 1360px; padding: 24px 40px; }
+.portal-page .brand { font-size: 23px; }
+.portal-page .brand img { width: 49px; height: 49px; }
+.portal-page .brand small { color: #69828c; }
+.portal-page .portal-nav { display: flex; align-items: center; gap: 28px; }
+.portal-page .portal-nav a { color: #526b75; font-size: 13px; min-height: 44px; display: flex; align-items: center; }
+.portal-page .portal-nav a:last-child { padding: 8px 17px; border: 1px solid #cbdcd3; border-radius: 8px; color: #29665b; }
+.portal-page main.wd-split { display: block; max-width: 1360px; padding: 12px 40px 34px; margin: 0 auto; }
+.portal-page .intro.wd-story { position: relative; min-height: 530px; margin: 0; padding: 58px 62px 118px; border-radius: 22px; overflow: hidden; background: #153e4e; justify-content: center; gap: 22px; }
+.portal-page .travel-hero-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 56%; }
+.portal-page .intro::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg,#0a293bc9 0%,#0c344b5c 46%,#123a4810 80%); pointer-events: none; }
+.portal-page .intro h1, .portal-page .portal-story-note { position: relative; z-index: 1; }
+.portal-page .intro h1 { font-size: clamp(42px,4.5vw,66px); line-height: 1.2; color: #fff; font-weight: 600; letter-spacing: .02em; }
+.portal-page .portal-story-note { font-size: 15px; color: #e0ebe9; line-height: 1.8; max-width: 25em; }
+.portal-page .portal-choices { position: relative; z-index: 2; margin: -80px 38px 0; display: block; }
+.portal-page .entry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.portal-page .entry-card, .portal-page .entry-card.personal { min-height: 222px; position: relative; padding: 26px 30px; background: #fff; color: #173b49; border: 1px solid #e1eae5; border-radius: 15px; box-shadow: 0 12px 26px #123e4210; }
+.portal-page .entry-card:hover { transform: translateY(-3px); border-color: #9bbfae; box-shadow: 0 15px 30px #123e4216; }
+.portal-page .entry-top { position: absolute; right: 30px; top: 27px; }
+.portal-page .entry-icon, .portal-page .personal .entry-icon { width: 43px; height: 43px; background: #edf5ef; color: #578a75; border-radius: 11px; }
+.portal-page .entry-icon svg { width: 23px; height: 23px; }
+.portal-page .entry-card h2 { margin: 3px 0 10px; padding-right: 54px; font-size: 26px; font-weight: 650; }
+.portal-page .entry-card p, .portal-page .personal p { color: #647e84; font-size: 13px; margin-bottom: 23px; }
+.portal-page .entry-action, .portal-page .personal .entry-action { width: 100%; background: #176f69; color: #fff; min-height: 47px; padding: 11px 15px; border-radius: 8px; font-size: 13px; }
+.portal-page .staff .entry-action { background: #edf4ef; color: #286658; }
+.portal-page .entry-footnote { text-align: center; color: #6d8288; font-size: 12px; margin: 24px 0 0; }
+.portal-page > footer { max-width: 1204px; width: calc(100% - 156px); margin: 0 auto; border-color: #e0e8e3; color: #6f8389; padding: 20px 0 27px; font-size: 12px; }
+
+/* Personal planner: an atmospheric arrival, then a quiet, practical work surface. */
+.personal-page .personal-header { background: #fff; border-bottom: 1px solid #e5ece7; }
+.personal-page .personal-header nav a { color: #627982; }
+.personal-page .personal-header nav a.active { color: #286d60; background: #edf5ef; }
+.personal-page .personal-shell { max-width: 1440px; padding: 28px 32px 36px; }
+.personal-page .personal-heading { position: relative; overflow: hidden; min-height: 160px; padding: 30px 36px; margin-bottom: 26px; border-radius: 17px; background: linear-gradient(90deg,#123342ed,#123342c2 40%,#12334224),url('/assets/personal-lake-background.png') center 53% / cover; }
+.personal-page .personal-heading h1 { font-size: 32px; color: #fff; font-weight: 600; letter-spacing: .02em; }
+.personal-page .personal-role { color: #d6e9e1; background: #163f4be8; border: 1px solid #ffffff24; border-radius: 7px; padding: 8px 13px; }
+.personal-page .personal-layout { display: grid; grid-template-columns: 300px minmax(0,1fr); gap: 24px; }
+.personal-page .personal-main-column { display: grid; grid-column: 2; grid-row: 1; align-content: start; gap: 22px; min-width: 0; }
+.personal-page .personal-layout > aside { grid-column: 1; grid-row: 1; min-width: 0; }
+.personal-page .personal-layout > aside > .card:first-child { padding: 24px; border-color: #e2eae5; }
+.personal-page .personal-layout > aside > .card:first-child > h2 { padding-bottom: 18px; border-bottom: 1px solid #e5ece7; color: #315b62; font-size: 19px; }
+.personal-page .personal-layout .field > span { color: #607880; font-size: 12px; }
+.personal-page .personal-layout .field { margin-top: 17px; }
+.personal-page .assistant-card { padding: 25px 28px; margin: 0; background: #fff; border-color: #dce8df; }
+.personal-page .assistant-heading h2 { font-size: 22px; color: #234e59; }
+.personal-page .assistant-heading > span { color: #57806e; background: #edf5ef; font-size: 11px; border-radius: 6px; }
+.personal-page .assistant-intro { color: #6b8187; font-size: 13px; margin-block: 12px 15px; }
+.personal-page .assistant-controls { gap: 14px; margin-block: 12px; }
+.personal-page .assistant-controls label { font-size: 13px; }
+.personal-page .assistant-card textarea { background: #fafcfb; font-size: 14px; min-height: 100px; border-color: #d6e4db; padding: 14px 16px; }
+.personal-page .assistant-prompt { font-size: 12px; color: #627e83; }
+.personal-page .assistant-controls .personal-small { font-size: 11px; color: #607c80; }
+.personal-page .personal-welcome { min-height: 315px; background: #fff; border-color: #e0e9e3; }
+.personal-page .personal-welcome-icon { color: #628c7c; background: #f0f6f1; }
+.personal-page .personal-welcome h2 { color: #315b61; font-size: 24px !important; }
+.personal-page .personal-welcome p { color: #798e93; }
+.personal-page .personal-more summary { color: #4d7e6b; }
+.personal-page .personal-history button.active { background: #f0f7f2; border-color: #bcd7c7; }
+.personal-page .personal-history, .personal-page .personal-profile { margin-top: 20px; }
+.personal-page .trip-detail { padding: 28px; border: 1px solid #e1e9e4; overflow: hidden; }
+.personal-page .trip-detail > .section-head { padding: 26px 28px; margin: -28px -28px 22px; background: #153d4b; border-bottom: 0; }
+.personal-page .trip-detail > .section-head h2 { color: #fff; font-size: 27px; font-weight: 600; }
+.personal-page .trip-detail > .section-head p { color: #c2d7d5; font-size: 13px; }
+.personal-page .trip-detail > .section-head .badge { color: #d5e8df; background: #2b5360; font-size: 11px; }
+.personal-page .trip-date-line { color: #578777; margin-top: 10px; font-size: 13px; }
+.personal-page .personal-reference { background: #edf3ef; }
+.personal-page .personal-footer { color: #72878d; }
+.wd-template .assistant-changes > div { background: #f0f6f2; }
+.wd-template .assistant-changes span, .wd-template .assistant-metrics b { color: #377362; }
+.wd-template .assistant-metrics { border-color: #dce7df; background: #fcfdfc; }
+.wd-template .trip-days { gap: 19px; }
+.wd-template .trip-day { background: #fff; border-color: #dce8df; padding: 21px; border-radius: 12px; }
+.wd-template .trip-day-heading { padding-bottom: 16px; border-bottom: 1px solid #edf2ee; }
+.wd-template .trip-day-heading > span { background: #edf5ef; color: #53816a; border-radius: 8px; }
+.wd-template .trip-day h4 { color: #2a555d; }
+.wd-template .trip-time-block { border-bottom-color: #edf2ee; }
+.wd-template .trip-time-block time { color: #608f7e; font-weight: 600; }
+.wd-template .trip-user.active { background: #edf6ef; border-color: #accdba; }
+.wd-template .trip-user strong { color: #315e62; }
+.wd-template .trip-rationale summary { color: #4a7a71; }
+
+/* Current quotes read as paired legs; timestamps and confirmation stay visible. */
+.wd-template .current-flight-panel { padding-block: 22px; border-bottom-color: #e1eae4; }
+.wd-template .current-flight-controls { gap: 16px; margin-block: 17px; }
+.wd-template .current-flight-controls label { white-space: nowrap; font-size: 13px; color: #5c767f; }
+.wd-template .current-flight-controls select { width: auto; min-width: 78px; border-color: #d4e1d8; }
+.wd-template .current-flight-option { background: #fff; border: 1px solid #d9e6de; border-radius: 12px; padding: 20px; gap: 20px; }
+.wd-template .current-flight-leg { gap: 8px; }
+.wd-template .current-flight-leg:first-child { padding-inline-end: 18px; border-inline-end: 1px dashed #ccdcd1; }
+.wd-template .current-flight-leg > strong { color: #297968; font-size: 18px; font-variant-numeric: tabular-nums; }
+.wd-template .current-flight-leg > span { font-size: 14px; color: #3b5e67; font-weight: 600; }
+.wd-template .current-flight-leg > small { color: #668188; line-height: 1.75; }
+.wd-template .current-flight-total { padding-top: 16px; border-top: 1px dashed #d1dfd5; }
+.wd-template .current-flight-total > strong { font-size: 19px; color: #244f56; font-variant-numeric: tabular-nums; }
+.wd-template .current-flight-selected { background: #eef7f0; border: 1px solid #cde3d4; padding: 21px; }
+.wd-template .current-flight-selected > strong { font-size: 21px; color: #286b54; font-variant-numeric: tabular-nums; }
+.wd-template .current-flight-preview { background: #f2f7f1; border: 1px solid #cfe0cd; padding: 21px; }
+.wd-template .current-flight-preview h4 { color: #47764f; font-size: 16px; }
+.wd-template .current-flight-preview label { display: flex; align-items: flex-start; gap: 9px; margin-top: 15px; font-size: 13px; }
+.wd-template .current-flight-preview input { flex: none; margin-top: 5px; }
+.wd-template .current-flight-preview .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.wd-template .current-flight-choices > summary, .wd-template .current-price-history > summary { cursor: pointer; color: #427367; font-size: 14px; font-weight: 600; padding-block: 10px; }
+.wd-template .current-price-history > div { border-bottom: 1px solid #e9f0eb; color: #607d81; padding-block: 12px; }
+.wd-template .current-price-history strong { color: #467366; font-variant-numeric: tabular-nums; }
+
+/* Marketing console: a dark, calm rail and a bright information canvas. */
+.marketing-page #sidebar { width: 232px; background: #153543; border-right: 0; }
+.marketing-page .main-shell { margin-left: 232px; }
+.marketing-page #sidebar .brand { color: #fff; font-size: 22px; padding: 29px 23px 24px; }
+.marketing-page #sidebar .brand small { color: #abc4c7; }
+.marketing-page .workspace { color: #d2e3df; background: #ffffff06; border: 1px solid #ffffff0f; padding: 12px; margin: 5px 17px 29px; }
+.marketing-page .workspace-icon { color: #b9d7cb; background: #31515c; }
+.marketing-page .nav-label { color: #93b2b4; font-size: 10px; margin-inline: 26px; }
+.marketing-page #sidebar nav { padding-inline: 14px; gap: 7px; }
+.marketing-page #sidebar nav a { color: #b9cecf; font-size: 14px; height: 47px; border-radius: 8px; padding: 0 15px; }
+.marketing-page #sidebar nav a > span { color: #85a7a9; }
+.marketing-page #sidebar nav a:hover { background: #ffffff0a; color: #fff; }
+.marketing-page #sidebar nav a.active { background: #dbece2; color: #245d54; font-weight: 650; }
+.marketing-page #sidebar nav a.active > span { color: #39786b; }
+.marketing-page .sidebar-bottom { padding-inline: 25px; }
+.marketing-page .sidebar-bottom > button, .marketing-page .sidebar-bottom > a { color: #a5c0c1; font-size: 12px; }
+.marketing-page .sidebar-bottom > button { border-color: #ffffff12; }
+.marketing-page .topbar { min-height: 80px; background: #fff; border-bottom: 1px solid #e5ece7; padding-inline: 32px; }
+.marketing-page .breadcrumb { color: #70858c; }
+.marketing-page .breadcrumb strong { color: #315c68; }
+.marketing-page .operator { color: #608b79; background: #edf5ef; }
+.marketing-page main { padding: 27px 32px 40px; }
+.marketing-page .page-head { margin-bottom: 26px; }
+.marketing-page .page-head h1 { color: #234957; font-size: 30px; font-weight: 600; }
+.marketing-page .overview-grid { grid-template-columns: minmax(0,1fr) 280px; gap: 22px; }
+.marketing-page .hero { min-height: 260px; padding: 33px 35px; border-radius: 16px; background: linear-gradient(90deg,#123745f5,#153d4cb8 53%,#1237451a),url('/assets/marketing-airport-background.png') center 68% / cover; }
+.marketing-page .hero h2 { font-size: 34px; color: #fff; font-weight: 600; }
+.marketing-page .hero .primary { background: #e3efe7; color: #2a6257; font-size: 13px; }
+.marketing-page .hero-graphic svg { display: none; }
+.marketing-page .hero-graphic .floating-tag { background: #163d4be8; border: 1px solid #ffffff16; padding: 15px 17px; color: #cee1da; }
+.marketing-page .hero-graphic .floating-tag strong { font-size: 22px; }
+.marketing-page .overview-aside { background: #fff; border: 1px solid #e0e8e3; padding: 25px; border-radius: 14px; }
+.marketing-page .overview-aside .number-circle { display: none; }
+.marketing-page .overview-aside h3 { color: #38636a; font-size: 17px; margin-top: 0; }
+.marketing-page .overview-aside .primary { font-size: 13px; }
+.marketing-page .selection-funnel { padding: 25px 27px; border-color: #e1e9e4; }
+.marketing-page .selection-stages { margin-block: 19px; }
+.marketing-page .selection-stages strong { color: #3b776b; font-size: 29px; }
+.marketing-page .selection-stages small { color: #668187; }
+.marketing-page .workflow { padding: 8px; border: 1px solid #e1e9e4; border-radius: 13px; background: #fff; gap: 0; }
+.marketing-page .workflow-card { border: 0; padding: 18px 16px; border-radius: 8px; }
+.marketing-page .workflow-card.current { background: #edf5ef; }
+.marketing-page .workflow-card:not(:last-child)::after { display: none; }
+.marketing-page .workflow-title { color: #486c70; font-size: 14px; }
+.marketing-page .workflow-no { color: #7ba28b; letter-spacing: .5px; font-size: 11px; }
+.marketing-page .workflow-card button { color: #568373; }
+.marketing-page .hotspot { background: #f1f7f3; border: 0; color: #47756b; }
+.marketing-page .hotspot span { color: #68867e; }
+.marketing-page .segment-card.active { border-color: #a9cab5; background: #f2f8f3; }
+.marketing-page .segment-card .segment-icon { background: #eef5ef; color: #719c83; }
+.marketing-page .route-cities { color: #34646b; }
+.marketing-page .route-card .price { color: #2f7b69; }
+.marketing-page .creative-strip button.active { background: #edf5ef; border-color: #bdd5c5; color: #46745b; }
+.marketing-page footer { color: #778e91; border-top: 0; }
+.wd-template .intent-card { background: #f7fbf8; border-color: #d9e7dd; }
+.wd-template .intent-grid strong { color: #377568; }
+.wd-template dialog { border-radius: 17px; }
+.wd-template .profile-head { margin: -34px -34px 24px; padding: 29px 76px 25px 30px; background: #eef5f0; border-bottom: 1px solid #dce9df; }
+.wd-template .profile-head h2 { color: #295b60; }
+.wd-template .profile-avatar { color: #6c9a80; background: #deeee2; }
+.wd-template .profile-list { border-bottom: 1px solid #edf3ee; }
+.wd-template .profile-list:last-child { border-bottom: 0; }
+.wd-template .profile-list strong { color: #447a6a; }
+
+@media(max-width:1200px) and (min-width:1101px) {
+  .marketing-page #sidebar { width: 212px; }
+  .marketing-page .main-shell { margin-left: 212px; }
+  .marketing-page .overview-grid { grid-template-columns: minmax(0,1fr) 250px; }
+  .marketing-page main, .marketing-page .topbar { padding-inline: 24px; }
+}
+@media(max-width:1100px) {
+  .marketing-page #sidebar { width: 100%; height: auto; position: relative; inset: auto; padding: 0 24px; }
+  .marketing-page .main-shell { margin-left: 0; }
+  .marketing-page #sidebar .brand { padding: 18px 0 13px; }
+  .marketing-page #sidebar .brand > span:last-child { display: block; }
+  .marketing-page #sidebar nav { flex-direction: row; overflow: auto; padding: 0 0 12px; gap: 6px; }
+  .marketing-page #sidebar nav a { flex: none; font-size: 13px; white-space: nowrap; }
+  .marketing-page .workspace, .marketing-page .nav-label, .marketing-page .sidebar-bottom { display: none; }
+  .marketing-page .topbar, .marketing-page main { padding-inline: 24px; }
+}
+@media(max-width:900px) {
+  .personal-page .personal-layout { grid-template-columns: minmax(0,1fr); }
+  .personal-page .personal-main-column { grid-column: 1; grid-row: 1; }
+  .personal-page .personal-layout > aside { grid-column: 1; grid-row: 2; display: grid; gap: 18px; }
+  .personal-page .personal-history, .personal-page .personal-profile { margin-top: 0; }
+  .portal-page .intro.wd-story { min-height: 470px; padding: 45px 42px 108px; }
+  .portal-page .intro h1 { font-size: 52px; }
+  .portal-page .portal-choices { margin-inline: 24px; }
+  .portal-page .entry-card, .portal-page .entry-card.personal { padding: 24px; min-height: 230px; }
+  .portal-page .entry-top { top: 25px; right: 23px; }
+  .portal-page .entry-card h2 { font-size: 24px; }
+}
+@media(max-width:720px) {
+  .portal-page > header { padding: 20px 22px; }
+  .portal-page .brand { font-size: 20px; }
+  .portal-page .brand img { width: 43px; height: 43px; }
+  .portal-page .brand small { font-size: 8px; }
+  .portal-page .portal-nav { gap: 0; }
+  .portal-page .portal-nav a:first-child { display: none; }
+  .portal-page .portal-nav a:last-child { padding: 7px 11px; font-size: 11px; }
+  .portal-page main.wd-split { padding: 8px 16px 25px; }
+  .portal-page .intro.wd-story { min-height: 430px; padding: 35px 28px 125px; border-radius: 17px; gap: 18px; }
+  .portal-page .intro h1 { font-size: 43px; }
+  .portal-page .portal-story-note { max-width: 17em; font-size: 13px; }
+  .portal-page .travel-hero-image { object-position: 58% center; }
+  .portal-page .intro::after { background: linear-gradient(90deg,#0a293bcb,#0c344b70 70%,#123a4826); }
+  .portal-page .portal-choices { margin: -87px 13px 0; }
+  .portal-page .entry-grid { grid-template-columns: minmax(0,1fr); gap: 14px; }
+  .portal-page .entry-card, .portal-page .entry-card.personal { min-height: 201px; padding: 24px; border-radius: 13px; }
+  .portal-page .entry-card h2 { font-size: 23px; }
+  .portal-page .entry-card p { font-size: 12px; }
+  .portal-page .entry-footnote { font-size: 11px; text-align: left; line-height: 1.8; margin-top: 19px; }
+  .portal-page > footer { margin-inline: 29px; width: auto; font-size: 11px; padding-bottom: 23px; }
+  .personal-page .personal-shell { padding: 20px 18px 30px; }
+  .personal-page .personal-heading { padding: 25px 24px; min-height: 140px; margin-bottom: 22px; gap: 15px; align-items: center; }
+  .personal-page .personal-heading h1 { font-size: 26px; }
+  .personal-page .personal-role { font-size: 10px; padding: 6px 9px; }
+  .personal-page .assistant-card { padding: 21px; }
+  .personal-page .assistant-card textarea { font-size: 16px; }
+  .personal-page .assistant-heading h2 { font-size: 20px; }
+  .personal-page .personal-main-column { gap: 18px; }
+  .personal-page .trip-detail { padding: 21px; }
+  .personal-page .trip-detail > .section-head { margin: -21px -21px 20px; padding: 24px 21px; }
+  .personal-page .trip-detail > .section-head h2 { font-size: 22px; }
+  .personal-page .trip-detail > .section-head p { font-size: 12px; }
+  .marketing-page #sidebar { padding-inline: 18px; }
+  .marketing-page .topbar { padding: 14px 18px; }
+  .marketing-page main { padding: 24px 18px 30px; }
+  .marketing-page .page-head h1 { font-size: 26px; }
+  .marketing-page .overview-grid { grid-template-columns: minmax(0,1fr); }
+  .marketing-page .hero { min-height: 225px; padding: 27px; background-position: center; }
+  .marketing-page .hero h2 { font-size: 29px; }
+  .marketing-page .hero-graphic { display: none; }
+  .marketing-page .metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+  .marketing-page .metric { padding: 18px; }
+  .marketing-page .metric strong { font-size: 29px; }
+  .marketing-page .metric:last-child:nth-child(odd) { grid-column: 1/-1; }
+  .marketing-page .workflow { padding: 7px; gap: 4px; }
+  .marketing-page .workflow-card { padding: 14px; }
+  .wd-template .current-flight-option { padding: 16px; gap: 16px; }
+  .wd-template .current-flight-leg:first-child { padding: 0 0 16px; border-inline-end: 0; border-bottom: 1px dashed #ccdcd1; }
+  .wd-template .current-flight-total > strong { font-size: 17px; }
+  .wd-template .current-flight-preview { padding: 18px; }
+  .wd-template .profile-head { margin: -24px -20px 23px; padding: 28px 55px 23px 22px; }
+  .wd-template .profile-head h2 { font-size: 21px; }
+  .wd-template .profile-head .badge { font-size: 10px; }
+  .wd-template .profile-grid { grid-template-columns: minmax(0,1fr); }
+}
+@media(prefers-reduced-motion:no-preference) {
+  .portal-page .entry-card { transition: transform 180ms, box-shadow 180ms, border-color 180ms; }
+}
+@media(prefers-reduced-motion:reduce) { .portal-page .entry-card:hover { transform: none; } }
