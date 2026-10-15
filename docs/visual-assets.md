@@ -21,10 +21,10 @@ Use case: photorealistic-natural. Asset type: panoramic hero background for a pr
 | 资产 | 保存位置 | 用途 |
 | --- | --- | --- |
 | 晨雾湖山 | `航旅智策应用/web/assets/personal-lake-background.png` | 个人旅客页标题横幅 |
-| 机场夜景 | `航旅智策应用/web/assets/marketing-airport-background.png` | 营销人员活动摘要 |
+| 晨光浅色机场 | `航旅智策应用/web/assets/marketing-airport-background.png` | 营销人员页面整体背景 |
 | 简化品牌 | `航旅智策应用/web/assets/huayi-chaoyang-logo-mountain-wave-v5.png` | 三个入口、网站图标与问卷 |
 
-背景为生成的氛围创作，不标识实际目的地、机场、航空公司或实时业务事实。它们仅装饰标题区域；页面文字与票价仍由应用渲染。首页继续使用机翼海岸图。
+背景为生成的氛围创作，不标识实际目的地、机场、航空公司或实时业务事实。个人背景延伸至标题区域，营销背景铺在整体页面底部；页面文字与票价仍由应用渲染。首页继续使用机翼海岸图。
 
 最终图标按用户指定的参考版本保留山形字母 A、飞机和环带，移除旅客及行李箱，两道青绿、薄荷色的简洁波浪穿过山形字母的底部，与山脚交叉融合，并调整整体比例与留白。左下白色尖尾完全移除，由青绿波浪直接向左延伸承接山脚。两道波浪保持相同起伏、长度、粗细及间距，端点对齐，山形右下底边沿上方青绿波浪等距平行。深蓝配色与外侧透明边角延续参考图。原品牌 PNG 与生成原图保留，网站与问卷引用新版，历史物料不改写。最终提示词见下文。
 
@@ -34,10 +34,21 @@ Use case: photorealistic-natural. Asset type: panoramic hero background for a pr
 Use case: photorealistic-natural. Asset type: wide panoramic background for the PERSONAL TRAVEL PLANNER page of a premium Chinese aviation and travel website. Create original editorial travel atmosphere imagery, not a website mockup. A serene blue-green alpine lake nestled between layered forested mountain ridges, thin morning mist floating over the water, soft clear dawn light, a subtle distant shoreline path with no people. Calm, restorative and spacious; refined magazine photography, realistic fine texture and restrained natural color. Palette: deep blue-teal water, muted jade-green forest, pale blue-grey mist, gentle warm highlights. Composition for a shallow website banner: panoramic landscape around 16:9; the strongest landscape detail sits on the RIGHT half and the middle horizontal band; the LEFT third stays calm, dark and low-detail, with room to overlay a white page title separately. Keep the horizon around the upper third. No aircraft wings, no ocean coastline, no busy city, no text, no logos, no watermark, no UI, no invented recognizable landmark. Do not bake any interface or typography into the picture.
 ```
 
-## 营销人员背景提示词
+## 营销人员背景提示词（浅色晨光版）
+
+2026-10-15根据用户要求，使用内置 imagegen 重新生成并替换原机场夜景，保存为项目内 PNG。画面采用原生晨光、浅蓝天空与暖白航站楼，页面仅叠加轻薄暖白遮罩和3px虚化。
+
+SHA256：`a29f6c3b9584bbdfe94fbf0c41603f83efac3eb2ef506eb47fc4d68431e1d1f0`
 
 ```text
-Use case: photorealistic-natural. Asset type: wide panoramic background for the MARKETING STAFF workspace of a premium Chinese aviation website. Create original editorial architectural aviation atmosphere imagery, not a dashboard or mockup. A modern airport terminal and orderly apron at blue hour, seen from a slightly elevated exterior viewpoint. Elegant glass-and-steel terminal architecture, a small number of distant unbranded passenger aircraft at gates, fine restrained warm interior lights, teal reflections on the apron, beautiful deep navy sky. Professional, precise, composed, sophisticated; realistic architectural photography with quiet detail rather than futuristic fantasy. Composition for a shallow website banner: panoramic landscape around 16:9; terminal buildings and aircraft occupy the RIGHT half and middle band; leave the LEFT third as calm dark navy sky or shadow with room for a white activity title to be overlaid separately. Airport must be generic, with no identifiable airport name. Palette: deep navy, muted blue-green, soft warm pinpoints. No airline logos, no readable signage, no people in foreground, no crowds, no data graphics, no charts, no interface, no words, no watermarks. Different scene from a plane wing above islands and from a mountain lake. Do not bake any text into the image.
+Use case: photorealistic-natural.
+Asset type: original wide 16:9 photographic background for a Chinese aviation decision workspace; an image asset only, NOT a website mockup.
+Primary request: a naturally LIGHT-COLORED airport scene that harmonizes with warm-white and pale sage content panels.
+Scene: a contemporary generic airport apron in gentle early-morning daylight, clean ivory glass-and-steel terminal extending from the right side into the distance, one or two small unbranded passenger aircraft at the right-hand gates. Restrained elegant architectural editorial photography.
+Composition: panoramic landscape, high and open pale mist-blue sky across the upper half; the left half remains calm, airy and low detail for dark-blue headings rendered separately by the website. Terminal and aircraft silhouettes occupy the right half and lower-right third. Shallow atmospheric perspective with soft fine details, natural spaciousness. Place no dominant aircraft nose or object in the center.
+Lighting: diffuse morning light, soft warm sun filtered through thin clouds, very gentle shadows, light blue-gray apron with subtle reflections. Naturally luminous materials, not a dark scene covered with a white filter. Very slight atmospheric softness, with recognizable airport forms.
+Palette: warm ivory, pale cool blue, light sage-gray, a restrained touch of muted teal glass. No deep navy sky, no nighttime lighting, no orange sunset, no hard black shadows. Subdued contrast appropriate behind an information interface.
+Constraints: no people in foreground, crowds, airline or airport logos, identifiable landmarks, readable signage, text, numbers, branding, watermarks, UI elements, panels, charts or typography. Original plausible architecture and aircraft, realistic proportions. This is an ambient airport backdrop, not a promise of any real airport or airline. Output one finished image.
 ```
 
 ## 山水融合基础版本提示词

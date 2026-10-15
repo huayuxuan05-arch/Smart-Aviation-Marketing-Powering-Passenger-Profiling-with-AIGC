@@ -176,7 +176,7 @@ body.wd-template {
 
 /* Marketing: an ink rail, warm canvas and varied information surfaces. */
 .marketing-page.wd-template{--marketing-surface:#f8faf4eb;position:relative;isolation:isolate;background:#e2e8df}
-.marketing-page.wd-template::before{content:"";position:fixed;z-index:-1;inset:0;background:linear-gradient(90deg,#e2e8dfb3 0%,#e2e8df8c 60%,#e2e8df80 100%),linear-gradient(0deg,#e2e8df66 0%,#e2e8df00 75%),url('/assets/marketing-airport-background.png') right center / cover;filter:blur(3px);pointer-events:none}
+.marketing-page.wd-template::before{content:"";position:fixed;z-index:-1;inset:0;background:linear-gradient(90deg,#edf2e759 0%,#f5f7ed33 60%,#f5f7ed26 100%),linear-gradient(0deg,#eef2e940 0%,#eef2e900 75%),url('/assets/marketing-airport-background.png') right center / cover;filter:blur(3px);pointer-events:none}
 .marketing-page #sidebar{width:232px;background:linear-gradient(100deg,#173746fa 0%,#284954f5 100%);border-right:0;border-radius:0 20px 20px 0;box-shadow:10px 0 26px #18374626}
 .marketing-page .card{background:var(--marketing-surface)}
 .marketing-page .empty,.marketing-page #app>.table-tools,.marketing-page #audience-table{background:var(--marketing-surface);border:0;border-radius:var(--wd-radius)}
