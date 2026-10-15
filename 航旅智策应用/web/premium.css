@@ -174,7 +174,8 @@ body.wd-template {
 .wd-template .current-price-history strong{color:#2d654e;font-variant-numeric:tabular-nums}
 
 /* Marketing: an ink rail, warm canvas and varied information surfaces. */
-.marketing-page.wd-template{background:#f1f2eb}
+.marketing-page.wd-template{position:relative;isolation:isolate;background:#eef1e9}
+.marketing-page.wd-template::before{content:"";position:fixed;z-index:-1;inset:0;background:linear-gradient(90deg,#eef1e9ed 0%,#eef1e9d1 58%,#eef1e9a8 100%),linear-gradient(0deg,#eef1e9d9 0%,#eef1e900 80%),url('/assets/marketing-airport-background.png') right center / cover;pointer-events:none}
 .marketing-page #sidebar{width:232px;background:#102f40;border-right:0}
 .marketing-page .main-shell{margin-left:232px}
 .marketing-page #sidebar .brand{padding:29px 23px 24px;color:#fff;font-size:22px}
@@ -199,12 +200,13 @@ body.wd-template {
 .marketing-page main{padding:28px 32px 40px}
 .marketing-page .page-head{margin-bottom:24px;padding-bottom:19px;border-bottom:1px solid #d3dccd}
 .marketing-page .page-head h1{color:#24434c;font-weight:600}
-.marketing-page .overview-grid{grid-template-columns:minmax(0,1fr) 280px;align-items:center;gap:24px}
-.marketing-page .hero{display:block;position:relative;overflow:hidden;min-height:0;padding:0;border-radius:14px;background:#102f40}
-.marketing-page .overview-image{display:block;width:100%;height:auto;aspect-ratio:1672/941;object-fit:contain}
-.marketing-page .overview-aside{background:#e4e9dc;border:0;border-radius:12px;padding:26px}
-.marketing-page .overview-aside h3{color:#284b40}
-.marketing-page .overview-aside .number-circle{display:none}
+.marketing-page .overview-status{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,.9fr) auto;align-items:center;gap:32px;padding:22px 26px;background:#e4e9dc;border:0;border-radius:12px}
+.marketing-page .overview-status h3{margin:0 0 6px;color:#284b40;font-size:18px}
+.marketing-page .overview-status .muted{margin:0;color:#496350;font-size:14px}
+.marketing-page .overview-status .number-circle{display:none}
+.marketing-page .overview-status .aside-progress{margin:0;min-width:0}
+.marketing-page .overview-status .aside-progress>div{color:#496350;font-size:13px}
+.marketing-page .overview-status .primary{grid-column:auto;width:auto;min-width:172px;margin:0}
 .marketing-page .metric-grid{gap:0;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-block:24px 32px;background:#f8f9f3;border-block:1px solid #d3dccd}
 .marketing-page .metric{padding:24px 26px;border:0;border-right:1px solid #d3dccd;border-radius:0;box-shadow:none;background:none}
 .marketing-page .metric:last-child{border-right:0}
@@ -250,7 +252,6 @@ body.wd-template {
 
 @media(max-width:1200px) and (min-width:1101px){
  .marketing-page #sidebar{width:212px}.marketing-page .main-shell{margin-left:212px}
- .marketing-page .overview-grid{grid-template-columns:minmax(0,1fr) 250px}
  .marketing-page :is(main,.topbar){padding-inline:24px}
 }
 @media(max-width:1100px){
@@ -311,8 +312,8 @@ body.wd-template {
  .wd-template .current-flight-total>strong{font-size:18px}.wd-template .current-flight-preview{padding:18px}
  .marketing-page #sidebar{padding-inline:18px}
  .marketing-page .topbar{padding:14px 18px}.marketing-page main{padding:23px 18px 30px}
- .marketing-page .overview-grid{grid-template-columns:minmax(0,1fr);gap:18px}
- .marketing-page .overview-aside{padding:22px}
+ .marketing-page .overview-status{grid-template-columns:minmax(0,1fr) minmax(110px,.9fr);gap:18px;padding:20px}
+ .marketing-page .overview-status .primary{grid-column:1/-1;width:100%;min-width:0}
  .marketing-page .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:0}
  .marketing-page .metric{padding:20px 18px}.marketing-page .metric:nth-child(2n){border-right:0}
  .marketing-page .metric:last-child:nth-child(odd){grid-column:1/-1;border-top:1px solid #d3dccd}
