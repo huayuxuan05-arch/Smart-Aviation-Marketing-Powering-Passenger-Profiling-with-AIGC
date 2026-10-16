@@ -7,7 +7,7 @@ import uuid
 import content_generation
 import personal_app as personal
 
-LABELS=dict(zip(personal.FIELDS,['出发地','目的地','出发日期','旅行天数','同行方式','旅行节奏','兴趣主题','每名成人全程预算','每名成人单程机票上限','日期弹性','住宿侧重','备选许可','超预算处理','具体景点','出游阶段']))
+LABELS=dict(zip(personal.FIELDS,['出发地','目的地','出发日期','旅行天数','同行方式','旅行节奏','兴趣主题','每名成人全程预算上限','每名成人单程机票上限','日期弹性','住宿侧重','备选许可','超预算处理','具体景点','出游阶段','每名成人全程预算下限','每名成人单程机票预算下限']))
 ENUMS={'party':personal.PARTIES,'pace':personal.PACES,'theme':personal.THEMES,
        'date_flexibility':personal.FLEXIBILITY,'lodging_priority':personal.LODGING,
        'fallback_policy':personal.FALLBACKS,'overbudget_policy':personal.OVERBUDGET,'planning_stage':personal.STAGES}
@@ -62,7 +62,12 @@ def extract_rules(text,cities):
                 flight=bool(re.search(r'机票|票价',clause));key='airfare_cap' if flight else 'trip_budget'
                 per_person=bool(re.search(r'每名成人|每位成人|每人|人均',clause))
                 party_total=bool(re.search(r'[二两三四五六七八九十\d]+(?:个)?人.*(?:总|一共|合计)|(?:总|一共|合计).*[二两三四五六七八九十\d]+(?:个)?人',clause))
-                if len(set(amounts))>1 or party_total or (flight and '单程' not in clause) or (not flight and not per_person):
+                interval=re.search(r'(?:预算|票价|上限)(?:是|为|约|在|区间|控制在)?\s*(\d+(?:\.\d+)?)\s*(?:元|块)?\s*(?:到|至|[-~～—])\s*(\d+(?:\.\d+)?)\s*(?:元|块)?',clause)
+                clear_basis=not party_total and (flight and '单程' in clause or not flight and per_person)
+                if interval and clear_basis:
+                    put(key,float(interval[2]),clause)
+                    put('airfare_min' if flight else 'trip_budget_min',float(interval[1]),clause)
+                elif len(set(amounts))>1 or party_total or (flight and '单程' not in clause) or (not flight and not per_person):
                     issues[key]='请确认每名成人的'+('单程机票上限；往返总额不能直接作单程上限。' if flight else '全程预算；多人总额不自动平摊，儿童费用需另行核实。')
                 else:put(key,float(amounts[0]),clause)
             elif re.search(r'[零一二两三四五六七八九十百千万]+(?:元|块)|预算.*[一二三四五六七八九十百千万]',clause):
@@ -90,7 +95,7 @@ def question(key,message,cities):
     if key=='destination':options=['为我推荐',*sorted(personal.planner.PLACES)]
     return {'field':key,'label':LABELS[key],'message':message,'options':options,
             'type':'select' if options else 'date' if key=='start_date' else 'number',
-            'optional':key in ('trip_budget','airfare_cap')}
+            'optional':key in ('trip_budget','airfare_cap','trip_budget_min','airfare_min')}
 
 
 def build_view(source,payload):
@@ -196,11 +201,11 @@ def clarify(source,owner,draft_id,body):
         view=build_view(source,payload);answers=body.get('answers')
         if not isinstance(answers,dict) or not answers or set(answers)-{q['field'] for q in view['questions']}:raise ValueError('请仅回答草稿中的待确认问题')
         for key,value in answers.items():
-            if key in ('trip_budget','airfare_cap') and value in ('',None):value=None
+            if key in ('trip_budget','airfare_cap','trip_budget_min','airfare_min') and value in ('',None):value=None
             elif key=='days':
                 if str(value) not in ('2','3','4','5','6','7','8'):raise ValueError('请选择2至8天')
                 value=int(value)
-            elif key in ('trip_budget','airfare_cap'):
+            elif key in ('trip_budget','airfare_cap','trip_budget_min','airfare_min'):
                 if isinstance(value,bool):raise ValueError('预算须为有效数值')
                 try:value=float(value)
                 except (ValueError,TypeError):raise ValueError('预算须为有效数值') from None

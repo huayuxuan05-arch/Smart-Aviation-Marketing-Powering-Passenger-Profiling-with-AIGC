@@ -29,6 +29,18 @@ class AssistantTests(unittest.TestCase):
     def tearDown(self):self.env.stop();self.runtime.stop();self.temp.cleanup()
     def create(self,text=TEXT,**body):
         return assistant.create(self.source,self.owner,{'text':text,'expected_revision':personal.state(self.owner)['revision'],**body})
+    def test_explicit_budget_intervals_preview_then_save_without_midpoints(self):
+        text=TEXT.replace('每名成人全程预算4000元','每名成人全程预算2000到4000元').replace('机票单程不超过1000元','单程机票预算500至1000元')
+        draft=self.create(text)
+        self.assertTrue(draft['can_confirm']);self.assertEqual(personal.state(self.owner)['revision'],0)
+        self.assertEqual(draft['preferences']['trip_budget_min'],2000)
+        self.assertEqual(draft['preferences']['trip_budget'],4000)
+        result=self.confirm(draft)
+        self.assertEqual(result['plan']['budget']['one_way_airfare_range'],{'min':500,'max':1000,'source':'self_report'})
+    def test_group_or_roundtrip_interval_requires_explicit_basis(self):
+        draft=self.create(TEXT.replace('每名成人全程预算4000元','两个人全程预算2000到4000元').replace('机票单程不超过1000元','往返机票预算500到1000元'))
+        self.assertFalse(draft['can_confirm'])
+        self.assertEqual({q['field'] for q in draft['questions']},{'trip_budget','airfare_cap'})
     def confirm(self,draft,owner=None,**body):
         return assistant.confirm(self.source,owner or self.owner,draft['id'],{'version':draft['version'],'confirmed':True,**body})
     def test_explicit_request_is_read_only_and_never_probes_model(self):

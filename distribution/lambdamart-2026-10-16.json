@@ -615,8 +615,8 @@
     },
     {
       "path": "real-choice-readiness/protocol.json",
-      "bytes": 657,
-      "sha256": "1fa99a20a83ca95f925494841944bafce60b1235e3109e918615733cbe8d492d"
+      "bytes": 782,
+      "sha256": "0d5cfd05a1a9999f9de2b11e8d626f765e3338e7996f46d50f4882e7832ec7dd"
     },
     {
       "path": "real-choice-readiness/readiness.json",

@@ -95,6 +95,8 @@ class FlightQuoteTests(unittest.TestCase):
         self.assertEqual(len(personal.state(self.owner)['plans']),1)
         self.assertEqual(personal.get_plan(self.owner,self.plan['id']),before)
     def test_confirm_creates_new_plan_and_preserves_old_version(self):
+        prefs=personal.state(self.owner)['preferences']
+        self.plan=personal.create_plan(self.source,self.owner,{'preferences':{**prefs,'trip_budget':6000}})['plan']
         q=self.quote();state=personal.state(self.owner)
         body={'plan_id':self.plan['id'],'query_id':q['id'],'option_index':0,'expected_revision':state['revision']}
         with self.assertRaises(ValueError):personal.apply_flight_quote(self.owner,body)
@@ -102,6 +104,18 @@ class FlightQuoteTests(unittest.TestCase):
         self.assertNotEqual(saved['id'],self.plan['id']);self.assertEqual(saved['parent_plan_id'],self.plan['id'])
         self.assertEqual(personal.get_plan(self.owner,self.plan['id']),self.plan)
         self.assertEqual(personal.state(self.owner)['revision'],state['revision'])
+    def test_confirm_cannot_override_explicit_hard_budget(self):
+        q=self.quote();state=personal.state(self.owner)
+        body={'plan_id':self.plan['id'],'query_id':q['id'],'option_index':0,'expected_revision':state['revision'],'confirmed':True}
+        preview=personal.preview_flight_quote(self.owner,self.plan,body)
+        self.assertFalse(preview['candidate_constraints']['allowed'])
+        with self.assertRaisesRegex(ValueError,'超出'):personal.apply_flight_quote(self.owner,body)
+        self.assertEqual(len(personal.state(self.owner)['plans']),1)
+    def test_cheaper_than_preferred_interval_is_still_allowed(self):
+        q=self.quote();p=quotes.preview(self.owner,self.plan,{'query_id':q['id'],'option_index':0})
+        p['budget'].update(specified_total=6000,one_way_airfare_cap=1500,
+            trip_budget_range={'min':5000,'max':6000},one_way_airfare_range={'min':1000,'max':1500})
+        self.assertTrue(personal.flight_constraint_check(p)['allowed'])
     def test_mismatched_and_expired_quotes_cannot_enter_budget(self):
         q=self.quote();body={'query_id':q['id'],'option_index':0}
         with self.assertRaises(ValueError):quotes.preview(self.owner,{**self.plan,'destination':'成都'},body)

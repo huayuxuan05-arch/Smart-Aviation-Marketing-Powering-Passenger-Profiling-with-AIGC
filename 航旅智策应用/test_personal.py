@@ -97,6 +97,17 @@ class PersonalTests(unittest.TestCase):
         for changes in [{'origin':'未知城市'},{'destination':'未知景点'},{'destination':'北京'},{'trip_budget':'nan'},{'days':1},{'days':3.5},{'start_date':'bad'},{'theme':'随便编造'}]:
             with self.assertRaises(ValueError):app.validate(self.source,{**self.prefs,**changes})
         self.assertEqual(app.state(self.owner)['revision'],0)
+    def test_real_budget_interval_preserves_bounds_and_history(self):
+        first=self.create(trip_budget_min=2000,trip_budget=4000,airfare_min=400,airfare_cap=1000)['plan']
+        self.assertEqual(first['budget']['trip_budget_range'],{'min':2000,'max':4000,'source':'self_report'})
+        self.assertEqual(first['budget']['one_way_airfare_range'],{'min':400,'max':1000,'source':'self_report'})
+        self.create(trip_budget_min=2500,trip_budget=5000)
+        self.assertEqual(app.get_plan(self.owner,first['id'])['budget']['trip_budget_range']['min'],2000)
+        with self.assertRaisesRegex(ValueError,'下限'):self.create(trip_budget_min=5000,trip_budget=4000)
+    def test_missing_interval_bound_is_not_filled_by_a_simulated_value(self):
+        first=self.create()['plan']
+        self.assertIsNone(first['budget']['trip_budget_range']['min'])
+        self.assertIsNone(first['budget']['one_way_airfare_range']['min'])
     def test_ai_explanation_requires_ownership_before_inference(self):
         plan=self.create()['plan']
         with patch.object(gen,'explain_trip') as generate:

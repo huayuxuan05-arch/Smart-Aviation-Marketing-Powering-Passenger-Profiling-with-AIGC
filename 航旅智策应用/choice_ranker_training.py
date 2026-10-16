@@ -64,7 +64,8 @@ def run(connection,output):
     protocol=dict(version='explicit-choice-lambdamart-v1',unit='passenger request x exposed itinerary',
         labels='1 explicitly chosen and saved; 0 explicitly rejected; nonchoice unlabelled; conflict excluded',
         source='local personal interactions, prospective only; no synthetic or questionnaire adoption labels',
-        minimum_owners=50,minimum_paired_requests=100,split='owner-disjoint 60/20/20, forward event windows',
+        minimum_owners=50,minimum_paired_requests=100,split='browser-owner-disjoint 60/20/20, forward event windows',
+        independence_limit='browser owners are not verified distinct people; cross-device linkage is not established',
         select='validation NDCG@3; compare simple fare-ratio baseline',
         promotion='test delta >=0.02, owner bootstrap CI lower >0; never auto-deploy',
         observed_paired_requests=len(groups),observed_owners=len(owners))
@@ -104,6 +105,7 @@ def run(connection,output):
     report=dict(status='evaluated',test_ndcg=ndcg(ty,pred,tqid),baseline_ndcg=ndcg(ty,baseline,tqid),
         paired_owner_delta=float(values.mean()),ci95=ci,promotion_gate_passed=bool(values.mean()>=.02 and ci[0]>0),
         online_weights_replaced=False,split_requests=[len(p) for p in parts],
+        independence_limit=protocol['independence_limit'],
         artifacts={n:cohort.digest(output/n) for n in ['itinerary_ranker.ubj','vectorizer.joblib']})
     cohort.write_json(output/'report.json',report);return report
 

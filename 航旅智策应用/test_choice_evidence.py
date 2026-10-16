@@ -86,6 +86,12 @@ class ChoiceEvidenceTests(unittest.TestCase):
         f=evidence.candidate_features(plan,self.q['options'][0],2)
         self.assertFalse(f['hard_constraints_satisfied'])
         self.assertGreater(f['outbound_cap_ratio'],1)
+    def test_explicit_interval_width_uses_actual_user_bounds(self):
+        plan={**self.plan,'budget':{**self.plan['budget'],
+            'trip_budget_range':{'min':2000,'max':4000},'one_way_airfare_range':{'min':300,'max':1000}}}
+        f=evidence.candidate_features(plan,self.q['options'][0],2)
+        self.assertEqual(f['trip_band_width'],2000);self.assertEqual(f['one_way_band_width'],700)
+        self.assertEqual(f['one_way_lower'],300)
 
     def test_real_choice_split_excludes_late_development_events(self):
         groups=[dict(owner=str(i),recorded_at=f'2026-10-{i+1:02}T10:00:00',candidates=[]) for i in range(10)]

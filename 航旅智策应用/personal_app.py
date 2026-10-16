@@ -22,7 +22,7 @@ LODGING=['综合比较','价格优先','安静休息','电梯与少走路','可�
 FALLBACKS=['先展示差异，由我确认','只接受直飞','可比较中转与机场接驳','只保留原目的地']
 OVERBUDGET=['先展示差异，由我选择','优先比较允许范围内的日期','优先降低住宿与付费体验','比较其他感兴趣的城市','缩短行程','暂缓出游']
 STAGES=['制定行程','先收集灵感','暂不计划出游']
-FIELDS=['origin','destination','start_date','days','party','pace','theme','trip_budget','airfare_cap','date_flexibility','lodging_priority','fallback_policy','overbudget_policy','preferred_attractions','planning_stage']
+FIELDS=['origin','destination','start_date','days','party','pace','theme','trip_budget','airfare_cap','date_flexibility','lodging_priority','fallback_policy','overbudget_policy','preferred_attractions','planning_stage','trip_budget_min','airfare_min']
 
 
 def now():return datetime.now(CST).isoformat(timespec='microseconds')
@@ -55,7 +55,8 @@ def defaults():
     return {'origin':'北京','destination':'杭州','start_date':(datetime.now(CST).date()+timedelta(days=30)).isoformat(),
             'days':3,'party':'独行','pace':'按同行方式安排','theme':'城市初访','trip_budget':None,'airfare_cap':None,
             'date_flexibility':FLEXIBILITY[0],'lodging_priority':LODGING[0],'fallback_policy':FALLBACKS[0],
-            'overbudget_policy':OVERBUDGET[0],'preferred_attractions':[],'planning_stage':STAGES[0]}
+            'overbudget_policy':OVERBUDGET[0],'preferred_attractions':[],'planning_stage':STAGES[0],
+            'trip_budget_min':None,'airfare_min':None}
 
 
 def validate(source,raw):
@@ -83,12 +84,16 @@ def validate(source,raw):
     if not isinstance(attractions,list) or len(attractions)>3 or any(not isinstance(x,str) for x in attractions) or len(set(attractions))!=len(attractions):raise ValueError('具体景点最多选择3个，不得重复')
     allowed=attraction_options(result['destination'])
     if any(x not in allowed for x in attractions):raise ValueError('请重新选择属于当前目的地的景点')
-    for key in ['trip_budget','airfare_cap']:
+    for key in ['trip_budget','airfare_cap','trip_budget_min','airfare_min']:
         if result[key] in (None,''):result[key]=None;continue
         try:value=float(result[key])
         except (ValueError,TypeError):raise ValueError('预算须为有效数值') from None
-        if not math.isfinite(value) or not 100<=value<=100000:raise ValueError('预算须为100至100000元')
+        minimum=0 if key in ('trip_budget_min','airfare_min') else 100
+        if isinstance(result[key],bool) or not math.isfinite(value) or not minimum<=value<=100000:raise ValueError('预算须为有效金额，上限为100至100000元')
         result[key]=value
+    for lower,upper in [('trip_budget_min','trip_budget'),('airfare_min','airfare_cap')]:
+        if result[lower] is not None and result[upper] is not None and result[lower]>result[upper]:
+            raise ValueError('预算下限不能高于上限')
     return result
 
 
@@ -141,6 +146,8 @@ def make_plan(source,prefs):
                        f'住宿侧重：{prefs["lodging_priority"]}；超预算处理：{prefs["overbudget_policy"]}。'])
     plan=planner.compose_plan(summary,intent,outbound,back,THEMES.index(prefs['theme']),{'days':prefs['days'],'trip_budget':prefs['trip_budget'],'preferred_attractions':prefs['preferred_attractions'],'adjust_lodging':prefs['overbudget_policy']=='优先降低住宿与付费体验'},priorities,alternatives)
     plan['preference_constraints']={k:prefs[k] for k in FIELDS[9:]}
+    plan['budget']['trip_budget_range']={'min':prefs['trip_budget_min'],'max':prefs['trip_budget'],'source':'self_report'}
+    plan['budget']['one_way_airfare_range']={'min':prefs['airfare_min'],'max':prefs['airfare_cap'],'source':'self_report'}
     span={'前后1天可比较':1,'前后3天可比较':3}.get(prefs['date_flexibility'],0)
     plan['date_comparisons']=[{'start_date':(datetime.strptime(start,'%Y-%m-%d').date()+timedelta(days=offset)).isoformat(),
         'advice':f'在你允许的日期范围内{abs(offset)}天；仅供改期比较，实际航班与报价需重查，确认生成后才保存。'} for offset in (-span,span) if '2024-01-01'<=(datetime.strptime(start,'%Y-%m-%d').date()+timedelta(days=offset)).isoformat()<='2035-12-31'] if span else []
@@ -218,6 +225,8 @@ def apply_flight_quote(owner,body):
     if body.get('confirmed') is not True:raise ValueError('请确认报价与预算后保存')
     original=get_plan(owner,body['plan_id'])
     plan=flight_quotes.preview(owner,original,body)
+    check=flight_constraint_check(plan)
+    if not check['allowed']:raise ValueError('该候选超出已保存的预算或直飞要求，请先调整偏好或重新选择')
     with db() as c:
         c.execute('BEGIN IMMEDIATE')
         current=c.execute('SELECT revision FROM personal_sessions WHERE owner=?',(owner,)).fetchone()
@@ -237,7 +246,22 @@ def preview_flight_quote(owner,original,body):
     with db() as c:
         request_id=choice_evidence.exposure(c,owner,original,observation)
         choice_evidence.event(c,owner,'preview',{},request_id,int(body['option_index']))
-    return {**plan,'choice_request_id':request_id}
+    return {**plan,'choice_request_id':request_id,'candidate_constraints':flight_constraint_check(plan)}
+
+
+def flight_constraint_check(plan):
+    """Lower bounds are preferred spend; explicit upper bounds and direct-only are hard."""
+    live=plan.get('live_flights');violations=[]
+    if not live:return {'allowed':False,'violations':['missing_current_quote']}
+    option=live['option'];adults=live['adults'];budget=plan['budget']
+    cap=budget.get('one_way_airfare_cap');total=budget.get('specified_total')
+    if cap is not None and max(option[leg]['price_cny']/adults for leg in ['outbound','inbound'])>cap:
+        violations.append('one_way_upper')
+    if total is not None and (budget.get('estimated_total') is None or budget['estimated_total']>total):
+        violations.append('trip_upper')
+    if plan.get('preference_constraints',{}).get('fallback_policy')=='只接受直飞' and any(len(option[leg]['segments'])>1 for leg in ['outbound','inbound']):
+        violations.append('direct_only')
+    return {'allowed':not violations,'violations':violations}
 
 
 def reject_candidate(owner,body):

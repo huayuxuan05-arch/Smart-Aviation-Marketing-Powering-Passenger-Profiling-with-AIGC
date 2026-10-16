@@ -33,6 +33,8 @@ def event(c,owner,kind,detail,request_id=None,candidate_index=None):
 def candidate_features(plan,option,adults):
     """Itinerary features use actual self-reported ceilings, not simulated bands."""
     budget=plan['budget']; cap=budget.get('one_way_airfare_cap'); total=budget.get('specified_total')
+    air_min=budget.get('one_way_airfare_range',{}).get('min')
+    trip_min=budget.get('trip_budget_range',{}).get('min')
     out=option['outbound']; back=option['inbound']
     def hour(leg,field):
         value=leg.get(field) or leg['segments'][0 if field=='departure_time' else -1][field]
@@ -52,8 +54,10 @@ def candidate_features(plan,option,adults):
         (total is None or estimate is not None and estimate<=total) and
         (constraints.get('fallback_policy')!='只接受直飞' or stops==0))
     return dict(outbound_per_adult=prices[0],inbound_per_adult=prices[1],
-        one_way_upper=cap,trip_upper=total,one_way_lower=None,trip_lower=None,
-        budget_source='actual self-reported upper bounds; lower bound not collected',
+        one_way_upper=cap,trip_upper=total,one_way_lower=air_min,trip_lower=trip_min,
+        one_way_band_width=cap-air_min if cap is not None and air_min is not None else None,
+        trip_band_width=total-trip_min if total is not None and trip_min is not None else None,
+        budget_source='actual self-reported bounds; unfilled bounds stay missing',
         roundtrip_trip_cap_share=sum(prices)/total if total else None,
         estimated_total_per_adult=estimate,total_budget_ratio=estimate/total if total and estimate is not None else None,
         hard_constraints_satisfied=bool(feasible),
