@@ -1,4 +1,4 @@
-param([int]$Port = 8765, [switch]$NoBrowser, [ValidateSet('template','local-model')][string]$GenerationMode = 'template')
+param([int]$Port = 8765, [switch]$NoBrowser, [ValidateSet('auto','template','local-model')][string]$GenerationMode = 'auto')
 $ErrorActionPreference = 'Stop'
 $taskRuntime = Join-Path $PSScriptRoot 'runtime'
 New-Item -ItemType Directory -Path $taskRuntime -Force | Out-Null
@@ -8,7 +8,12 @@ $env:TEMP = $taskTemp
 $env:TMP = $taskTemp
 $env:TMPDIR = $taskTemp
 $env:PYTHONDONTWRITEBYTECODE = '1'
+$taskModelProfile = Join-Path $taskRuntime 'local_aigc\active_model.json'
+if ($GenerationMode -eq 'auto') { $GenerationMode = if (Test-Path -LiteralPath $taskModelProfile) { 'local-model' } else { 'template' } }
 $env:AEROLENS_GENERATION_MODE = $GenerationMode
+if ($GenerationMode -eq 'local-model' -and (Test-Path -LiteralPath $taskModelProfile)) {
+    $env:AEROLENS_LOCAL_MODEL_PROFILE = $taskModelProfile
+}
 $env:HF_HOME = Join-Path $taskRuntime 'local_aigc\cache\huggingface'
 $env:CUDA_CACHE_PATH = Join-Path $taskRuntime 'local_aigc\cache\cuda'
 $taskPython = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'

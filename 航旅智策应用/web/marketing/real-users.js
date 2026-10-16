@@ -1,0 +1,106 @@
+'use strict';
+let realData=null,realWindow=30,realSearch='',realPage=1,realDecision=null,realBusy=false;
+let realStage='',realAirline='',realDestination='',realPageSize=20,realSort='recent',realOnlyUnmatched=false;
+const realSelected=new Set();
+function realCarrierNames(codes){return (codes||[]).map(c=>realData.airline_names?.[c]||c).join('、')||'不限航司';}
+function realEventLabel(e){return e.activity?.label||({preferences_confirmed:'确认偏好',plan_saved:'保存方案',plan_deleted:'删除方案',flight_search:'查询航班',flight_search_result:e.result?.status==='empty'?'未找到符合条件的航班':'已返回航班报价',flight_selected:'选择航班',flight_rejected:'排除航班',destination_view:'浏览目的地'})[e.kind]||e.kind;}
+function realFiltered(){
+ const q=realSearch.toLowerCase();
+ return realData.profiles.filter(p=>(!q||[p.user_id,p.origin,p.destination,p.intent_stage,p.theme,p.party,p.preferences.lodging_priority,realCarrierNames(p.preferences.required_airlines)].some(x=>String(x||'').toLowerCase().includes(q)))
+  &&(!realStage||p.intent_stage===realStage)&&(!realAirline||(p.preferences.required_airlines||[]).includes(realAirline))
+  &&(!realDestination||p.destination===realDestination)&&(!realOnlyUnmatched||p.flight_search_result?.status==='empty'))
+ .sort((a,b)=>realSort==='date'?(a.start_date||'9999').localeCompare(b.start_date||'9999'):realSort==='budget'?(a.preferences.trip_budget??Infinity)-(b.preferences.trip_budget??Infinity):b.last_active_at.localeCompare(a.last_active_at));
+}
+function realDistribution(values,limit=6){
+ const rows=Object.entries(values||{}).sort((a,b)=>b[1]-a[1]).slice(0,limit),max=Math.max(1,...rows.map(x=>x[1]));
+ return rows.length?`<div class="real-distribution">${rows.map(([label,count])=>`<div><span>${esc(label)}</span><div class="real-bar" aria-hidden="true"><i style="width:${count/max*100}%"></i></div><strong>${fmt(count)}</strong></div>`).join('')}</div>`:'<p class="real-empty">暂无记录，用户填写或浏览后更新。</p>';
+}
+function realButton(text,action,extra=''){return `<button type="button" class="secondary small" data-real-action="${action}" ${extra}>${text}</button>`;}
+function realBlank(text='尚无已同意共享的真实旅客。旅客在个人页开启匿名共享后，偏好和交互将进入此处。'){return `<section class="card"><h2>真实客群</h2><p>${text}</p></section>`;}
+function realHotspots(){
+ if(!realData.hotspots.length)return '<p>当前窗口内尚无目的地关注记录。</p>';
+ return `<div class="table-container"><table><thead><tr><th>目的地</th><th>关注旅客</th><th>近7天</th><th>较前7天</th></tr></thead><tbody>${realData.hotspots.map(h=>`<tr><td><strong>${esc(h.destination)}</strong></td><td>${fmt(h.users)}</td><td>${fmt(h.users_last_7d)}</td><td>${h.change_users_7d>0?'+':''}${h.change_users_7d}</td></tr>`).join('')}</tbody></table></div>`;
+}
+function realMetrics(){return `<div class="metric-grid real-metrics">${metric('共享用户',fmt(realData.population),'当前同意共享的用户')}${metric('明确意向',fmt((realData.intent_groups['明确计划']||0)+(realData.intent_groups['已比较航班']||0)),'已表达计划或比较航班')}${metric('近期活跃',fmt(realData.active_users),`近${realWindow}天有浏览或操作`)}${metric('待匹配需求',fmt(realData.unmatched_users),'偏好已保留，数据源未返回报价')}</div>`;}
+function realIntentGroups(){return realDistribution(realData.intent_groups);}
+function realAirlines(){return `<section class="card"><div class="real-panel-heading"><h2>航司偏好</h2><span>本人主动选择 · 可多选</span></div>${realData.airline_preferences.length?`<div class="table-container"><table><thead><tr><th>航空公司</th><th>指定</th><th>排除</th><th>待匹配</th></tr></thead><tbody>${realData.airline_preferences.map(a=>`<tr><td>${realButton(a.name,'filter-airline',`data-code="${esc(a.code)}"`)}</td><td>${a.preferred_users}</td><td>${a.excluded_users}</td><td>${a.unmatched_users}</td></tr>`).join('')}</tbody></table></div>`:'<p class="real-empty">尚无主动指定或排除的航司。</p>'}<p class="real-caption">无报价保留偏好，不自动改推其他航司。</p></section>`;}
+function realPortrait(){return `<div class="real-profile-grid">${[['兴趣主题','theme'],['同行方式','party'],['住宿要求','lodging_priority'],['日期弹性','date_flexibility']].map(([title,key])=>`<section class="card"><h2>${title}</h2>${realDistribution(realData.profile_dimensions[key])}</section>`).join('')}<section class="card"><h2>预算分布</h2>${realDistribution(realData.budget_groups)}<p class="real-caption">用户填写的每名成人全程预算</p></section><section class="card"><h2>浏览操作</h2>${realDistribution(realData.behavior_groups)}<p class="real-caption">观察窗口内记录次数；不等于成交</p></section></div>`;}
+function realDecisionView(){return `<section class="card"><div class="row"><h2>决策建议</h2>${realButton(realBusy?'正在整理…':'整理客群建议','analyze',realBusy||!realData.population?'disabled':'')}</div>${realDecision?`<p>${esc(realDecision.summary)}</p><ul>${realDecision.actions.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><small>本地模型草稿 · ${esc(realDecision.status)}</small>`:'<p>结合真实意向阶段、近期目的地关注和主动偏好，整理营销决策草稿。</p>'}</section>`;}
+function realOverview(){return realMetrics()+`<div class="real-overview-grid"><section class="card"><div class="real-panel-heading"><h2>客群画像</h2>${realButton('查看全部','navigate','data-to="insights"')}</div><div class="real-summary-grid"><div><h3>兴趣主题</h3>${realDistribution(realData.profile_dimensions.theme,4)}</div><div><h3>同行方式</h3>${realDistribution(realData.profile_dimensions.party,4)}</div></div></section><section class="card"><h2>意向阶段</h2>${realIntentGroups()}</section><section class="card"><h2>近期热门</h2>${realHotspots()}</section><section class="card"><h2>浏览操作</h2>${realDistribution(realData.behavior_groups,5)}</section></div>`+realDecisionView();}
+function realFilters(){return `<div class="real-audience-filters"><label class="field real-search"><span>检索用户</span><input id="real-audience-search" aria-label="搜索真实旅客" value="${esc(realSearch)}" placeholder="编号、城市、兴趣或航司"></label>${[['意向阶段','stage',realStage,Object.keys(realData.intent_groups).map(v=>[v,v])],['指定航司','airline',realAirline,Object.entries(realData.airline_names)],['目的地','destination',realDestination,[...new Set(realData.profiles.map(p=>p.destination).filter(Boolean))].sort().map(v=>[v,v])]].map(([label,key,value,options])=>`<label class="field"><span>${label}</span><select data-real-filter="${key}"><option value="">全部</option>${options.map(([v,t])=>`<option value="${esc(v)}" ${value===v?'selected':''}>${esc(t)}</option>`).join('')}</select></label>`).join('')}<label class="field"><span>排列顺序</span><select data-real-filter="sort">${[['recent','最近活跃'],['date','出发日期'],['budget','预算从低到高']].map(([v,t])=>`<option value="${v}" ${realSort===v?'selected':''}>${t}</option>`).join('')}</select></label></div>`;}
+function realAudience(){
+ const items=realFiltered();realPage=Math.min(realPage,Math.max(1,Math.ceil(items.length/realPageSize)));const visible=items.slice((realPage-1)*realPageSize,realPage*realPageSize);
+ return `<section class="card real-audience"><div class="real-panel-heading"><h2>用户画像</h2><span>${fmt(items.length)} 位匹配 / ${fmt(realData.population)} 位共享用户</span></div>${realFilters()}<div class="real-list-tools"><label><input type="checkbox" data-real-unmatched ${realOnlyUnmatched?'checked':''}> 仅看待匹配需求</label><span>已选 <b data-real-selection-count>${realSelected.size}</b> 位</span><div>${realButton('选择本页','select-page')}${realButton('清空选择','clear-selection')}${realButton('重置筛选','reset-filters')}</div></div><div class="table-container" tabindex="0" aria-label="用户画像明细，可横向滚动"><table><thead><tr><th>选择</th><th>匿名用户 / 兴趣</th><th>出行方向 / 同行</th><th>航司 / 意向</th><th>日期 / 预算</th><th>浏览操作 / 状态</th><th>操作</th></tr></thead><tbody>${visible.map(p=>`<tr data-real-user="${esc(p.user_id)}"><td><input type="checkbox" data-real-select="${esc(p.user_id)}" aria-label="选择${esc(p.user_id)}" ${realSelected.has(p.user_id)?'checked':''}></td><td><strong>${esc(p.user_id)}</strong><small>${esc(p.theme||'兴趣待确认')}</small></td><td>${esc(p.origin||'待确认')} → ${esc(p.destination||'待确认')}<small>${esc(p.party||'同行待确认')} · ${esc(p.preferences.pace||'节奏待确认')}</small></td><td class="real-wrappable">${esc(realCarrierNames(p.preferences.required_airlines))}<small>${esc(p.intent_stage)}</small></td><td>${esc(p.start_date||'待确认')}<small>${p.preferences.trip_budget==null?'预算待确认':'每名成人 ¥'+fmt(p.preferences.trip_budget)}</small></td><td>${fmt(Object.values(p.events_30d).reduce((a,b)=>a+b,0))} 次<small>${p.flight_search_result?.status==='empty'?'偏好已存 · 航班待匹配':esc(new Date(p.last_active_at).toLocaleDateString('zh-CN'))}</small></td><td>${realButton('查看画像','profile',`data-user="${esc(p.user_id)}"`)}</td></tr>`).join('')||'<tr><td colspan="7">当前没有匹配用户，可调整筛选条件。</td></tr>'}</tbody></table></div><div class="pagination real-pagination"><label>每页 <select data-real-page-size>${[10,20,50].map(n=>`<option value="${n}" ${n===realPageSize?'selected':''}>${n} 位</option>`).join('')}</select></label><span>第 ${realPage} / ${Math.max(1,Math.ceil(items.length/realPageSize))} 页</span><div>${realButton('上一页','prev',realPage===1?'disabled':'')}${realButton('下一页','next',realPage*realPageSize>=items.length?'disabled':'')}</div></div></section>`;
+}
+function realTrips(){
+ const travelers=realData.profiles.filter(p=>p.has_saved_plan);
+ if(!travelers.length)return realBlank('尚无已共享的旅行方案。旅客确认保存后，可在此查看真实条件并核验实时航班。');
+ return `<div class="trip-layout"><aside class="card trip-traveler-list"><h3>旅客方案</h3><div class="trip-user-list">${travelers.map(p=>`<button type="button" class="trip-user ${tripPlan?.user_id===p.user_id?'active':''}" data-real-action="plan" data-user="${esc(p.user_id)}"><strong>${esc(p.origin)} → ${esc(p.destination)}</strong><span>${esc(p.user_id)}</span><small>${esc(p.start_date||'日期待确认')} · ${esc(p.intent_stage)}</small></button>`).join('')}</div></aside>${tripPlan?tripDetail():'<section class="card"><p>选择旅客查看本人已保存的旅行方案。</p></section>'}</div>`;
+}
+function realDelivery(){
+ return `<section class="card"><h2>服务决策</h2><p>先筛选客群，再查看画像中的下一步建议，选择名单后创建活动。当前未发送营销信息。</p></section>`+realAudience();
+}
+function realEvaluation(){return realMetrics()+`<section class="card"><h2>观察结果</h2><p>${esc(realData.window_start.slice(0,10))} 至 ${esc(realData.updated_at.slice(0,10))}，共记录 ${fmt(realData.observed_events)} 次实际交互。</p>${realIntentGroups()}<p>实际订票、营销转化和收入尚未接入，暂不计算转化率或收益。</p></section>`;}
+function renderRealMarketing(){
+ if(!realData)return;
+ const current=page();$('#page-title').textContent=titles[current]||titles.overview;
+ $$('[data-nav]').forEach(e=>e.classList.toggle('active',e.dataset.nav===current));
+ $('#campaign-count').textContent=realData.campaigns.length;$('#active-campaign').hidden=true;
+ const controls=`<div class="real-data-toolbar"><div><strong>真实用户画像</strong><small>${esc(new Date(realData.updated_at).toLocaleString('zh-CN'))} 更新 · 自动同步</small></div><label>观察窗口 <select id="real-window"><option value="7" ${realWindow===7?'selected':''}>近7天</option><option value="30" ${realWindow===30?'selected':''}>近30天</option><option value="90" ${realWindow===90?'selected':''}>近90天</option></select></label>${realButton('导出案例','export-case')}${realButton('刷新数据','refresh')}</div>`;
+ const views={overview:realOverview,insights:()=>realMetrics()+realPortrait()+`<div class="real-overview-grid">${realAirlines()}<section class="card"><h2>近期热门</h2>${realHotspots()}</section></div>`+realDecisionView(),audience:realAudience,trips:realTrips,
+  routes:()=>tripPlan?`<section class="card"><h2>实时航班</h2><p>${esc(tripPlan.origin)} → ${esc(tripPlan.destination)}</p>${liveFlightPanel(tripPlan)}</section>`:realTrips(),
+  creative:realDecisionView,delivery:realDelivery,evaluation:realEvaluation};
+ $('#app').innerHTML=heading(titles[current]||titles.overview)+controls+(views[current]||realOverview)();
+}
+async function refreshRealMarketing(quiet=false){
+ const fresh=await api('real/dashboard?window_days='+realWindow),valid=new Set(fresh.profiles.map(p=>p.user_id));
+ for(const id of realSelected)if(!valid.has(id))realSelected.delete(id);
+ if(tripPlan){const current=fresh.profiles.find(p=>p.user_id===tripPlan.user_id);if(!current||!current.has_saved_plan||current.revision!==tripPlan.profile_revision)tripPlan=null;}
+ if(realData&&JSON.stringify(realData.profiles)!==JSON.stringify(fresh.profiles))realDecision=null;realData=fresh;meta.generation=fresh.generation;
+ if(!quiet||(!modal.open&&!document.activeElement?.closest('form')&&!document.activeElement?.matches('input,select,textarea')))renderRealMarketing();
+}
+async function realMarketingAction(b){
+ const action=b.dataset.realAction||b.dataset.action;
+ if(action==='close'){close();return;}
+ if(action==='navigate'){location.hash=b.dataset.to;return;}
+ if(action==='refresh'){await refreshRealMarketing();return;}
+ if(action==='prev'||action==='next'){realPage+=action==='next'?1:-1;renderRealMarketing();return;}
+ if(action==='select-page'){realFiltered().slice((realPage-1)*realPageSize,realPage*realPageSize).forEach(p=>realSelected.add(p.user_id));renderRealMarketing();return;}
+ if(action==='clear-selection'){realSelected.clear();renderRealMarketing();return;}
+ if(action==='reset-filters'){realSearch=realStage=realAirline=realDestination='';realOnlyUnmatched=false;realPage=1;renderRealMarketing();return;}
+ if(action==='filter-airline'){realAirline=b.dataset.code;realStage=realDestination=realSearch='';realOnlyUnmatched=false;realPage=1;location.hash='audience';return;}
+ if(action==='export-case'){const data=await api('real/export?window_days='+realWindow);download('匿名用户案例_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(data,null,2));toast('匿名画像、偏好更新和本站行为记录已导出');return;}
+ if(action==='plan'){tripPlan=await api('real/plans/'+b.dataset.user);renderRealMarketing();return;}
+ if(action==='profile'){
+  const p=await api('real/profiles/'+b.dataset.user);
+  const labels={origin:'出发地',destination:'目的地',start_date:'出发日期',days:'旅行天数',party:'同行方式',pace:'旅行节奏',theme:'兴趣主题',planning_stage:'出游阶段',trip_budget:'全程预算上限',trip_budget_min:'全程预算下限',airfare_cap:'单程机票上限',airfare_min:'单程机票下限',required_airlines:'指定航司',excluded_airlines:'排除航司',date_flexibility:'日期弹性',lodging_priority:'住宿要求',fallback_policy:'备选许可',overbudget_policy:'超预算处理',preferred_attractions:'景点偏好',flight_budget_policy:'航班预算规则'};
+  const value=(key,v)=>['required_airlines','excluded_airlines'].includes(key)?(v?.length?realCarrierNames(v):'未限制'):v==null||v===''?'尚未表达':['trip_budget','trip_budget_min','airfare_cap','airfare_min'].includes(key)?'¥'+fmt(v):key==='days'?v+'天':Array.isArray(v)?v.join('、')||'未选择':String(v);
+  open(`<div class="real-profile-heading"><h2>动态画像</h2><span class="badge green">${esc(p.intent_stage)}</span></div><p>${esc(p.user_id)} · ${esc(p.origin||'待确认')} → ${esc(p.destination||'待确认')}</p><div class="real-profile-next"><strong>下一步建议</strong><p>${esc(p.next_action)}</p>${p.flight_search_result?.status==='empty'?'<small>该数据源未返回符合条件的报价，用户偏好仍保留。</small>':''}</div><h3>主动偏好</h3><dl class="real-preference-grid">${Object.entries(labels).map(([key,label])=>`<div><dt>${label}</dt><dd>${esc(value(key,p.preferences[key]))}</dd></div>`).join('')}</dl><div class="real-profile-columns"><section><h3>偏好更新</h3>${p.profile_history.slice(0,20).map(h=>`<details class="real-history"><summary>${esc(new Date(h.at).toLocaleString('zh-CN'))} · 版本 ${h.revision}</summary><dl>${Object.entries(labels).map(([key,label])=>`<div><dt>${label}</dt><dd>${esc(value(key,h.preferences[key]))}</dd></div>`).join('')}</dl></details>`).join('')||'<p>暂无偏好更新。</p>'}</section><section><h3>行为轨迹</h3><ol class="real-timeline">${p.observations.slice(-60).reverse().map(e=>`<li><strong>${esc(realEventLabel(e))}</strong><small>${esc(new Date(e.at).toLocaleString('zh-CN'))} · ${esc(e.destination||'方向待确认')}</small>${e.result?`<small>${esc(realCarrierNames(e.result.required_airlines))} · ${esc(e.result.interpretation)}</small>`:''}</li>`).join('')||'<li>尚无本站行为记录。</li>'}</ol></section></div><p class="real-caption">展示近期60条行为和20次偏好更新，完整观察窗口记录可从“导出案例”获取。</p>`);return;
+ }
+ if(action==='analyze'){
+  if(realBusy)return;realBusy=true;renderRealMarketing();
+  try{realDecision=await api('real/analysis',{window_days:realWindow});}finally{realBusy=false;renderRealMarketing();}return;
+ }
+ if(action==='new-campaign'){
+  if(!realSelected.size){toast('请先在潜客与画像中选择真实旅客');location.hash='audience';return;}
+  open(`<h2>创建活动</h2><form id="real-campaign-form">${field('活动名称','name','','text','required maxlength="80"')}<p>已选择 ${realSelected.size} 位真实旅客；保存时重新核验共享状态。</p><button class="primary" type="submit">保存决策名单</button></form>`);return;
+ }
+ if(action==='campaign-list'){open(`<h2>我的活动</h2>${realData.campaigns.map(c=>`<section><h3>${esc(c.name)}</h3><p>${c.user_ids.length} 位当前仍共享的旅客 · ${esc(c.status)} · 发送 ${c.sent} 次</p></section>`).join('')||'<p>尚无真实客群活动。</p>'}`);return;}
+ if(action==='models'){open(`<h2>数据与模型</h2><p>正式客群：${realData.population} 位已同意共享的本站用户。</p><p>注册账号按固定用户编号关联画像；原匿名会话不自动转入新账号。原模拟用户用于训练和离线测试。</p><p>${esc(realData.algorithm)}</p><p>本地模型：${esc(realData.generation.label)}</p>`);return;}
+ if(action==='trip-export'&&tripPlan){download('真实旅客旅行方案.json',JSON.stringify(tripPlan,null,2));return;}
+ if(action==='trip-ai'){toast('此处查看旅客已确认方案；修改建议由旅客在个人页确认。');return;}
+}
+async function realMarketingSubmit(form){
+ if(form.id==='real-campaign-form'){
+  await api('real/campaigns',{name:new FormData(form).get('name'),user_ids:[...realSelected]});close();await refreshRealMarketing();toast('真实客群决策名单已保存');
+ }
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-real-action]');if(!b||b.disabled)return;e.preventDefault();realMarketingAction(b).catch(error=>toast(error.message));});
+document.addEventListener('change',e=>{
+ if(e.target.id==='real-window'){realWindow=Number(e.target.value);realDecision=null;refreshRealMarketing().catch(error=>toast(error.message));}
+ if(e.target.matches('[data-real-select]')){e.target.checked?realSelected.add(e.target.dataset.realSelect):realSelected.delete(e.target.dataset.realSelect);const count=$('[data-real-selection-count]');if(count)count.textContent=realSelected.size;}
+ if(e.target.matches('[data-real-filter]')){const k=e.target.dataset.realFilter,v=e.target.value;if(k==='stage')realStage=v;if(k==='airline')realAirline=v;if(k==='destination')realDestination=v;if(k==='sort')realSort=v;realPage=1;renderRealMarketing();}
+ if(e.target.matches('[data-real-page-size]')){realPageSize=Number(e.target.value);realPage=1;renderRealMarketing();}
+ if(e.target.matches('[data-real-unmatched]')){realOnlyUnmatched=e.target.checked;realPage=1;renderRealMarketing();}
+});
+document.addEventListener('input',e=>{if(e.target.id==='real-audience-search'){realSearch=e.target.value;realPage=1;const pos=e.target.selectionStart;renderRealMarketing();const input=$('#real-audience-search');input.focus();input.setSelectionRange(pos,pos);}});

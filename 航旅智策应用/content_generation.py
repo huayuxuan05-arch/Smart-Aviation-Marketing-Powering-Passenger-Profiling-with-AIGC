@@ -7,8 +7,8 @@ def configuration():
     if mode not in ('template', 'local-model'):
         raise ValueError('AEROLENS_GENERATION_MODE 仅支持 template 或 local-model')
     if mode == 'local-model':
-        from aigc_config import LABEL
-        return {'mode': mode, 'label': LABEL, 'model_enabled': True,
+        from aigc_config import runtime_configuration
+        return {'mode': mode, 'label': runtime_configuration()['label'], 'model_enabled': True,
                 'description': '本地大模型生成文案与视觉配方，历史事实独立引用。',
                 'visual': '模型选择主题与配色，本地SVG合成',
                 'loading': '本地模型正在生成文案与视觉配方，预计数秒至半分钟…'}

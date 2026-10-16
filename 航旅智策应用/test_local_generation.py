@@ -46,4 +46,35 @@ class GenerationTests(unittest.TestCase):
   with patch.object(gen,'rpc',side_effect=[{'status':'ok'},{'model_path':str(ROOT/MODEL_FILE)},{'data':[{'id':'wrong-alias'}]}]):self.assertFalse(gen.health())
   with patch.object(gen,'rpc',side_effect=[{'status':'ok'},{'model_path':str(ROOT/MODEL_FILE)},{'data':[{'id':ALIAS}]}]):self.assertTrue(gen.health())
 
+ def extraction(self,text,items):
+  response={'model':gen.ALIAS,'choices':[{'finish_reason':'stop','message':{'content':json.dumps({'items':items},ensure_ascii=False)}}]}
+  with patch.object(gen,'ensure'),patch.object(gen,'rpc',return_value=response):
+   return gen.extract_preferences(text,['上海'],['成都'],{'pace':['轻松','充实'],'lodging_priority':['安静休息']})
+
+ def test_reworded_evidence_does_not_abort_other_model_findings(self):
+  result=self.extraction('从上海去成都，酒店别太吵，想轻松一点',[
+   {'field':'origin','value':'上海','evidence':'从上海'},
+   {'field':'lodging_priority','value':'安静休息','evidence':'酒店要安静'},
+   {'field':'pace','value':'轻松','evidence':'想轻松一点'}])
+  self.assertEqual([i['field'] for i in result['items']],['origin','pace'])
+  self.assertEqual(result['unverified_fields'],['lodging_priority'])
+
+ def test_typography_is_reanchored_to_original_text_without_changing_negation(self):
+  text='预算４０００元，\n想 轻松一点，不要春秋航空'
+  self.assertEqual(gen.original_evidence(text,'预算4000元'),'预算４０００元')
+  self.assertEqual(gen.original_evidence(text,'“想轻松一点”'),'想 轻松一点')
+  self.assertIsNone(gen.original_evidence(text,'我要春秋航空'))
+  self.assertIsNone(gen.original_evidence(text,''))
+  self.assertIsNone(gen.original_evidence(text,None))
+
+ def test_conflicting_or_missing_evidence_is_isolated_per_field(self):
+  result=self.extraction('想轻松一点但也想充实，从上海去成都',[
+   {'field':'pace','value':'轻松','evidence':'轻松一点'},
+   {'field':'pace','value':'充实','evidence':'想充实'},
+   {'field':'origin','value':'上海','evidence':'从上海'},
+   {'field':'lodging_priority','value':'安静休息'},
+   {'field':'unsupported','value':'anything','evidence':'上海'}])
+  self.assertEqual(result['items'],[{'field':'origin','value':'上海','evidence':'从上海'}])
+  self.assertEqual(set(result['unverified_fields']),{'pace','lodging_priority'})
+
 if __name__=='__main__':unittest.main()

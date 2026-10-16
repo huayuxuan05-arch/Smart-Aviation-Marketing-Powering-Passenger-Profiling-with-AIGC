@@ -71,6 +71,33 @@ class FlightQuoteTests(unittest.TestCase):
         self.assertIsNone(self.plan['budget']['estimated_total'])
         self.assertIsNone(self.plan['budget']['components'][0]['value'])
         self.assertFalse(self.plan['bookable'])
+    def test_airline_preferences_change_cache_and_block_bypassed_preview(self):
+        import airline_preferences as airlines
+        base=quotes.query_for(self.plan)
+        self.plan['preference_constraints'].update(required_airlines=['3U'],excluded_airlines=['9C'])
+        constrained=quotes.query_for(self.plan)
+        self.assertNotEqual(quotes.query_key(base),quotes.query_key(constrained))
+        def forged(query):
+            result=fixture_result(query)
+            for leg in ['outbound','inbound']:
+                result['options'][0][leg]['segments'][0].update(airline='Spring Airlines',flight_number='9C1234')
+            return result
+        # Simulate a corrupted persisted provider result to exercise preview defense
+        # independently of the mandatory filtering before persistence.
+        with patch.object(quotes,'_search',side_effect=forged):
+            empty=quotes.submit(self.owner,self.plan)
+        self.assertEqual(empty['status'],'empty');self.assertEqual(empty['options'],[])
+        pristine=copy.deepcopy(self.plan);pristine['preference_constraints'].update(required_airlines=[],excluded_airlines=[])
+        with patch.object(quotes,'_search',side_effect=forged):q=quotes.submit(self.owner,pristine)
+        with quotes.db() as c:c.execute('UPDATE flight_observations SET query_json=? WHERE id=?',(json.dumps(constrained),q['id']))
+        with self.assertRaisesRegex(ValueError,'航空公司要求'):quotes.preview(self.owner,self.plan,{'query_id':q['id'],'option_index':0})
+        allowed=forged(constrained)['options'][0]
+        for leg in ['outbound','inbound']:allowed[leg]['segments'][0].update(flight_number='3U1234',airline='Sichuan Airlines')
+        self.assertTrue(airlines.matches_option(allowed,constrained))
+        allowed['inbound']['segments'].append({'flight_number':'9C1234','airline':'Spring Airlines'})
+        self.assertFalse(airlines.matches_option(allowed,constrained))
+        allowed['inbound']['segments']=[{'flight_number':'UNKNOWN'}]
+        self.assertFalse(airlines.matches_option(allowed,constrained))
     def test_observations_cached_and_owned(self):
         q=self.quote();self.assertEqual(q['status'],'success')
         cached=quotes.submit(self.owner,self.plan,{'adults':2})
@@ -82,7 +109,9 @@ class FlightQuoteTests(unittest.TestCase):
             with self.assertRaises(ValueError):quotes.submit(self.owner,self.plan,{'adults':3})
         self.assertEqual(quotes.history(self.owner,quotes.query_for(self.plan,{'adults':3}))['items'],[])
         with patch.object(quotes,'_search',return_value={'options':[]}):
-            with self.assertRaises(ValueError):quotes.submit(self.owner,self.plan,{'adults':4})
+            empty=quotes.submit(self.owner,self.plan,{'adults':4})
+        self.assertEqual(empty['status'],'empty');self.assertEqual(empty['options'],[])
+        with self.assertRaises(ValueError):quotes.get(self.other,empty['id'])
         with quotes.db() as c:self.assertEqual(c.execute('SELECT COUNT(*) FROM flight_observations').fetchone()[0],0)
     def test_preview_uses_group_quote_per_adult_without_saving(self):
         q=self.quote();before=personal.get_plan(self.owner,self.plan['id'])

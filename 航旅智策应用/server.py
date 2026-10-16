@@ -15,6 +15,8 @@ import travel_planner as planner
 import personal_app as personal
 import personal_assistant as assistant
 import flight_quotes as flights
+import real_travelers as real
+import accounts
 
 from http.cookies import SimpleCookie, CookieError
 
@@ -26,12 +28,50 @@ class Handler(BaseHTTPRequestHandler):
         if '/flights/' in getattr(self,'path',''):return
         super().log_message(format,*args)
     def personal_owner(self):
+        if accounts.required():
+            user=accounts.resolve(self.login_token('personal'),'traveler')
+            if not user:raise PermissionError('请先登录个人账号')
+            return user['owner']
         cookie=SimpleCookie()
         try:cookie.load(self.headers.get('Cookie',''))
         except CookieError:cookie=SimpleCookie()
         token,owner,fresh=personal.session(cookie['huayi_personal'].value if 'huayi_personal' in cookie else None)
         if fresh:self.personal_cookie=f'huayi_personal={token}; Path=/api/personal/; HttpOnly; SameSite=Strict; Max-Age=2592000'
         return owner
+
+    def login_token(self,area):
+        cookie=SimpleCookie()
+        try:cookie.load(self.headers.get('Cookie',''))
+        except CookieError:return None
+        name='huayi_personal' if area=='personal' else 'huayi_marketing'
+        return cookie[name].value if name in cookie else None
+
+    def auth_route(self,path,body=None):
+        area='personal' if path.startswith('/api/personal/') else 'mkt'
+        prefix=f'/api/{area}/auth/'
+        if not path.startswith(prefix):return False
+        action=path.removeprefix(prefix);role='traveler' if area=='personal' else 'staff'
+        token=self.login_token(area)
+        if body is None and action=='status':
+            user=accounts.resolve(token,role) if accounts.required() else None
+            self.send_json({'enabled':accounts.required(),'authenticated':bool(user),
+                'user':{k:user[k] for k in ('username','role','user_id')} if user else None})
+            return True
+        if not isinstance(body,dict):raise ValueError('不支持的登录操作')
+        if action=='register' and area=='personal':
+            # A new account gets a fresh identity; never adopt the prior browser user's profile.
+            owner=accounts.create_account(body.get('username'),body.get('password'));token=accounts.issue(owner)
+        elif action=='login':token=accounts.login(body,role)
+        elif action=='logout':accounts.logout(token);token=''
+        else:raise ValueError('不支持的登录操作')
+        name='huayi_personal' if area=='personal' else 'huayi_marketing'
+        self.personal_cookie=f'{name}={token}; Path=/api/{area}/; HttpOnly; SameSite=Strict; Max-Age={accounts.SESSION_SECONDS if token else 0}'
+        self.send_json({'authenticated':bool(token)})
+        return True
+
+    def require_marketing_login(self,path):
+        if path.startswith('/api/mkt/') and accounts.required() and not accounts.resolve(self.login_token('mkt'),'staff'):
+            raise PermissionError('请登录营销管理账号')
 
     def send_json(self, data, status=200):
         data = flights.public_payload(data)
@@ -49,6 +89,8 @@ class Handler(BaseHTTPRequestHandler):
         url = urlsplit(self.path)
         q = {k:v[0] for k,v in parse_qs(url.query,keep_blank_values=True).items()}
         try:
+            if self.auth_route(url.path):return
+            self.require_marketing_login(url.path)
             if not url.path.startswith('/api/'):
                 rel = url.path.lstrip('/') or 'index.html'
                 if rel in ('personal','personal/'):
@@ -70,13 +112,21 @@ class Handler(BaseHTTPRequestHandler):
                 return
             with connect() as c:
                 path = url.path
+                if path=='/api/mkt/data-source':return self.send_json({'mode':real.mode()})
+                if path.startswith('/api/mkt/real/'):
+                    tail=path.removeprefix('/api/mkt/real/')
+                    if tail=='dashboard':return self.send_json(real.dashboard(q))
+                    if tail=='export':return self.send_json(real.export_case(q))
+                    if tail.startswith('profiles/'):return self.send_json(real.profile(tail.split('/')[1]))
+                    if tail.startswith('plans/'):return self.send_json(real.plan(tail.split('/')[1]))
+                    return self.send_json({'error':'接口不存在'},404)
                 if path.startswith(('/api/personal/flights/','/api/mkt/flights/')):
                     owner=self.personal_owner() if path.startswith('/api/personal/') else 'marketing'
                     tail=path.split('/flights/',1)[1]
                     if tail=='status':return self.send_json(flights.configuration())
                     if tail.startswith('queries/'):return self.send_json(flights.get(owner,tail.split('/')[1]))
                     if tail=='history':
-                        plan=personal.get_plan(owner,q['plan_id']) if owner!='marketing' else q
+                        plan=personal.get_plan(owner,q['plan_id']) if owner!='marketing' else real.plan(q['user_id']) if real.mode()=='real' else q
                         return self.send_json(flights.history(owner,flights.query_for(plan,q)))
                     return self.send_json({'error':'接口不存在'},404)
                 if path.startswith('/api/personal/'):
@@ -88,6 +138,7 @@ class Handler(BaseHTTPRequestHandler):
                     if len(parts)==2 and parts[0]=='plans':return self.send_json(personal.get_plan(owner,parts[1]))
                     return self.send_json({'error':'接口不存在'},404)
                 if path.startswith('/api/mkt/'):
+                    if real.mode()=='real':return self.send_json({'error':'正式营销端仅处理已同意共享的真实旅客，请使用真实客群接口'},400)
                     tail = path.removeprefix('/api/mkt/')
                     if tail == 'travel-plans':
                         return self.send_json(planner.list_plans(c,q))
@@ -114,6 +165,7 @@ class Handler(BaseHTTPRequestHandler):
                 if path == '/api/health':
                     return self.send_json({'application':'aerolens','status':'ok','database':DB.exists(),'host':'127.0.0.1','process_id':os.getpid(),'generation':mkt.content_generation.configuration()})
                 return self.send_json({'error':'接口不存在'},404)
+        except PermissionError as e:self.send_json({'error':str(e)},401)
         except (ValueError,KeyError,TypeError) as e:
             self.send_json({'error':str(e)},400)
         except Exception:
@@ -131,22 +183,40 @@ class Handler(BaseHTTPRequestHandler):
                 raise ValueError('请求大小不合法')
             body = json.loads(self.rfile.read(size))
             path = urlsplit(self.path).path
+            if self.auth_route(path,body):return
+            self.require_marketing_login(path)
             if path.startswith(('/api/personal/flights/','/api/mkt/flights/')):
                 if not isinstance(body,dict):raise ValueError('请求参数须为对象')
                 owner=self.personal_owner() if path.startswith('/api/personal/') else 'marketing'
                 tail=path.split('/flights/',1)[1]
-                if owner!='marketing':plan=personal.get_plan(owner,body['plan_id'])
+                if owner!='marketing':
+                    plan=personal.get_plan(owner,body['plan_id'])
+                    if plan['profile_revision']!=personal.state(owner)['revision']:raise ValueError('偏好标签已更新，请按当前标签生成新方案后搜索')
                 else:
-                    with connect() as c:plan=planner.make_plan(c,body['user_id'],body.get('settings',{}))
-                if tail=='queries':return self.send_json(flights.submit(owner,plan,body),202)
+                    if real.mode()=='real':plan=real.plan(body['user_id'])
+                    else:
+                        with connect() as c:plan=planner.make_plan(c,body['user_id'],body.get('settings',{}))
+                if tail=='queries':
+                    result=flights.submit(owner,plan,body)
+                    if owner!='marketing':
+                        with personal.db() as pc:real.record_event(pc,owner,'flight_search',plan['destination'])
+                    return self.send_json(result,202)
+                if tail=='returns':return self.send_json(flights.query_returns(owner,plan,body))
                 if tail=='preview':return self.send_json(personal.preview_flight_quote(owner,plan,body) if owner!='marketing' else flights.preview(owner,plan,body))
                 if tail=='apply' and owner!='marketing':return self.send_json(personal.apply_flight_quote(owner,body),201)
                 if tail=='reject' and owner!='marketing':return self.send_json(personal.reject_flight_quote(owner,plan,body))
+                return self.send_json({'error':'接口不存在'},404)
+            if path.startswith('/api/mkt/real/'):
+                tail=path.removeprefix('/api/mkt/real/')
+                if tail=='campaigns':return self.send_json(real.create_campaign(body),201)
+                if tail=='analysis':return self.send_json(real.decision_summary(body))
                 return self.send_json({'error':'接口不存在'},404)
             if path.startswith('/api/personal/'):
                 if not isinstance(body,dict):raise ValueError('请求参数须为对象')
                 owner=self.personal_owner()
                 tail=path.removeprefix('/api/personal/')
+                if tail=='collection':return self.send_json(real.set_consent(owner,body))
+                if tail=='activity':return self.send_json(real.record_activity(owner,body))
                 with connect() as c:
                     if tail=='preferences':return self.send_json(personal.save_preferences(c,owner,body))
                     if tail=='plans':return self.send_json(personal.create_plan(c,owner,body),201)
@@ -161,6 +231,7 @@ class Handler(BaseHTTPRequestHandler):
                     if len(parts)==3 and parts[0]=='plans' and parts[2]=='delete':return self.send_json(personal.delete_plan(owner,parts[1],body))
                 return self.send_json({'error':'接口不存在'},404)
             if path.startswith('/api/mkt/'):
+                if real.mode()=='real':return self.send_json({'error':'正式营销端仅处理真实旅客；不会使用模拟名单或发送外部营销信息'},400)
                 tail = path.removeprefix('/api/mkt/')
                 with connect() as c:
                     if tail.startswith('travel-plans/'):
@@ -199,6 +270,7 @@ class Handler(BaseHTTPRequestHandler):
                             return self.send_json(mkt.evaluate_campaign(cid))
                 return self.send_json({'error':'接口不存在'},404)
             return self.send_json({'error':'接口不存在'},404)
+        except PermissionError as e:self.send_json({'error':str(e)},401)
         except (ValueError,KeyError,TypeError) as e:
             self.send_json({'error':str(e)},400)
         except Exception:
@@ -211,6 +283,7 @@ if __name__ == '__main__':
     parser.add_argument('--port',type=int,default=8765)
     args = parser.parse_args()
     build()
+    if accounts.required():accounts.ensure_admin()
     flights.recover_interrupted()
     server = ThreadingHTTPServer(('127.0.0.1',args.port),Handler)
     print(f'航旅智策 本地测试版 http://127.0.0.1:{args.port}',flush=True)

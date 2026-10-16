@@ -43,14 +43,16 @@ def candidate_features(plan,option,adults):
         start=leg.get('departure_time') or leg['segments'][0]['departure_time']
         end=leg.get('arrival_time') or leg['segments'][-1]['arrival_time']
         return (datetime.fromisoformat(end)-datetime.fromisoformat(start)).total_seconds()/60
-    prices=[out['price_cny']/adults,back['price_cny']/adults]
-    if not all(math.isfinite(v) and v>0 for v in prices):raise ValueError('Invalid current fare')
+    prices=[leg['price_cny']/adults if leg.get('price_cny') is not None else None for leg in (out,back)]
+    airfare=option['total_price_cny']/adults
+    if not math.isfinite(airfare) or airfare<=0 or any(v is not None and (not math.isfinite(v) or v<=0) for v in prices):raise ValueError('Invalid current fare')
+    known=all(v is not None for v in prices)
     constraints=plan.get('preference_constraints',{})
     recorded=datetime.now(timezone.utc)
-    nonflight=[c.get('value') for c in budget.get('components',[]) if c['name'] not in ('去程航空','返程航空','机动预留')]
-    estimate=round((sum(prices)+sum(nonflight))*1.1,2) if nonflight and all(v is not None for v in nonflight) else None
+    nonflight=[c.get('value') for c in budget.get('components',[]) if c['name'] not in ('去程航空','返程航空','往返航空','机动预留')]
+    estimate=round((airfare+sum(nonflight))*1.1,2) if nonflight and all(v is not None for v in nonflight) else None
     stops=max(len(out['segments'])-1,len(back['segments'])-1)
-    within_budget=((cap is None or max(prices)<=cap) and
+    within_budget=((cap is None or known and max(prices)<=cap) and
         (total is None or estimate is not None and estimate<=total))
     feasible=(constraints.get('fallback_policy')!='只接受直飞' or stops==0)
     return dict(outbound_per_adult=prices[0],inbound_per_adult=prices[1],
@@ -58,11 +60,11 @@ def candidate_features(plan,option,adults):
         one_way_band_width=cap-air_min if cap is not None and air_min is not None else None,
         trip_band_width=total-trip_min if total is not None and trip_min is not None else None,
         budget_source='actual self-reported bounds; unfilled bounds stay missing',
-        roundtrip_trip_cap_share=sum(prices)/total if total else None,
+        roundtrip_trip_cap_share=airfare/total if total else None,
         estimated_total_per_adult=estimate,total_budget_ratio=estimate/total if total and estimate is not None else None,
         hard_constraints_satisfied=bool(feasible),
-        within_budget=bool(within_budget),budget_policy='prefer',
-        outbound_cap_ratio=prices[0]/cap if cap else None,inbound_cap_ratio=prices[1]/cap if cap else None,
+        within_budget=None if cap is not None and not known else bool(within_budget),budget_policy='prefer',
+        outbound_cap_ratio=prices[0]/cap if cap and known else None,inbound_cap_ratio=prices[1]/cap if cap and known else None,
         days=plan['days'],adults=adults,
         booking_lead_days=(datetime.fromisoformat(plan['start_date']).date()-recorded.astimezone().date()).days,
         max_stops=stops,
@@ -80,9 +82,15 @@ def exposure(c,owner,plan,observation):
         relevance=None) for i,option in enumerate(observation.get('options',[]))]
     if not candidates:raise ValueError('No quoted itinerary candidates')
     revision=plan['profile_revision']
-    row=c.execute('SELECT id FROM itinerary_requests WHERE owner=? AND query_id=? AND plan_id=? AND profile_revision=?',
+    row=c.execute('SELECT id,candidates FROM itinerary_requests WHERE owner=? AND query_id=? AND plan_id=? AND profile_revision=?',
         (owner,observation['id'],plan['id'],revision)).fetchone()
-    if row:return row[0]
+    if row:
+        # Native shopping appends choices as other outbound flights are selected.
+        previous=json.loads(row[1]);seen={v['index'] for v in previous}
+        previous.extend(v for v in candidates if v['index'] not in seen)
+        c.execute('UPDATE itinerary_requests SET candidates=? WHERE id=?',
+            (json.dumps(previous,ensure_ascii=False,allow_nan=False),row[0]))
+        return row[0]
     ident='REQ_'+uuid.uuid4().hex
     c.execute('INSERT INTO itinerary_requests VALUES(?,?,?,?,?,?,?)',(ident,owner,
         datetime.now(timezone.utc).isoformat(),observation['id'],plan['id'],revision,

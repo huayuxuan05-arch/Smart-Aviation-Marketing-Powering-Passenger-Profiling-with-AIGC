@@ -6,11 +6,15 @@ import uuid
 
 import content_generation
 import personal_app as personal
+import airline_preferences as airlines
 
 LABELS=dict(zip(personal.FIELDS,['出发地','目的地','出发日期','旅行天数','同行方式','旅行节奏','兴趣主题','每名成人全程预算上限','每名成人单程机票上限','日期弹性','住宿侧重','备选许可','超预算处理','具体景点','出游阶段','每名成人全程预算下限','每名成人单程机票预算下限']))
+LABELS.update(required_airlines='仅选择的航空公司',excluded_airlines='排除的航空公司')
+LABELS['travel_request']='本次旅行需求'
+LABELS['flight_budget_policy']='航班预算标签'
 ENUMS={'party':personal.PARTIES,'pace':personal.PACES,'theme':personal.THEMES,
        'date_flexibility':personal.FLEXIBILITY,'lodging_priority':personal.LODGING,
-       'fallback_policy':personal.FALLBACKS,'overbudget_policy':personal.OVERBUDGET,'planning_stage':personal.STAGES}
+       'fallback_policy':personal.FALLBACKS,'overbudget_policy':personal.OVERBUDGET,'planning_stage':personal.STAGES,'flight_budget_policy':personal.FLIGHT_BUDGET_POLICIES}
 REQUIRED=['origin','destination','start_date','days','party','trip_budget']
 
 
@@ -85,6 +89,8 @@ def extract_rules(text,cities):
             if match and not re.search(r'(?:不想|不要|不喜欢)$',clause[:match.start()]):put(key,value,match[0])
     if re.search(r'国庆|五一|春节|中秋|端午|明天|下周|下月|明年|今年|\d{1,2}月\d{1,2}日',text) and 'start_date' not in patch:
         issues['start_date']='请确认包含年份的具体出发日期；不推定节假日或调休日。'
+    carrier_patch,carrier_spans=airlines.extract(text)
+    patch.update(carrier_patch);spans.update(carrier_spans)
     if not patch:notes.append('尚未识别到明确条件，请补充信息或使用左侧表单。')
     return patch,spans,issues,notes
 
@@ -101,6 +107,12 @@ def question(key,message,cities):
 def build_view(source,payload):
     cities=personal.planner.network(source).outgoing
     prefs={**payload['baseline'],**payload['patch']}
+    for key in airlines.FIELDS:prefs.setdefault(key,[])
+    # An explicit new carrier choice replaces contradictory inherited restrictions.
+    if 'required_airlines' in payload['patch'] and 'excluded_airlines' not in payload['patch']:
+        prefs['excluded_airlines']=[c for c in prefs['excluded_airlines'] if c not in prefs['required_airlines']]
+    if 'excluded_airlines' in payload['patch'] and 'required_airlines' not in payload['patch']:
+        prefs['required_airlines']=[c for c in prefs['required_airlines'] if c not in prefs['excluded_airlines']]
     issues=dict(payload['issues'])
     # 新会话没有确认过的日期、天数、客群等不采用界面初始值。
     for key in REQUIRED:
@@ -118,7 +130,12 @@ def build_view(source,payload):
     elif not issues:
         try:
             checked=personal.validate(source,prefs)
-            if checked['planning_stage']=='制定行程':plan=personal.make_plan(source,checked)
+            if checked['planning_stage']=='制定行程':
+                cache_key=json.dumps(checked,ensure_ascii=False,sort_keys=True)
+                if payload.get('preview_key')==cache_key:plan=payload['preview_plan']
+                else:
+                    plan=personal.generate_content(personal.make_plan(source,checked),checked)
+                    payload['preview_key']=cache_key;payload['preview_plan']=plan
         except ValueError as e:error=str(e)
     changes=[{'field':key,'label':LABELS[key],'before':payload['baseline'].get(key),'after':prefs[key],
               'evidence':payload['spans'].get(key,'目的地改变后清空原景点' if key=='preferred_attractions' else '首次仅保存意向，未确定条件保留为空')}
@@ -176,11 +193,15 @@ def create(source,owner,body):
             key,value,span=item['field'],item['value'],item['evidence']
             if key in patch or key in issues:continue
             # 数字、日期、城市只接受程序可独立重现的提取，不允许模型编造。
-            if key not in ENUMS:
+            if key not in ENUMS or key in ('flight_budget_policy','fallback_policy','date_flexibility'):
                 verified,_,ambiguities,_=extract_rules(span,set(cities)|set(personal.planner.PLACES))
                 if key in ambiguities or key not in verified or verified[key]!=value:continue
             patch[key]=value;spans[key]=span
+        for key in suggestions.get('unverified_fields',[]):
+            if key in LABELS and key not in patch and key not in issues:
+                issues[key]='请确认'+LABELS[key]+'；这项需求还需要你明确一下。'
         engine={'mode':'local-model','label':suggestions['engine'],'model_called':True}
+        patch['travel_request']=text;spans['travel_request']=text
         if patch:notes=[]
     payload={'id':'DRAFT_'+uuid.uuid4().hex,'version':1,'base_revision':state['revision'],'created_at':personal.now(),
              'status':'pending','kind':kind,'text':text,'baseline':state['preferences'],'baseline_plan':baseline_plan,
@@ -233,6 +254,7 @@ def confirm(source,owner,draft_id,body):
                 'assistant_provenance':{'draft_id':draft_id,'kind':payload['kind'],'engine':payload['engine'],'confirmed':True}})
             c.execute('INSERT INTO personal_plans VALUES(?,?,?,?,?)',(plan['id'],owner,plan['created_at'],revision,json.dumps(plan,ensure_ascii=False)));result['plan']=plan
             personal.choice_evidence.event(c,owner,'save_plan',{'plan_id':plan['id'],'profile_revision':revision,'booking':False,'source':'assistant_confirmation'})
+            personal.real_travelers.record_event(c,owner,'plan_saved',plan['destination'],{'revision':revision})
         payload['status']='confirmed';payload['confirmed_at']=personal.now();payload['confirmed_revision']=revision
         c.execute('UPDATE personal_assistant_drafts SET status=?,payload=? WHERE id=? AND owner=?',('confirmed',json.dumps(payload,ensure_ascii=False),draft_id,owner));c.commit()
     return result

@@ -30,7 +30,7 @@ function updatePersonalDisclosures(){
  personalSection(document.querySelector('[data-current-flights]'),'flights');
  for(const section of document.querySelectorAll('[data-trip-detail]>section.trip-subsection')){
   const title=section.querySelector(':scope > h3,:scope > .row>h3')?.textContent||'';
-  const key=title.includes('预算')?'trip-budget':title==='AI旅行建议'?'trip-ai':'trip-'+title;
+  const key=title.includes('预算')?'trip-budget':['AI旅行建议','旅行建议'].includes(title)?'trip-ai':'trip-'+title;
   personalSection(section,key);
  }
  for(const day of document.querySelectorAll('[data-trip-day]')){

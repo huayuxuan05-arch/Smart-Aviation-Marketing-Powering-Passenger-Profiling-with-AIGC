@@ -37,6 +37,44 @@ class AssistantTests(unittest.TestCase):
         self.assertEqual(draft['preferences']['trip_budget'],4000)
         result=self.confirm(draft)
         self.assertEqual(result['plan']['budget']['one_way_airfare_range'],{'min':500,'max':1000,'source':'self_report'})
+    def test_airline_feedback_is_previewed_and_saved_with_new_destination(self):
+        first=self.confirm(self.create())
+        draft=self.create('我不要春秋航空，我要川航的，我想从上海去成都',kind='feedback',plan_id=first['plan']['id'])
+        self.assertTrue(draft['can_confirm'])
+        self.assertEqual(draft['preferences']['origin'],'上海')
+        self.assertEqual(draft['preferences']['destination'],'成都')
+        self.assertEqual(draft['preferences']['required_airlines'],['3U'])
+        self.assertEqual(draft['preferences']['excluded_airlines'],['9C'])
+        self.assertEqual(personal.state(self.owner)['preferences']['destination'],'杭州')
+        result=self.confirm(draft)
+        self.assertEqual(result['plan']['preference_constraints']['required_airlines'],['3U'])
+        self.assertNotIn('live_flights',result['plan'])
+        self.assertEqual(personal.get_plan(self.owner,first['plan']['id'])['destination'],'杭州')
+    def test_airline_conflicts_and_explicit_cancellation(self):
+        self.confirm(self.create())
+        draft=self.create('我要川航，不要川航')
+        self.assertFalse(draft['can_confirm'])
+        self.assertIn('同时指定和排除',draft['error'])
+        self.confirm(self.create('我要川航，不要春秋'))
+        self.assertEqual(self.create('不限航司')['preferences']['excluded_airlines'],[])
+        self.assertEqual(self.create('不限航司')['preferences']['required_airlines'],[])
+        self.assertEqual(self.create('我要春秋')['preferences']['excluded_airlines'],[])
+    def test_model_cannot_invent_or_reverse_airline_preferences(self):
+        self.confirm(self.create())
+        suggestions={'items':[{'field':'required_airlines','value':['3U'],'evidence':'不要春秋航空'}],'engine':'mocked local parser'}
+        with patch.object(assistant.content_generation,'configuration',return_value={'model_enabled':True}),patch.object(generation,'extract_preferences',return_value=suggestions),patch.object(personal,'generate_content',side_effect=lambda plan,prefs:plan):
+            draft=self.create('不要春秋航空')
+        self.assertEqual(draft['preferences']['required_airlines'],[])
+        self.assertEqual(draft['preferences']['excluded_airlines'],['9C'])
+    def test_model_cannot_silently_weaken_user_selected_search_tags(self):
+        self.confirm(self.create())
+        prefs=personal.state(self.owner)['preferences']
+        personal.save_preferences(self.source,self.owner,{'preferences':{**prefs,'flight_budget_policy':'只看预算内','fallback_policy':'只接受直飞'},'expected_revision':1})
+        suggestion={'items':[{'field':'flight_budget_policy','value':'预算优先','evidence':'我要川航'},
+                             {'field':'fallback_policy','value':'可比较中转与机场接驳','evidence':'我要川航'}],'engine':'mocked local parser'}
+        with patch.object(assistant.content_generation,'configuration',return_value={'model_enabled':True}),patch.object(generation,'extract_preferences',return_value=suggestion),patch.object(personal,'generate_content',side_effect=lambda plan,prefs:plan):draft=self.create('我要川航')
+        self.assertEqual(draft['preferences']['flight_budget_policy'],'只看预算内')
+        self.assertEqual(draft['preferences']['fallback_policy'],'只接受直飞')
     def test_group_or_roundtrip_interval_requires_explicit_basis(self):
         draft=self.create(TEXT.replace('每名成人全程预算4000元','两个人全程预算2000到4000元').replace('机票单程不超过1000元','往返机票预算500到1000元'))
         self.assertFalse(draft['can_confirm'])
@@ -168,19 +206,40 @@ class AssistantTests(unittest.TestCase):
     def test_model_numeric_invention_is_filtered_before_preview(self):
         self.confirm(self.create())
         suggestion={'items':[{'field':'trip_budget','value':100,'evidence':'想轻松一点'},{'field':'pace','value':'轻松','evidence':'想轻松一点'}],'engine':'mocked local parser'}
-        with patch.object(assistant.content_generation,'configuration',return_value={'model_enabled':True}),patch.object(generation,'extract_preferences',return_value=suggestion):draft=self.create('想轻松一点')
+        with patch.object(assistant.content_generation,'configuration',return_value={'model_enabled':True}),patch.object(generation,'extract_preferences',return_value=suggestion),patch.object(personal,'generate_content',side_effect=lambda plan,prefs:plan):draft=self.create('想轻松一点')
         self.assertEqual(draft['preferences']['trip_budget'],4000)
         self.assertTrue(draft['engine']['model_called'])
+    def test_unverified_model_field_becomes_a_question_without_losing_explicit_preferences(self):
+        self.confirm(self.create())
+        suggestion={'items':[],'unverified_fields':['lodging_priority','required_airlines'],'engine':'mocked local parser'}
+        with patch.object(assistant.content_generation,'configuration',return_value={'model_enabled':True}),patch.object(generation,'extract_preferences',return_value=suggestion),patch.object(personal,'generate_content',side_effect=lambda plan,prefs:plan):
+            draft=self.create('我不要春秋航空，只要国航和东航，酒店别太吵')
+        self.assertTrue(draft['engine']['model_called']);self.assertIsNone(draft['error'])
+        changes={item['field']:item['after'] for item in draft['changes']}
+        self.assertEqual(changes['required_airlines'],['CA','MU'])
+        self.assertEqual(changes['excluded_airlines'],['9C'])
+        self.assertEqual({q['field'] for q in draft['questions']},{'lodging_priority'})
+        self.assertEqual(personal.state(self.owner)['revision'],1)
+    def test_coordinated_airline_lists_keep_positive_and_negative_scope_separate(self):
+        for text,expected in [
+            ('只选国航和东航，不要春秋和吉祥',{'required_airlines':['CA','MU'],'excluded_airlines':['9C','HO']}),
+            ('不是要国航和东航，只要川航',{'required_airlines':['3U']}),
+            ('只选国航，不要东航和春秋',{'required_airlines':['CA'],'excluded_airlines':['9C','MU']}),
+            ('想坐Sichuan Airlines和Air China',{'required_airlines':['3U','CA']})]:
+            actual,_=assistant.airlines.extract(text)
+            self.assertEqual(actual,expected,text)
     def test_disabled_extractor_cannot_start_a_model(self):
         with patch.object(generation,'rpc') as rpc,patch.object(generation.subprocess,'Popen') as start:
             with self.assertRaisesRegex(ValueError,'未接入大模型'):generation.extract_preferences('需求',[],[],assistant.ENUMS)
             rpc.assert_not_called();start.assert_not_called()
-    def test_model_adapter_rejects_untraceable_and_duplicate_proposals(self):
+    def test_model_adapter_requests_confirmation_for_untraceable_and_duplicate_proposals(self):
         for items in [[{'field':'pace','value':'轻松','evidence':'不存在的文本'}],
                       [{'field':'pace','value':'轻松','evidence':'轻松'},{'field':'pace','value':'充实','evidence':'充实'}]]:
             response={'model':generation.ALIAS,'choices':[{'finish_reason':'stop','message':{'content':json.dumps({'items':items})}}]}
             with patch.object(generation,'ensure'),patch.object(generation,'rpc',return_value=response):
-                with self.assertRaises(ValueError):generation.extract_preferences('轻松或充实',[],[],assistant.ENUMS)
+                result=generation.extract_preferences('轻松或充实',[],[],assistant.ENUMS)
+            self.assertEqual(result['items'],[])
+            self.assertEqual(result['unverified_fields'],['pace'])
 
 
 if __name__=='__main__':unittest.main()

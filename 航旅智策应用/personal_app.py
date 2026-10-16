@@ -1,4 +1,4 @@
-"""个人旅客入口：独立浏览器会话、自报偏好快照和个人方案，不读取模拟用户画像。"""
+"""个人旅客入口：独立账号归属、自报偏好快照和个人方案，不读取模拟用户画像。"""
 from datetime import datetime, timedelta
 from pathlib import Path
 import hashlib
@@ -13,6 +13,8 @@ import travel_planner as planner
 import survey_evidence as evidence
 import flight_quotes
 import travel_choice_evidence as choice_evidence
+import airline_preferences as airlines
+import real_travelers
 
 THEMES=['城市初访','自然与景区','舒适休闲','交通与预算','文化与攻略']
 PARTIES=['独行','情侣','朋友','亲子','长者同行']
@@ -23,6 +25,10 @@ FALLBACKS=['先展示差异，由我确认','只接受直飞','可比较中转�
 OVERBUDGET=['先展示差异，由我选择','优先比较允许范围内的日期','优先降低住宿与付费体验','比较其他感兴趣的城市','缩短行程','暂缓出游']
 STAGES=['制定行程','先收集灵感','暂不计划出游']
 FIELDS=['origin','destination','start_date','days','party','pace','theme','trip_budget','airfare_cap','date_flexibility','lodging_priority','fallback_policy','overbudget_policy','preferred_attractions','planning_stage','trip_budget_min','airfare_min']
+FIELDS += list(airlines.FIELDS)
+FIELDS += ['travel_request']
+FLIGHT_BUDGET_POLICIES=['预算优先','只看预算内']
+FIELDS += ['flight_budget_policy']
 
 
 def now():return datetime.now(CST).isoformat(timespec='microseconds')
@@ -32,11 +38,22 @@ def db():
     RUNTIME.mkdir(parents=True,exist_ok=True)
     c=sqlite3.connect(RUNTIME/'personal.sqlite3',timeout=30,factory=ClosingConnection)
     c.row_factory=sqlite3.Row
+    c.execute('PRAGMA journal_mode=WAL')
     c.executescript('''CREATE TABLE IF NOT EXISTS personal_sessions(owner TEXT PRIMARY KEY,created_at TEXT,revision INTEGER DEFAULT 0,preferences TEXT);
+    CREATE TABLE IF NOT EXISTS personal_users(owner TEXT PRIMARY KEY,user_id TEXT UNIQUE NOT NULL,created_at TEXT NOT NULL,last_seen_at TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS personal_preferences(id INTEGER PRIMARY KEY,owner TEXT,revision INTEGER,recorded_at TEXT,changed_fields TEXT,preferences TEXT);
     CREATE TABLE IF NOT EXISTS personal_plans(id TEXT PRIMARY KEY,owner TEXT,created_at TEXT,profile_revision INTEGER,payload TEXT);
+    CREATE INDEX IF NOT EXISTS personal_preference_owner ON personal_preferences(owner,revision);
     CREATE INDEX IF NOT EXISTS personal_plan_owner ON personal_plans(owner,created_at);''')
     choice_evidence.initialize(c)
+    real_travelers.initialize(c)
+    import accounts
+    accounts.initialize(c)
+    # Migrate identities without enrolling old or QA sessions in shared analysis.
+    c.execute('''INSERT OR IGNORE INTO personal_users SELECT s.owner,
+        COALESCE(r.public_id,'TRAVEL_'||upper(hex(randomblob(6)))),s.created_at,s.created_at
+        FROM personal_sessions s LEFT JOIN real_traveler_consent r ON r.owner=s.owner
+        WHERE NOT EXISTS(SELECT 1 FROM personal_users u WHERE u.owner=s.owner)''')
     c.commit();return c
 
 
@@ -44,10 +61,14 @@ def session(token=None):
     with db() as c:
         if isinstance(token,str) and re.fullmatch(r'[0-9a-f]{64}',token):
             owner=hashlib.sha256(token.encode()).hexdigest()
-            if c.execute('SELECT 1 FROM personal_sessions WHERE owner=?',(owner,)).fetchone():return token,owner,False
+            if c.execute('SELECT 1 FROM personal_sessions WHERE owner=?',(owner,)).fetchone():
+                c.execute('UPDATE personal_users SET last_seen_at=? WHERE owner=? AND last_seen_at<?',
+                    (now(),owner,(datetime.now(CST)-timedelta(minutes=5)).isoformat()))
+                return token,owner,False
         token=uuid.uuid4().hex+uuid.uuid4().hex
         owner=hashlib.sha256(token.encode()).hexdigest()
         c.execute('INSERT INTO personal_sessions(owner,created_at) VALUES(?,?)',(owner,now()));c.commit()
+        c.execute('INSERT INTO personal_users VALUES(?,?,?,?)',(owner,'TRAVEL_'+uuid.uuid4().hex[:12].upper(),now(),now()))
         return token,owner,True
 
 
@@ -56,12 +77,17 @@ def defaults():
             'days':3,'party':'独行','pace':'按同行方式安排','theme':'城市初访','trip_budget':None,'airfare_cap':None,
             'date_flexibility':FLEXIBILITY[0],'lodging_priority':LODGING[0],'fallback_policy':FALLBACKS[0],
             'overbudget_policy':OVERBUDGET[0],'preferred_attractions':[],'planning_stage':STAGES[0],
-            'trip_budget_min':None,'airfare_min':None}
+            'trip_budget_min':None,'airfare_min':None,'required_airlines':[],'excluded_airlines':[],'travel_request':'','flight_budget_policy':FLIGHT_BUDGET_POLICIES[0]}
 
 
 def validate(source,raw):
     if not isinstance(raw,dict):raise ValueError('偏好参数须为对象')
     result={**defaults(),**{k:raw[k] for k in FIELDS if k in raw}}
+    if result['flight_budget_policy'] not in FLIGHT_BUDGET_POLICIES:raise ValueError('请选择支持的航班预算标签')
+    if not isinstance(result['travel_request'],str) or len(result['travel_request'])>2000:raise ValueError('旅行需求须为2000字以内的文本')
+    for key in airlines.FIELDS:result[key]=airlines.normalize(result[key])
+    if set(result['required_airlines']) & set(result['excluded_airlines']):
+        raise ValueError('同一航司不能同时指定和排除，请确认选择')
     if result['planning_stage'] not in STAGES:raise ValueError('请选择支持的出游阶段')
     intent_only=result['planning_stage']!='制定行程'
     network=planner.network(source)
@@ -94,6 +120,8 @@ def validate(source,raw):
     for lower,upper in [('trip_budget_min','trip_budget'),('airfare_min','airfare_cap')]:
         if result[lower] is not None and result[upper] is not None and result[lower]>result[upper]:
             raise ValueError('预算下限不能高于上限')
+    if result['flight_budget_policy']=='只看预算内' and result['trip_budget'] is None and result['airfare_cap'] is None:
+        raise ValueError('选择只看预算内时，请填写全程或单程机票预算上限')
     return result
 
 
@@ -121,7 +149,8 @@ def make_plan(source,prefs):
                     'reference_fare':0,'date_gap':0}
         candidates.append((destination,pending(start,destination),pending(end,origin)))
     if not candidates:raise ValueError('当前条件缺少航线网络参考，请调整目的地；不会改写历史航班日期')
-    prior=evidence.destination_prior()
+    from planning_evidence import learned_reference
+    prior=learned_reference()['destination_training_prior']
     def cost_order(candidate):
         d,o,b=candidate;cap=prefs['airfare_cap'];total=prefs['trip_budget']
         # 下界是情景比较，不是实时报价；先保往返与用户约束，再用样本先验打破并列。
@@ -141,7 +170,7 @@ def make_plan(source,prefs):
                 '将逐项情景费用与你本次填写的全程预算对照，超预算明确提示，并按你选择的方式提出调整。' if prefs['trip_budget'] is not None else '你尚未填写全程预算，先提供逐项估算供比较。']
     alternatives=[{'destination':d,'target_date':start,'reference_fare':o['reference_fare'],'kind':o['kind'],'status':o['status']} for d,o,b in candidates[1:]]
     if prefs['destination']=='为我推荐' and prior:
-        priorities.append('先比较往返参考完整性、直飞要求与所填预算，再以本批有效问卷的城市关注率打破同等条件并列；样本热度不代表你的购票概率。')
+        priorities.append('先比较往返参考完整性、直飞要求与所填预算，再以模拟用户训练期城市关注先验打破同等条件并列；样本热度不代表你的购票概率。')
     priorities.extend([f'日期弹性：{prefs["date_flexibility"]}；备选许可：{prefs["fallback_policy"]}。原日期与目的地的调整均需你确认。',
                        f'住宿侧重：{prefs["lodging_priority"]}；超预算处理：{prefs["overbudget_policy"]}。'])
     plan=planner.compose_plan(summary,intent,outbound,back,THEMES.index(prefs['theme']),{'days':prefs['days'],'trip_budget':prefs['trip_budget'],'preferred_attractions':prefs['preferred_attractions'],'adjust_lodging':prefs['overbudget_policy']=='优先降低住宿与付费体验'},priorities,alternatives)
@@ -152,7 +181,7 @@ def make_plan(source,prefs):
     plan['date_comparisons']=[{'start_date':(datetime.strptime(start,'%Y-%m-%d').date()+timedelta(days=offset)).isoformat(),
         'advice':f'在你允许的日期范围内{abs(offset)}天；仅供改期比较，实际航班与报价需重查，确认生成后才保存。'} for offset in (-span,span) if '2024-01-01'<=(datetime.strptime(start,'%Y-%m-%d').date()+timedelta(days=offset)).isoformat()<='2035-12-31'] if span else []
     if prefs['date_flexibility']=='同一假期内可比较':plan['checklist'].insert(0,'尚未确认假期实际日期范围，请核实后选择比较日期，不自动推定调休。')
-    plan['recommendation_model']={'version':'survey-constrained-ranking-v2','survey_prior_used':prefs['destination']=='为我推荐' and bool(prior),'shadow_classifier_used':False,'criteria':['往返参考完整性','主动直飞要求','机票预算与全程情景费用下界','有效问卷城市关注率仅作并列参考']}
+    plan['recommendation_model']={'version':'training-prior-constrained-v3','survey_prior_used':False,'training_prior_used':prefs['destination']=='为我推荐','shadow_classifier_used':False,'criteria':['本人明确偏好','当前航班有效性与航司限制','预算优先','训练期城市关注先验仅作次级建议']}
     if prefs['preferred_attractions']:
         plan['personalization'].append('你选择的具体景点：'+'、'.join(prefs['preferred_attractions'])+'；优先作为行程候选，开放预约仍需核验。')
         scheduled=' '.join(b['activity'] for d in plan['daily_itinerary'] for b in d['blocks'])
@@ -183,6 +212,7 @@ def record_preferences(c,owner,prefs,expected_revision=None):
         c.execute('UPDATE personal_sessions SET revision=?,preferences=? WHERE owner=?',(revision,json.dumps(prefs,ensure_ascii=False),owner))
         c.execute('INSERT INTO personal_preferences(owner,revision,recorded_at,changed_fields,preferences) VALUES(?,?,?,?,?)',(owner,revision,now(),json.dumps(changed),json.dumps(prefs,ensure_ascii=False)))
         choice_evidence.event(c,owner,'modify',{'revision':revision,'changed_fields':changed})
+        real_travelers.record_preferences(c,owner,prefs,revision)
     return revision
 
 
@@ -193,29 +223,41 @@ def save_preferences(source,owner,body):
     return {'preferences':prefs,'revision':revision}
 
 
+def generate_content(plan,prefs):
+    import content_generation
+    if content_generation.configuration()['model_enabled']:
+        from personal_plan_generation import compose
+        return compose(plan,prefs)
+    return plan
+
+
 def create_plan(source,owner,body):
     prefs=validate(source,body.get('preferences',{}));plan=make_plan(source,prefs)
+    plan=generate_content(plan,prefs)
     with db() as c:
         c.execute('BEGIN IMMEDIATE');revision=record_preferences(c,owner,prefs,body.get('expected_revision'))
         plan.update({'id':'PERSONAL_'+uuid.uuid4().hex,'created_at':now(),'profile_revision':revision})
         c.execute('INSERT INTO personal_plans VALUES(?,?,?,?,?)',(plan['id'],owner,plan['created_at'],revision,json.dumps(plan,ensure_ascii=False)))
         choice_evidence.event(c,owner,'save_plan',{'plan_id':plan['id'],'profile_revision':revision,'booking':False})
+        real_travelers.record_event(c,owner,'plan_saved',plan['destination'],{'revision':revision})
         c.commit()
     return {'plan':plan,'preferences':prefs,'revision':revision}
 
 
 def get_plan(owner,plan_id):
     with db() as c:row=c.execute('SELECT payload FROM personal_plans WHERE id=? AND owner=?',(plan_id,owner)).fetchone()
-    if not row:raise ValueError('方案不存在或不属于当前浏览器')
+    if not row:raise ValueError('方案不存在或不属于当前账号')
     return json.loads(row[0])
 
 
 def delete_plan(owner,plan_id,body):
     if body.get('confirmed') is not True:raise ValueError('请确认删除此旅行方案')
     with db() as c:
+        original=c.execute('SELECT payload FROM personal_plans WHERE id=? AND owner=?',(plan_id,owner)).fetchone()
         deleted=c.execute('DELETE FROM personal_plans WHERE id=? AND owner=?',(plan_id,owner))
-        if deleted.rowcount!=1:raise ValueError('方案不存在或不属于当前浏览器')
+        if deleted.rowcount!=1:raise ValueError('方案不存在或不属于当前账号')
         choice_evidence.event(c,owner,'delete_plan',{'plan_id':plan_id,'rejection_label':False})
+        real_travelers.record_event(c,owner,'plan_deleted',json.loads(original['payload'])['destination'])
         c.commit()
     return state(owner)
 
@@ -224,11 +266,16 @@ def apply_flight_quote(owner,body):
     import flight_quotes
     if body.get('confirmed') is not True:raise ValueError('请确认报价与预算后保存')
     original=get_plan(owner,body['plan_id'])
+    if original['profile_revision']!=state(owner)['revision']:raise ValueError('偏好标签已更新，请重新生成方案')
     plan=flight_quotes.preview(owner,original,body)
     check=flight_constraint_check(plan)
     if not check['allowed']:raise ValueError('该候选不符合已选择的航程要求，请重新选择')
     plan['candidate_constraints']=check
     plan['recommendation_policy']='budget-preferred-v1'
+    import content_generation
+    if plan.get('ai_planning',{}).get('content_generated') and content_generation.configuration()['model_enabled']:
+        import local_generation
+        plan['ai_explanation']=local_generation.explain_trip(plan)
     with db() as c:
         c.execute('BEGIN IMMEDIATE')
         current=c.execute('SELECT revision FROM personal_sessions WHERE owner=?',(owner,)).fetchone()
@@ -239,10 +286,12 @@ def apply_flight_quote(owner,body):
         observation=flight_quotes.get(owner,body['query_id'])
         request_id=choice_evidence.exposure(c,owner,original,observation)
         choice_evidence.event(c,owner,'choose',{'saved_plan_id':plan['id'],'booking':False},request_id,int(body['option_index']))
+        real_travelers.record_event(c,owner,'flight_selected',plan['destination'],{'booking':False})
     return plan
 
 
 def preview_flight_quote(owner,original,body):
+    if original['profile_revision']!=state(owner)['revision']:raise ValueError('偏好标签已更新，请重新生成方案')
     plan=flight_quotes.preview(owner,original,body)
     observation=flight_quotes.get(owner,body['query_id'])
     with db() as c:
@@ -256,19 +305,24 @@ def flight_constraint_check(plan):
     live=plan.get('live_flights');violations=[];budget_violations=[]
     if not live:return {'allowed':False,'violations':['missing_current_quote']}
     option=live['option'];adults=live['adults'];budget=plan['budget']
+    if not airlines.matches_option(option,plan.get('preference_constraints',{})):violations.append('airline_preference')
     cap=budget.get('one_way_airfare_cap');total=budget.get('specified_total')
-    if cap is not None and max(option[leg]['price_cny']/adults for leg in ['outbound','inbound'])>cap:
+    leg_prices=[option[leg].get('price_cny') for leg in ['outbound','inbound']]
+    per_leg_known=all(p is not None for p in leg_prices)
+    one_way_unknown=cap is not None and not per_leg_known
+    if cap is not None and per_leg_known and max(leg_prices)/adults>cap:
         budget_violations.append('one_way_upper')
     if total is not None and (budget.get('estimated_total') is None or budget['estimated_total']>total):
         budget_violations.append('trip_upper')
     if plan.get('preference_constraints',{}).get('fallback_policy')=='只接受直飞' and any(len(option[leg]['segments'])>1 for leg in ['outbound','inbound']):
         violations.append('direct_only')
     return {'allowed':not violations,'violations':violations,'budget_violations':budget_violations,
-        'budget_status':'over_budget' if budget_violations else 'within_budget' if cap is not None or total is not None else 'unspecified',
+        'budget_status':'over_budget' if budget_violations else 'partially_verified' if one_way_unknown else 'within_budget' if cap is not None or total is not None else 'unspecified',
+        'one_way_budget_verified':not one_way_unknown,
         'budget_policy':'prefer','original_budget':{'trip':dict(budget.get('trip_budget_range',{'min':None,'max':total})),
             'one_way_airfare':dict(budget.get('one_way_airfare_range',{'min':None,'max':cap}))},
         'trip_budget_gap':max(0,(budget.get('estimated_total') or 0)-(total or float('inf'))),
-        'one_way_budget_gap':max(0,max(option[leg]['price_cny']/adults for leg in ['outbound','inbound'])-(cap or float('inf')))}
+        'one_way_budget_gap':max(0,max(leg_prices)/adults-(cap or float('inf'))) if per_leg_known else None}
 
 
 def reject_candidate(owner,body):
@@ -285,6 +339,7 @@ def reject_flight_quote(owner,original,body):
     with db() as c:
         request_id=choice_evidence.exposure(c,owner,original,observation)
         choice_evidence.explicit_rejection(c,owner,request_id,int(body['option_index']))
+        real_travelers.record_event(c,owner,'flight_rejected',original['destination'])
     return {'recorded':True}
 
 
@@ -303,14 +358,15 @@ def state(owner):
         row=c.execute('SELECT revision,preferences FROM personal_sessions WHERE owner=?',(owner,)).fetchone()
         plans=[json.loads(r[0]) for r in c.execute('SELECT payload FROM personal_plans WHERE owner=? ORDER BY created_at DESC LIMIT 20',(owner,))]
         history=[{'revision':r['revision'],'recorded_at':r['recorded_at'],'changed_fields':json.loads(r['changed_fields'])} for r in c.execute('SELECT revision,recorded_at,changed_fields FROM personal_preferences WHERE owner=? ORDER BY revision DESC LIMIT 10',(owner,))]
+        collection=real_travelers.consent_view(c,owner)
     return {'preferences':{**defaults(),**(json.loads(row['preferences']) if row['preferences'] else {})},'revision':row['revision'],
             'plans':[{'id':p['id'],'origin':p['origin'],'destination':p['destination'],'days':p['days'],'start_date':p['start_date'],'created_at':p['created_at'],'profile_revision':p['profile_revision']} for p in plans],
-            'latest_plan':plans[0] if plans else None,'profile_history':history}
+            'latest_plan':plans[0] if plans else None,'profile_history':history,'collection':collection}
 
 
 def bootstrap(source,owner):
     import content_generation
     network=planner.network(source)
-    return {**state(owner),'cities':sorted(network.outgoing),'destinations':sorted(planner.PLACES),'themes':THEMES,'parties':PARTIES,'paces':PACES,
-            'date_flexibilities':FLEXIBILITY,'lodging_priorities':LODGING,'fallback_policies':FALLBACKS,'overbudget_policies':OVERBUDGET,
+    return {**state(owner),'airlines':{code:names[0] for code,names in airlines.AIRLINES.items()},'cities':sorted(network.outgoing),'destinations':sorted(planner.PLACES),'themes':THEMES,'parties':PARTIES,'paces':PACES,
+            'date_flexibilities':FLEXIBILITY,'lodging_priorities':LODGING,'fallback_policies':FALLBACKS,'overbudget_policies':OVERBUDGET,'flight_budget_policies':FLIGHT_BUDGET_POLICIES,
             'attractions':{d:attraction_options(d) for d in planner.PLACES},'planning_stages':STAGES,'generation':content_generation.configuration()}

@@ -1,16 +1,13 @@
 {
   "project_name": "航旅智策——节假日航空智慧营销决策系统",
-  "framework_version": "4.2",
-  "updated_date": "2026-10-15",
-  "delivery_scope": "local_interactive_demo_and_trained_synthetic_models",
+  "framework_version": "4.4",
+  "updated_date": "2026-10-16",
+  "delivery_scope": "local_account_owned_profiles_and_consented_behavior_analysis",
   "scenario": {
-    "holiday": "2024国庆历史回放",
-    "start": "2024-10-01",
-    "end": "2024-10-07",
-    "origin_region": "模拟旅客常用出发城市（多城市）",
-    "destinations": "41个模拟目的地，按兴趣与历史航班筛选",
-    "decision_cutoff": "2024-09-30T23:59:59+08:00",
-    "other_holidays": "支持2024元旦、清明、五一、端午、中秋等历史场景"
+    "population": "consented_real_personal_accounts_with_stable_user_ids",
+    "dates": "traveler_confirmed_current_or_future_dates",
+    "destinations": "observed_real_interest_and_self_report",
+    "flight_policy": "user_selected_airlines_then_date_then_budget_fare"
   },
   "layers": [
     {
@@ -22,7 +19,11 @@
         "节假日",
         "用户行为",
         "营销反馈",
-        "自愿问卷补充与字段校验"
+        "自愿问卷补充与字段校验",
+        "真实画像共享同意与撤回",
+        "本站真实交互与去重热门目的地",
+        "固定用户编号与账号归属数据库",
+        "本站浏览操作与查询结果记录"
       ],
       "spec": "docs/data-contracts.md",
       "status": "local_full_dataset_index_and_provenance_checks"
@@ -35,7 +36,9 @@
         "动态画像",
         "航线推荐",
         "营销策略优化",
-        "个人偏好与预算约束规划"
+        "个人偏好与预算约束规划",
+        "自主航司与日期标签的字典序排序",
+        "真实客群意向阶段与趋势"
       ],
       "spec": "docs/algorithms.md",
       "status": "trained_full_10000_synthetic_travelers_time_split"
@@ -47,7 +50,9 @@
         "结构化事实引用",
         "个性化文案",
         "SVG视觉合成",
-        "受限结构化需求理解（默认规则，可选本地模型）"
+        "受限结构化需求理解（默认规则，可选本地模型）",
+        "本地模型整理完整个人旅行卡片",
+        "真实客群决策草稿"
       ],
       "spec": "docs/aigc.md",
       "status": "rules_and_templates_default_optional_local_qwen_structured_proposals"
@@ -59,10 +64,12 @@
         "个人旅客入口",
         "营销人员入口",
         "偏好版本与方案保存",
-        "需求澄清、工具预览与本人确认"
+        "需求澄清、工具预览与本人确认",
+        "个人注册登录与管理角色隔离",
+        "200账号客群分页筛选与匿名案例导出"
       ],
       "spec": "docs/application.md",
-      "status": "dual_entry_personal_planner_and_eight_page_marketing_demo"
+      "status": "dual_entry_consented_real_profiles_and_existing_eight_section_staff_workspace"
     },
     {
       "id": "evaluation",
@@ -81,13 +88,16 @@
     "backend": "Python标准库HTTP服务及SQLite",
     "frontend": "原生HTML/CSS/JavaScript",
     "entry": "航旅智策应用/server.py",
-    "local_model": "Qwen3.5-9B-Q4_K_M，Unsloth量化，llama.cpp CUDA",
+    "local_model": "默认发布Qwen3.5-9B；本机显式复用Qwen3-4B，AMD Vulkan",
     "framework_selection": "implemented_local_demo"
   },
   "data_kinds": [
     "historical_flights",
     "synthetic",
-    "optional_private_self_report_supplement"
+    "optional_private_self_report_supplement",
+    "consented_real_preferences",
+    "real_onsite_events",
+    "current_flight_observations"
   ],
   "live_marketing_enabled": false,
   "paid_model_calls_enabled": false,
@@ -109,5 +119,14 @@
     "website": "current Google Flights observations only; explicit HTTPS proxy; no historical-price fallback",
     "storage": "runtime/flight_quotes.sqlite3 append-only observations including empty and failed attempts",
     "source_commit": "7adb330fc167029e5874799e26c36c25aba019e9"
+  },
+  "offline_evaluation_scenario": {
+    "holiday": "2024国庆历史回放",
+    "start": "2024-10-01",
+    "end": "2024-10-07",
+    "origin_region": "模拟旅客常用出发城市（多城市）",
+    "destinations": "41个模拟目的地，按兴趣与历史航班筛选",
+    "decision_cutoff": "2024-09-30T23:59:59+08:00",
+    "other_holidays": "支持2024元旦、清明、五一、端午、中秋等历史场景"
   }
 }

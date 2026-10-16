@@ -3,9 +3,15 @@ $taskModelRecord = Join-Path $PSScriptRoot 'runtime\local_aigc\process.json'
 if (Test-Path -LiteralPath $taskModelRecord) {
     $taskModelInfo = Get-Content -LiteralPath $taskModelRecord -Raw | ConvertFrom-Json
     $taskModelAllowed = @((Join-Path $PSScriptRoot 'runtime\local_aigc\llama\llama-server.exe'), (Join-Path $PSScriptRoot 'runtime\local_aigc\llama-cuda\llama-server.exe'))
+    $taskActiveProfile = Join-Path $PSScriptRoot 'runtime\local_aigc\active_model.json'
+    if (Test-Path -LiteralPath $taskActiveProfile) {
+        $taskActiveModel = Get-Content -LiteralPath $taskActiveProfile -Raw | ConvertFrom-Json
+        if ($taskModelInfo.model_file -eq $taskActiveModel.model_file) { $taskModelAllowed += $taskActiveModel.executable }
+    }
     $taskModelProc = Get-CimInstance Win32_Process -Filter "ProcessId=$($taskModelInfo.pid)" -ErrorAction SilentlyContinue
     if ($taskModelProc) {
-        if ($taskModelInfo.exe -notin $taskModelAllowed -or $taskModelProc.ExecutablePath -ne $taskModelInfo.exe) {
+        if ($taskModelInfo.exe -notin $taskModelAllowed -or $taskModelProc.ExecutablePath -ne $taskModelInfo.exe -or
+            ($taskModelInfo.model_file -and -not $taskModelProc.CommandLine.Contains($taskModelInfo.model_file))) {
             throw 'Local model PID belongs to another process; no action taken.'
         }
         Stop-Process -Id $taskModelInfo.pid
