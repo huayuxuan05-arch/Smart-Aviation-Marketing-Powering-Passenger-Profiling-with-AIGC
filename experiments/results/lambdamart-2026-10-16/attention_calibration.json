@@ -1,0 +1,163 @@
+{
+  "protocol": {
+    "event": "future 7 days same city >=2 searches",
+    "source": "synthetic attention only",
+    "model": "frozen production attention classifier, fixed sigmoid on clipped logit",
+    "calibration_users": 2000,
+    "validation_used_for_fitting": true,
+    "calibration_dates": [
+      "2026-07-17",
+      "2026-08-16",
+      "2026-09-15"
+    ],
+    "fresh_assessment_users": 2000,
+    "fresh_seed": 20261106,
+    "assessment_dates": [
+      "2026-08-09",
+      "2026-09-08",
+      "2026-10-08"
+    ],
+    "metrics": [
+      "Brier",
+      "log loss",
+      "10 equal-width bins ECE"
+    ],
+    "interpretation": "not probability of booking, adopting or responding to marketing",
+    "online_scores_changed": false,
+    "original_sha256": "e729fccdac96dd149880fce00f2bdc39500b41e663683490688aafed92a58bf3"
+  },
+  "metrics": {
+    "uncalibrated": {
+      "brier": 0.007176559713642536,
+      "log_loss": 0.03294607517757578,
+      "ece_10_bins": 0.006524785987602539
+    },
+    "sigmoid": {
+      "brier": 0.0070509067571902315,
+      "log_loss": 0.03160687741755148,
+      "ece_10_bins": 0.002488187270968897
+    }
+  },
+  "positive_rate": 0.03039837398373984,
+  "candidate_events": 246000,
+  "paired_user_brier_improvement": 0.00012565295645230434,
+  "ci95": [
+    9.36132157993319e-05,
+    0.00015900249824771722
+  ],
+  "monotonic_rank_preserved": true,
+  "online_scores_changed": false,
+  "assessment_manifest": {
+    "version": "annual-independent-v1",
+    "seed": 20261106,
+    "split": "calibration_assessment_v1",
+    "anchor": "2026-10-16",
+    "users": 2000,
+    "behavior_days": 365,
+    "behavior_rows": 730000,
+    "behavior_start": "2025-10-16",
+    "behavior_end": "2026-10-15",
+    "candidate_destinations": [
+      "三亚",
+      "上海",
+      "丽江",
+      "乌鲁木齐",
+      "兰州",
+      "北京",
+      "南京",
+      "南宁",
+      "南昌",
+      "厦门",
+      "合肥",
+      "呼和浩特",
+      "哈尔滨",
+      "大连",
+      "天津",
+      "太原",
+      "广州",
+      "张家界",
+      "成都",
+      "拉萨",
+      "昆明",
+      "杭州",
+      "桂林",
+      "武汉",
+      "沈阳",
+      "济南",
+      "海口",
+      "深圳",
+      "石家庄",
+      "福州",
+      "苏州",
+      "西双版纳",
+      "西宁",
+      "西安",
+      "贵阳",
+      "郑州",
+      "重庆",
+      "银川",
+      "长春",
+      "长沙",
+      "青岛"
+    ],
+    "scenarios": {
+      "逐步迁移": 334,
+      "预算变化": 333,
+      "稳定关注": 334,
+      "多目的地比较": 333,
+      "广泛探索": 333,
+      "临近出游变化": 333
+    },
+    "original_user_overlap": 0,
+    "source": "independently simulated; no copied original behavior rows",
+    "holiday_source": "https://www.beijing.gov.cn/cs/gncs/zcwj/202603/t20260327_4568275.html",
+    "route_scope": [
+      [
+        "北京",
+        "杭州"
+      ],
+      [
+        "上海",
+        "成都"
+      ],
+      [
+        "广州",
+        "西安"
+      ],
+      [
+        "深圳",
+        "厦门"
+      ],
+      [
+        "成都",
+        "三亚"
+      ],
+      [
+        "北京",
+        "重庆"
+      ],
+      [
+        "广州",
+        "上海"
+      ],
+      [
+        "上海",
+        "北京"
+      ]
+    ],
+    "flight_scope": "8 representative domestic routes × 2 departure dates × 2 trip lengths; shared queries, not 10000 independent flight observations",
+    "original_model_sha256": "e729fccdac96dd149880fce00f2bdc39500b41e663683490688aafed92a58bf3",
+    "files": {
+      "users.jsonl": {
+        "sha256": "08904c56af31b642e8a79e2842fa84091ee95add1d9844693c9dc63824af3634",
+        "bytes": 866509
+      },
+      "behavior_arrays.npz": {
+        "sha256": "f1eb76dca852116de57e6eda35d2606070662aae966e3989eea5d1d627b405d5",
+        "bytes": 6924201
+      }
+    }
+  },
+  "calibrator_sha256": "aa9542fa95d7d6fa686025c63ee1a9fed13afffc006261931f634529060fcf06",
+  "original_unchanged": true
+}

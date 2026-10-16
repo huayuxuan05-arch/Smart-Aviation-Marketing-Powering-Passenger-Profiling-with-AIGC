@@ -1,0 +1,9 @@
+{
+  "status": "insufficient_explicit_labels",
+  "training_performed": false,
+  "online_weights_replaced": false,
+  "observed_paired_requests": 0,
+  "observed_owners": 0,
+  "required_owners": 50,
+  "required_paired_requests": 100
+}

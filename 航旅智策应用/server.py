@@ -136,8 +136,9 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     with connect() as c:plan=planner.make_plan(c,body['user_id'],body.get('settings',{}))
                 if tail=='queries':return self.send_json(flights.submit(owner,plan,body),202)
-                if tail=='preview':return self.send_json(flights.preview(owner,plan,body))
+                if tail=='preview':return self.send_json(personal.preview_flight_quote(owner,plan,body) if owner!='marketing' else flights.preview(owner,plan,body))
                 if tail=='apply' and owner!='marketing':return self.send_json(personal.apply_flight_quote(owner,body),201)
+                if tail=='reject' and owner!='marketing':return self.send_json(personal.reject_flight_quote(owner,plan,body))
                 return self.send_json({'error':'接口不存在'},404)
             if path.startswith('/api/personal/'):
                 if not isinstance(body,dict):raise ValueError('请求参数须为对象')
@@ -146,6 +147,7 @@ class Handler(BaseHTTPRequestHandler):
                 with connect() as c:
                     if tail=='preferences':return self.send_json(personal.save_preferences(c,owner,body))
                     if tail=='plans':return self.send_json(personal.create_plan(c,owner,body),201)
+                    if tail=='feedback/reject':return self.send_json(personal.reject_candidate(owner,body))
                     if tail=='assistant/drafts':return self.send_json(assistant.create(c,owner,body),201)
                     parts=tail.split('/')
                     if len(parts)==4 and parts[:2]==['assistant','drafts']:

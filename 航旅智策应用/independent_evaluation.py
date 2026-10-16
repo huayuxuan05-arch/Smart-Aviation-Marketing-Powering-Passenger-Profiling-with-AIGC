@@ -203,7 +203,7 @@ def collect_flights(root):
         try:
             result=flights._search(query)
             return key,dict(id='EVAL_'+uuid.uuid4().hex,query_key=key,requested_at=started,
-                finished_at=flights.now(),status='success' if result['options'] else 'empty',query=query,result=result)
+                finished_at=flights.now(),status=flights.result_status(result),query=query,result=result)
         except Exception as exc:
             return key,dict(id='EVAL_'+uuid.uuid4().hex,query_key=key,requested_at=started,
                 finished_at=flights.now(),status='failed',query=query,error_code=type(exc).__name__)

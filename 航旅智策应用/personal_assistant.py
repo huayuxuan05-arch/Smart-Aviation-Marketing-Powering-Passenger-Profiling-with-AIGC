@@ -227,6 +227,7 @@ def confirm(source,owner,draft_id,body):
             plan=view['preview'];plan.update({'id':'PERSONAL_'+uuid.uuid4().hex,'created_at':personal.now(),'profile_revision':revision,
                 'assistant_provenance':{'draft_id':draft_id,'kind':payload['kind'],'engine':payload['engine'],'confirmed':True}})
             c.execute('INSERT INTO personal_plans VALUES(?,?,?,?,?)',(plan['id'],owner,plan['created_at'],revision,json.dumps(plan,ensure_ascii=False)));result['plan']=plan
+            personal.choice_evidence.event(c,owner,'save_plan',{'plan_id':plan['id'],'profile_revision':revision,'booking':False,'source':'assistant_confirmation'})
         payload['status']='confirmed';payload['confirmed_at']=personal.now();payload['confirmed_revision']=revision
         c.execute('UPDATE personal_assistant_drafts SET status=?,payload=? WHERE id=? AND owner=?',('confirmed',json.dumps(payload,ensure_ascii=False),draft_id,owner));c.commit()
     return result
@@ -238,4 +239,5 @@ def cancel(owner,draft_id,body):
         if payload['status']!='pending':raise ValueError('需求草稿已处理')
         if body.get('version')!=payload['version']:raise ValueError('草稿已更新，请重新查看')
         c.execute('UPDATE personal_assistant_drafts SET status=? WHERE id=? AND owner=?',('cancelled',draft_id,owner));c.commit()
+        personal.choice_evidence.event(c,owner,'discard_draft',{'draft_id':draft_id,'rejection_label':False});c.commit()
     return {'status':'cancelled'}

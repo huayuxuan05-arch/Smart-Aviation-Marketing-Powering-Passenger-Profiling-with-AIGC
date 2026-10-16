@@ -1,0 +1,3 @@
+# Optional offline experiments. The website does not require this package.
+-r requirements.txt
+xgboost==3.4.1

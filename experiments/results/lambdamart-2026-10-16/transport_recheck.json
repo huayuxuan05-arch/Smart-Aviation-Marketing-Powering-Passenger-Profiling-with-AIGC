@@ -1,0 +1,21 @@
+[
+  {
+    "origin": "CTU",
+    "destination": "PVG",
+    "date": "2026-10-27",
+    "adults": 1,
+    "observed_at": "2026-10-16T01:22:57+00:00",
+    "currency": "CNY",
+    "response_meta": {
+      "http_status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "bytes": 325
+    },
+    "upstream_rpc_code": 13,
+    "status": "failed",
+    "error_code": "ValueError",
+    "error_stage": "upstream_rpc",
+    "finished_at": "2026-10-16T01:23:00+00:00",
+    "option_count": 0
+  }
+]

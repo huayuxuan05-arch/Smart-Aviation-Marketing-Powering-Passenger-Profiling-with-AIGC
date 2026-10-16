@@ -1,0 +1,142 @@
+{
+  "query_snapshots": 24,
+  "statuses": {
+    "success": 20,
+    "empty": 4
+  },
+  "routes": [
+    [
+      "武汉",
+      "上海"
+    ],
+    [
+      "杭州",
+      "西安"
+    ],
+    [
+      "西安",
+      "厦门"
+    ],
+    [
+      "重庆",
+      "广州"
+    ],
+    [
+      "南京",
+      "成都"
+    ],
+    [
+      "长沙",
+      "北京"
+    ]
+  ],
+  "departure_dates": [
+    "2026-11-06",
+    "2026-11-13"
+  ],
+  "days": [
+    3,
+    5
+  ],
+  "collected_at": "2026-10-16T00:53:59+00:00",
+  "unique_queries": 24,
+  "users": 0,
+  "artifacts": {
+    "query_000.json": {
+      "sha256": "815631ddee6e74a3aa5b16a27126befabeac9170c85ae20f776777251e800fc9",
+      "bytes": 830108
+    },
+    "query_001.json": {
+      "sha256": "c87a8540e6afb342ad6ed417431f900f194c2ce0ecbc845fcc73693696bd38c2",
+      "bytes": 1446787
+    },
+    "query_002.json": {
+      "sha256": "fb232df04c09f9016f14f2f417c9e91b96d635c1bc9606e57b3551db85ba5ebd",
+      "bytes": 1263765
+    },
+    "query_003.json": {
+      "sha256": "7277904cd33b5c4429b7fbc9b05a19e871a3bcd786b6daaa86c111ac6c730b3d",
+      "bytes": 1287056
+    },
+    "query_004.json": {
+      "sha256": "fb28a0caaeda78458e05b30ffc102a92205dc0a0e38b27e71bae527a6d66ada3",
+      "bytes": 946393
+    },
+    "query_005.json": {
+      "sha256": "2ee1a5a56ddac186ec031a37a2503e23241a42ceda2a12c2ae10e8a4d23d07c0",
+      "bytes": 849367
+    },
+    "query_006.json": {
+      "sha256": "3edba29a5ee5df6a7f80de71ef1c6753b4185d4cc505995bbefaa8f837d53836",
+      "bytes": 945104
+    },
+    "query_007.json": {
+      "sha256": "8345cfa8c90542547c880726fb7648162ede7a4725575d8e585dcf6d9adbbdad",
+      "bytes": 830808
+    },
+    "query_008.json": {
+      "sha256": "8afad0dc8ae146047d95d09932c51252c8da39c1e7289bfa06f8736ca6fc7857",
+      "bytes": 855071
+    },
+    "query_009.json": {
+      "sha256": "4761f94ba2a328a081a8b488d55153e6a764e3f2c17458a14eb1efa04ed85f9c",
+      "bytes": 874041
+    },
+    "query_010.json": {
+      "sha256": "5e6d4daa248aacd42fc746dac50a47caf991d605ab3906d4e229a5f5409aadb6",
+      "bytes": 864533
+    },
+    "query_011.json": {
+      "sha256": "7608285f0700d261a167e82ea6c91ac1a2e9309ded9060b556c06e6d1eef025a",
+      "bytes": 455511
+    },
+    "query_012.json": {
+      "sha256": "5c3bb3023ee1e0028d4f4c78acc2fab35cfd24eb6bc09bef3145ecb417a7747a",
+      "bytes": 978895
+    },
+    "query_013.json": {
+      "sha256": "267107194fb98325b40efc920380ab7c4138b7995ba96122d464031842fba600",
+      "bytes": 1039659
+    },
+    "query_014.json": {
+      "sha256": "36c66c55c0ab3ffce922f57a7bf75d951557173a13dd3df8561915c4221dae28",
+      "bytes": 535925
+    },
+    "query_015.json": {
+      "sha256": "b287e4854b364cc070ce594a722e0e8078ae3e61b89f99310c2a37926784914e",
+      "bytes": 1074268
+    },
+    "query_016.json": {
+      "sha256": "f0c38a90c56b42c536e16b51d1c426926c83ffed1ab9f31c6f19cede2ae97346",
+      "bytes": 1254218
+    },
+    "query_017.json": {
+      "sha256": "69cbedcb4b987d32417e891f321eab1a5ae224562e307dacc44393c9571fab92",
+      "bytes": 433542
+    },
+    "query_018.json": {
+      "sha256": "4495e846abf185c1c3604ac88fe64e353b5f70be11cd7a46565cb0caa07e95c8",
+      "bytes": 3167
+    },
+    "query_019.json": {
+      "sha256": "fd918773cf88acc88f75926e07021fa07830772bb9a001c77bfbe4fd85d0aeea",
+      "bytes": 2815
+    },
+    "query_020.json": {
+      "sha256": "73d9a2c630e2f543ca173cd0079ea3ccac40be7a21d0d0d81fa098ecf2723c8c",
+      "bytes": 1726649
+    },
+    "query_021.json": {
+      "sha256": "d0b760c0b3ea9c4464899b08da334e99c2be023733587c5f953b13454b8b6ac5",
+      "bytes": 1084433
+    },
+    "query_022.json": {
+      "sha256": "09d236a30f6e6842583aeb3df34622a30c5123c9800e2600537e4c3d82e033bd",
+      "bytes": 1096634
+    },
+    "query_023.json": {
+      "sha256": "76b319f84726f0e802f48f8d5fa51c1b39f7bb1e020038db32155970688ddc56",
+      "bytes": 1687648
+    }
+  }
+}

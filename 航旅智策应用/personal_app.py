@@ -12,6 +12,7 @@ from data_layer import RUNTIME, ClosingConnection, CST
 import travel_planner as planner
 import survey_evidence as evidence
 import flight_quotes
+import travel_choice_evidence as choice_evidence
 
 THEMES=['城市初访','自然与景区','舒适休闲','交通与预算','文化与攻略']
 PARTIES=['独行','情侣','朋友','亲子','长者同行']
@@ -35,6 +36,7 @@ def db():
     CREATE TABLE IF NOT EXISTS personal_preferences(id INTEGER PRIMARY KEY,owner TEXT,revision INTEGER,recorded_at TEXT,changed_fields TEXT,preferences TEXT);
     CREATE TABLE IF NOT EXISTS personal_plans(id TEXT PRIMARY KEY,owner TEXT,created_at TEXT,profile_revision INTEGER,payload TEXT);
     CREATE INDEX IF NOT EXISTS personal_plan_owner ON personal_plans(owner,created_at);''')
+    choice_evidence.initialize(c)
     c.commit();return c
 
 
@@ -173,6 +175,7 @@ def record_preferences(c,owner,prefs,expected_revision=None):
         revision+=1
         c.execute('UPDATE personal_sessions SET revision=?,preferences=? WHERE owner=?',(revision,json.dumps(prefs,ensure_ascii=False),owner))
         c.execute('INSERT INTO personal_preferences(owner,revision,recorded_at,changed_fields,preferences) VALUES(?,?,?,?,?)',(owner,revision,now(),json.dumps(changed),json.dumps(prefs,ensure_ascii=False)))
+        choice_evidence.event(c,owner,'modify',{'revision':revision,'changed_fields':changed})
     return revision
 
 
@@ -188,7 +191,9 @@ def create_plan(source,owner,body):
     with db() as c:
         c.execute('BEGIN IMMEDIATE');revision=record_preferences(c,owner,prefs,body.get('expected_revision'))
         plan.update({'id':'PERSONAL_'+uuid.uuid4().hex,'created_at':now(),'profile_revision':revision})
-        c.execute('INSERT INTO personal_plans VALUES(?,?,?,?,?)',(plan['id'],owner,plan['created_at'],revision,json.dumps(plan,ensure_ascii=False)));c.commit()
+        c.execute('INSERT INTO personal_plans VALUES(?,?,?,?,?)',(plan['id'],owner,plan['created_at'],revision,json.dumps(plan,ensure_ascii=False)))
+        choice_evidence.event(c,owner,'save_plan',{'plan_id':plan['id'],'profile_revision':revision,'booking':False})
+        c.commit()
     return {'plan':plan,'preferences':prefs,'revision':revision}
 
 
@@ -203,6 +208,7 @@ def delete_plan(owner,plan_id,body):
     with db() as c:
         deleted=c.execute('DELETE FROM personal_plans WHERE id=? AND owner=?',(plan_id,owner))
         if deleted.rowcount!=1:raise ValueError('方案不存在或不属于当前浏览器')
+        choice_evidence.event(c,owner,'delete_plan',{'plan_id':plan_id,'rejection_label':False})
         c.commit()
     return state(owner)
 
@@ -219,7 +225,36 @@ def apply_flight_quote(owner,body):
             raise ValueError('偏好已在另一个页面更新，请刷新后重试')
         plan.update(id='PERSONAL_'+uuid.uuid4().hex,created_at=now(),parent_plan_id=original['id'])
         c.execute('INSERT INTO personal_plans VALUES(?,?,?,?,?)',(plan['id'],owner,plan['created_at'],plan['profile_revision'],json.dumps(plan,ensure_ascii=False)))
+        observation=flight_quotes.get(owner,body['query_id'])
+        request_id=choice_evidence.exposure(c,owner,original,observation)
+        choice_evidence.event(c,owner,'choose',{'saved_plan_id':plan['id'],'booking':False},request_id,int(body['option_index']))
     return plan
+
+
+def preview_flight_quote(owner,original,body):
+    plan=flight_quotes.preview(owner,original,body)
+    observation=flight_quotes.get(owner,body['query_id'])
+    with db() as c:
+        request_id=choice_evidence.exposure(c,owner,original,observation)
+        choice_evidence.event(c,owner,'preview',{},request_id,int(body['option_index']))
+    return {**plan,'choice_request_id':request_id}
+
+
+def reject_candidate(owner,body):
+    if body.get('confirmed') is not True:raise ValueError('请明确确认不接受该候选方案')
+    with db() as c:choice_evidence.explicit_rejection(c,owner,body['request_id'],body['candidate_index'])
+    return {'recorded':True}
+
+
+def reject_flight_quote(owner,original,body):
+    if body.get('confirmed') is not True:raise ValueError('请明确确认不接受该候选方案')
+    # Ownership, date/query identity, freshness and index are checked before logging.
+    flight_quotes.preview(owner,original,body)
+    observation=flight_quotes.get(owner,body['query_id'])
+    with db() as c:
+        request_id=choice_evidence.exposure(c,owner,original,observation)
+        choice_evidence.explicit_rejection(c,owner,request_id,int(body['option_index']))
+    return {'recorded':True}
 
 
 def explain(owner,plan_id):

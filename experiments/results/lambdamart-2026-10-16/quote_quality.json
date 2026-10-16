@@ -1,0 +1,12 @@
+{
+  "errors": {
+    "ValueError": 191
+  },
+  "leg_statuses": {
+    "success": 207,
+    "empty": 10,
+    "failed": 191
+  },
+  "empty_is_not_no_flight": true,
+  "method": "same immutable 72-query batch, metadata-only diagnosis"
+}

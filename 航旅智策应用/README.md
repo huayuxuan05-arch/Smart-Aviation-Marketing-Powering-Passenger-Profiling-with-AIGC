@@ -102,3 +102,8 @@
 `independent_cohort.py`生成新的全年模拟用户，`independent_evaluation.py`读取明确传入的数据与日历，原2024索引和模型保持不变。`new_method_evaluation.py`在独立开发用户上训练成对排序与梯度提升，再用另建确认用户评价；`constraint_planner.py`先筛选航班与预算可行性，`feasibility_benchmark.py`对照实际采集的日期/目的地备选。新方法目前作为独立评估流程，网站不会因执行评估而切换数据源或覆盖模型。
 
 数据、指标、局限及重现命令见[独立年度测试](../docs/independent-evaluation-2026-10-16.md)。新增专项：`python -m unittest test_independent_evaluation test_constraint_planner -v`。原始航班响应与大数据文件保存在runtime，不提交Git；SHA256与版本见distribution独立数据清单。
+## 2026-10-16 行程级排序与反馈
+
+候选航班增加“不考虑”，比较预算、明确确认保存、修改偏好、删除方案和放弃草稿分别保留本地操作事件；未选中候选保持未标注。模型训练只采用满足硬约束的显式选择/拒绝配对，样本不足则返回就绪检查，不自动部署。数据存于现有`runtime/personal.sqlite3`新增证据表，不回填旧方案。
+
+已用22,000名模拟用户完成LambdaMART开发，并在新的10,000名用户上测试；提升尚未通过替换门槛。另完成关注事件校准和96组新航班查询。可选实验安装`requirements-experiments.txt`，不会成为网站必需依赖。结果和复现说明见[本轮验收](../docs/lambdamart-2026-10-16.md)。

@@ -68,7 +68,7 @@ def collect(root):
         def one(key,q):
             value=dict(id='ALT_'+uuid.uuid4().hex,query_key=key,query=q,requested_at=flights.now())
             try:
-                result=flights._search(q);value.update(result=result,status='success' if result['options'] else 'empty')
+                result=flights._search(q);value.update(result=result,status=flights.result_status(result))
             except Exception as exc:value.update(status='failed',error_code=type(exc).__name__)
             value['finished_at']=flights.now();return key,value
         pending=[pool.submit(one,key,q) for key,q in queries.items()];counts=Counter()

@@ -18,6 +18,8 @@ let server,servingPid;function stop(){if(servingPid){try{process.kill(servingPid
   assert.deepEqual(await page.locator('[data-live-action=preview]').evaluateAll(buttons=>buttons.map(b=>b.dataset.option)),['0','2','3']);pass('One shared outbound is displayed once; three different returns survive source deduplication with original quote indices');
   const first=(await (await context.request.get(base+'/api/personal/state')).json()).latest_plan;
   await page.locator('[data-flight-adults]').selectOption('2');await page.waitForFunction(()=>document.querySelector('.current-flight-total')?.textContent.includes('2名成人'));
+  await page.locator('[data-live-action=reject][data-option="3"]').click();await page.waitForFunction(()=>document.querySelector('[data-live-action=reject][data-option="3"]')?.textContent==='已排除');
+  assert.equal((await (await context.request.get(base+'/api/personal/state')).json()).plans.length,1);pass('Explicitly rejecting an itinerary records the action and leaves saved plans and other choices intact');
   await page.locator('[data-live-action=preview][data-option="2"]').click();await page.locator('[data-flight-confirm]').waitFor();assert.equal(await page.locator('[data-live-action=apply]').isDisabled(),true);
   assert.equal((await (await context.request.get(base+'/api/personal/state')).json()).plans.length,1);pass('Two-adult quotation previews per-adult budget without changing the saved plan');
   await page.locator('[data-flight-confirm]').check();await page.locator('[data-live-action=apply]').click();await page.locator('.current-flight-selected').waitFor();

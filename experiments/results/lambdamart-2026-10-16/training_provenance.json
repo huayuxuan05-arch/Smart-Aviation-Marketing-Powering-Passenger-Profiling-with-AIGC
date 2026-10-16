@@ -1,0 +1,48 @@
+{
+  "sources": [
+    {
+      "source": "original",
+      "users": 10000,
+      "cutoffs": [
+        "2024-02-15",
+        "2024-04-15",
+        "2024-06-15"
+      ],
+      "sha256": "0877bae32954a769f0c7b0e763a26f55cb8b5cc46e39011902e74663ef3d08d8"
+    },
+    {
+      "source": "training",
+      "users": 4000,
+      "cutoffs": [
+        "2026-02-17",
+        "2026-04-18",
+        "2026-06-17"
+      ],
+      "sha256": "f1332ecd734046ed59758239726563a0c89a26e52ddcd1f4a98ad122b77b1842"
+    },
+    {
+      "source": "test",
+      "users": 4000,
+      "cutoffs": [
+        "2026-02-17",
+        "2026-04-18",
+        "2026-06-17"
+      ],
+      "sha256": "f7a8071fff3f66eceb5ee4373424d2e878842e18a45ca62380fea11087fed806"
+    },
+    {
+      "source": "confirmation",
+      "users": 4000,
+      "cutoffs": [
+        "2026-02-17",
+        "2026-04-18",
+        "2026-06-17"
+      ],
+      "sha256": "b0175887a8b9373d89bf4239f465e0db1a3b314bf60d6150f6752cdcc621b8b4"
+    }
+  ],
+  "users": 22000,
+  "query_groups": 66000,
+  "pair_rows": 2706000,
+  "feature_count": 36
+}

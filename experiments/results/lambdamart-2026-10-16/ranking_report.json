@@ -1,0 +1,468 @@
+{
+  "protocol": {
+    "version": "lambdamart-v1",
+    "anchor": "2026-10-16",
+    "features": [
+      "近7天关注占比",
+      "近30天关注占比",
+      "近60天关注占比",
+      "14天衰减关注占比",
+      "最近关注距今天数",
+      "重复访问占比",
+      "收藏对象数",
+      "目的地信息占比",
+      "景区内容占比",
+      "酒店内容占比",
+      "机票查询占比",
+      "攻略内容占比",
+      "目的地停留强度",
+      "近期关注变化",
+      "明确假期计划占比",
+      "明确出行计划占比",
+      "近期预算均值",
+      "预算证据数",
+      "全局机票查询占比",
+      "全局攻略访问占比",
+      "全局重复访问占比",
+      "当前假期临近度",
+      "用户内容停留强度",
+      "近1天关注",
+      "近3天关注",
+      "近14天关注",
+      "近90天关注",
+      "3天衰减关注",
+      "7天衰减关注",
+      "28天衰减关注",
+      "7天关注熵",
+      "30天关注熵",
+      "7天主次差距",
+      "30天主次差距",
+      "7天与30天分布变化",
+      "7天预算相对30天变化"
+    ],
+    "target": "future seven days same-city >=2 searches; synthetic attention, not plan adoption",
+    "development_sources": [
+      "original 2024 first-half cutoffs, 10000 users",
+      "training, test and confirmation cohorts: seeded 4000 users each"
+    ],
+    "previous_test_role": "test and confirmation were already inspected; explicitly reused for development",
+    "new_training_dates": [
+      "2026-02-17",
+      "2026-04-18",
+      "2026-06-17"
+    ],
+    "original_training_dates": [
+      "2024-02-15",
+      "2024-04-15",
+      "2024-06-15"
+    ],
+    "validation_dates": [
+      "2026-07-17",
+      "2026-08-16",
+      "2026-09-15"
+    ],
+    "validation_users": 2000,
+    "fresh_holdout": {
+      "split": "lambda_holdout_v1",
+      "users": 10000,
+      "seed": 20261066,
+      "dates": [
+        "2026-08-09",
+        "2026-09-08",
+        "2026-10-08"
+      ]
+    },
+    "trials": {
+      "LambdaMART浅树": {
+        "max_depth": 3,
+        "n_estimators": 100,
+        "lambdarank_pair_method": "topk"
+      },
+      "LambdaMART深树": {
+        "max_depth": 5,
+        "n_estimators": 160,
+        "lambdarank_pair_method": "topk"
+      },
+      "LambdaMART随机配对": {
+        "max_depth": 4,
+        "n_estimators": 140,
+        "lambdarank_pair_method": "mean"
+      }
+    },
+    "objective": "rank:ndcg",
+    "qid": "passenger x cutoff, all 41 cities",
+    "selection": "validation NDCG@3 maximum; Recall floor original minus 0.005",
+    "promotion": "selected learned model: NDCG improvement >=0.005 and CI lower >0 against BOTH frozen model and validation-selected rule; Recall no worse than frozen by 0.005",
+    "quote_temporal_policy": "current quotes only in prospective feasibility/features; never backfilled into past training snapshots",
+    "original_model_sha256": "e729fccdac96dd149880fce00f2bdc39500b41e663683490688aafed92a58bf3",
+    "xgboost": "3.4.1",
+    "runtime": "CPU 6 threads; preserve local Qwen GPU; no paid model"
+  },
+  "selection": {
+    "selected": "LambdaMART随机配对",
+    "strongest_validation_rule": "14天衰减",
+    "validation": {
+      "原冻结模型": {
+        "recall_at_3": 0.9204398447606728,
+        "ndcg_at_3": 0.9083785089593791,
+        "eligible_snapshots": 5411,
+        "no_relevant_snapshots": 589
+      },
+      "近30天频次": {
+        "recall_at_3": 0.9245056366660507,
+        "ndcg_at_3": 0.9103954812885482,
+        "eligible_snapshots": 5411,
+        "no_relevant_snapshots": 589
+      },
+      "14天衰减": {
+        "recall_at_3": 0.9250600628349658,
+        "ndcg_at_3": 0.9116824595005307,
+        "eligible_snapshots": 5411,
+        "no_relevant_snapshots": 589
+      },
+      "近7天频次": {
+        "recall_at_3": 0.896445512228177,
+        "ndcg_at_3": 0.8842584949565845,
+        "eligible_snapshots": 5411,
+        "no_relevant_snapshots": 589
+      },
+      "短期变化规则": {
+        "recall_at_3": 0.9160044354093513,
+        "ndcg_at_3": 0.9048268168967148,
+        "eligible_snapshots": 5411,
+        "no_relevant_snapshots": 589
+      },
+      "LambdaMART浅树": {
+        "recall_at_3": 0.9252448715579376,
+        "ndcg_at_3": 0.9135426804513582,
+        "eligible_snapshots": 5411,
+        "no_relevant_snapshots": 589
+      },
+      "LambdaMART深树": {
+        "recall_at_3": 0.9246904453890223,
+        "ndcg_at_3": 0.9124618099013814,
+        "eligible_snapshots": 5411,
+        "no_relevant_snapshots": 589
+      },
+      "LambdaMART随机配对": {
+        "recall_at_3": 0.9263537238957679,
+        "ndcg_at_3": 0.9144199257084338,
+        "eligible_snapshots": 5411,
+        "no_relevant_snapshots": 589
+      }
+    },
+    "training_seconds": {
+      "LambdaMART浅树": 6.27,
+      "LambdaMART深树": 11.81,
+      "LambdaMART随机配对": 16.77
+    },
+    "protocol_sha256": "71b0861a20e259920398681f69cb2102cf9ae5baf385c8eb74892990fc6580e8",
+    "artifacts": {
+      "ranker_0.ubj": "729c9864ce6b1b12415639b5f6401d982201e9b46f705236d8ba79360000c80e",
+      "ranker_1.ubj": "a53bb95fb5ccccebecbacb434a4757fbf3b2ec893f6046d03be46a4fdb4aed75",
+      "ranker_2.ubj": "89136ca87dfd21a50cd184aac0cd575cc44978767b40bbfb36af3031bae29b6e"
+    }
+  },
+  "holdout_manifest": {
+    "version": "annual-independent-v1",
+    "seed": 20261066,
+    "split": "lambda_holdout_v1",
+    "anchor": "2026-10-16",
+    "users": 10000,
+    "behavior_days": 365,
+    "behavior_rows": 3650000,
+    "behavior_start": "2025-10-16",
+    "behavior_end": "2026-10-15",
+    "candidate_destinations": [
+      "三亚",
+      "上海",
+      "丽江",
+      "乌鲁木齐",
+      "兰州",
+      "北京",
+      "南京",
+      "南宁",
+      "南昌",
+      "厦门",
+      "合肥",
+      "呼和浩特",
+      "哈尔滨",
+      "大连",
+      "天津",
+      "太原",
+      "广州",
+      "张家界",
+      "成都",
+      "拉萨",
+      "昆明",
+      "杭州",
+      "桂林",
+      "武汉",
+      "沈阳",
+      "济南",
+      "海口",
+      "深圳",
+      "石家庄",
+      "福州",
+      "苏州",
+      "西双版纳",
+      "西宁",
+      "西安",
+      "贵阳",
+      "郑州",
+      "重庆",
+      "银川",
+      "长春",
+      "长沙",
+      "青岛"
+    ],
+    "scenarios": {
+      "稳定关注": 1667,
+      "多目的地比较": 1666,
+      "广泛探索": 1666,
+      "临近出游变化": 1667,
+      "预算变化": 1667,
+      "逐步迁移": 1667
+    },
+    "original_user_overlap": 0,
+    "source": "independently simulated; no copied original behavior rows",
+    "holiday_source": "https://www.beijing.gov.cn/cs/gncs/zcwj/202603/t20260327_4568275.html",
+    "route_scope": [
+      [
+        "北京",
+        "杭州"
+      ],
+      [
+        "上海",
+        "成都"
+      ],
+      [
+        "广州",
+        "西安"
+      ],
+      [
+        "深圳",
+        "厦门"
+      ],
+      [
+        "成都",
+        "三亚"
+      ],
+      [
+        "北京",
+        "重庆"
+      ],
+      [
+        "广州",
+        "上海"
+      ],
+      [
+        "上海",
+        "北京"
+      ]
+    ],
+    "flight_scope": "8 representative domestic routes × 2 departure dates × 2 trip lengths; shared queries, not 10000 independent flight observations",
+    "original_model_sha256": "e729fccdac96dd149880fce00f2bdc39500b41e663683490688aafed92a58bf3",
+    "files": {
+      "users.jsonl": {
+        "sha256": "4c6c343dc3c75255fbaae91c2fb47899e53afcdc71af0eefc441f18e8469f861",
+        "bytes": 4252484
+      },
+      "behavior_arrays.npz": {
+        "sha256": "8a4fc3d4610d370ac78dae2cfafaa48bbea86f4403aa2bbd8b964f9a59de6d14",
+        "bytes": 34642580
+      }
+    }
+  },
+  "holdout": {
+    "原冻结模型": {
+      "recall_at_3": 0.9222784529570389,
+      "ndcg_at_3": 0.910519070120936,
+      "eligible_snapshots": 27071,
+      "no_relevant_snapshots": 2929
+    },
+    "近30天频次": {
+      "recall_at_3": 0.9244517503355374,
+      "ndcg_at_3": 0.9103886898085661,
+      "eligible_snapshots": 27071,
+      "no_relevant_snapshots": 2929
+    },
+    "14天衰减": {
+      "recall_at_3": 0.92499969216751,
+      "ndcg_at_3": 0.9121002356358455,
+      "eligible_snapshots": 27071,
+      "no_relevant_snapshots": 2929
+    },
+    "近7天频次": {
+      "recall_at_3": 0.900563949121446,
+      "ndcg_at_3": 0.8896197869823771,
+      "eligible_snapshots": 27071,
+      "no_relevant_snapshots": 2929
+    },
+    "短期变化规则": {
+      "recall_at_3": 0.9195079605481881,
+      "ndcg_at_3": 0.9083670073562552,
+      "eligible_snapshots": 27071,
+      "no_relevant_snapshots": 2929
+    },
+    "LambdaMART浅树": {
+      "recall_at_3": 0.9245256301331068,
+      "ndcg_at_3": 0.9134347128379718,
+      "eligible_snapshots": 27071,
+      "no_relevant_snapshots": 2929
+    },
+    "LambdaMART深树": {
+      "recall_at_3": 0.9253998744043441,
+      "ndcg_at_3": 0.9138424864515329,
+      "eligible_snapshots": 27071,
+      "no_relevant_snapshots": 2929
+    },
+    "LambdaMART随机配对": {
+      "recall_at_3": 0.9252336448598131,
+      "ndcg_at_3": 0.9137787183016344,
+      "eligible_snapshots": 27071,
+      "no_relevant_snapshots": 2929
+    }
+  },
+  "selected_method": "LambdaMART随机配对",
+  "delta_against_original": {
+    "mean": 0.0026490291161994665,
+    "ci95": [
+      0.000826808176284955,
+      0.004449345159166234
+    ]
+  },
+  "delta_against_best_rule": {
+    "mean": 0.0011269014600792098,
+    "ci95": [
+      -0.0005902324283372963,
+      0.0029076812647301714
+    ]
+  },
+  "subgroups": {
+    "稳定关注": {
+      "LambdaMART随机配对": {
+        "recall_at_3": 0.9944344464440446,
+        "ndcg_at_3": 0.9919236504559823,
+        "eligible_snapshots": 5001,
+        "no_relevant_snapshots": 0
+      },
+      "原冻结模型": {
+        "recall_at_3": 0.9873358661601014,
+        "ndcg_at_3": 0.981534935701187,
+        "eligible_snapshots": 5001,
+        "no_relevant_snapshots": 0
+      },
+      "14天衰减": {
+        "recall_at_3": 0.9942344864360462,
+        "ndcg_at_3": 0.9922213247745434,
+        "eligible_snapshots": 5001,
+        "no_relevant_snapshots": 0
+      }
+    },
+    "逐步迁移": {
+      "LambdaMART随机配对": {
+        "recall_at_3": 0.9951676331400386,
+        "ndcg_at_3": 0.9931586175636874,
+        "eligible_snapshots": 5001,
+        "no_relevant_snapshots": 0
+      },
+      "原冻结模型": {
+        "recall_at_3": 0.995367593148037,
+        "ndcg_at_3": 0.9937175543490318,
+        "eligible_snapshots": 5001,
+        "no_relevant_snapshots": 0
+      },
+      "14天衰减": {
+        "recall_at_3": 0.995367593148037,
+        "ndcg_at_3": 0.9920712366549153,
+        "eligible_snapshots": 5001,
+        "no_relevant_snapshots": 0
+      }
+    },
+    "临近出游变化": {
+      "LambdaMART随机配对": {
+        "recall_at_3": 0.9949666666666666,
+        "ndcg_at_3": 0.9705362634319439,
+        "eligible_snapshots": 5000,
+        "no_relevant_snapshots": 1
+      },
+      "原冻结模型": {
+        "recall_at_3": 0.9921666666666666,
+        "ndcg_at_3": 0.9729731899668319,
+        "eligible_snapshots": 5000,
+        "no_relevant_snapshots": 1
+      },
+      "14天衰减": {
+        "recall_at_3": 0.9947666666666666,
+        "ndcg_at_3": 0.9616810551739406,
+        "eligible_snapshots": 5000,
+        "no_relevant_snapshots": 1
+      }
+    },
+    "预算变化": {
+      "LambdaMART随机配对": {
+        "recall_at_3": 0.9951666666666666,
+        "ndcg_at_3": 0.9933402363686135,
+        "eligible_snapshots": 5000,
+        "no_relevant_snapshots": 1
+      },
+      "原冻结模型": {
+        "recall_at_3": 0.988,
+        "ndcg_at_3": 0.9828429219484089,
+        "eligible_snapshots": 5000,
+        "no_relevant_snapshots": 1
+      },
+      "14天衰减": {
+        "recall_at_3": 0.9950666666666667,
+        "ndcg_at_3": 0.9935933592076882,
+        "eligible_snapshots": 5000,
+        "no_relevant_snapshots": 1
+      }
+    },
+    "广泛探索": {
+      "LambdaMART随机配对": {
+        "recall_at_3": 0.07162401416385,
+        "ndcg_at_3": 0.05286774511765692,
+        "eligible_snapshots": 2071,
+        "no_relevant_snapshots": 2927
+      },
+      "原冻结模型": {
+        "recall_at_3": 0.07371640109447931,
+        "ndcg_at_3": 0.051674128839451924,
+        "eligible_snapshots": 2071,
+        "no_relevant_snapshots": 2927
+      },
+      "14天衰减": {
+        "recall_at_3": 0.0692901979719942,
+        "ndcg_at_3": 0.05360243633287466,
+        "eligible_snapshots": 2071,
+        "no_relevant_snapshots": 2927
+      }
+    },
+    "多目的地比较": {
+      "LambdaMART随机配对": {
+        "recall_at_3": 1.0,
+        "ndcg_at_3": 0.9765177394229139,
+        "eligible_snapshots": 4998,
+        "no_relevant_snapshots": 0
+      },
+      "原冻结模型": {
+        "recall_at_3": 1.0,
+        "ndcg_at_3": 0.9772561752901178,
+        "eligible_snapshots": 4998,
+        "no_relevant_snapshots": 0
+      },
+      "14天衰减": {
+        "recall_at_3": 1.0,
+        "ndcg_at_3": 0.9765177394229139,
+        "eligible_snapshots": 4998,
+        "no_relevant_snapshots": 0
+      }
+    }
+  },
+  "promotion_gate_passed": false,
+  "online_weights_replaced": false,
+  "original_artifact_unchanged": true,
+  "limitation": "Dense one-event/day synthetic generator. Exploration is random. No real booking/adoption ground truth; no fare forecasting claim."
+}

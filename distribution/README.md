@@ -19,3 +19,6 @@ Qwen权重由发布任务从固定Unsloth源版本取回并校验后上传GitHub
 
 
 新增全年独立测试数据的版本、模拟标记、许可状态和SHA256记录在[independent-test-2026-10-16.json](independent-test-2026-10-16.json)，结果见[独立年度验收](../docs/independent-evaluation-2026-10-16.md)。当前这些大文件仅保存在项目runtime，尚未另行发布为GitHub Release附件；该清单不改原始七项发布契约。
+## 2026-10-16 排序实验产物
+
+`lambdamart-2026-10-16.json`登记本轮130份本地产物的版本、大小及SHA256，包括候选排序权重、年度独立用户、校准模型和航班快照。数据及模型保留于D盘runtime；此次仅同步源码、汇总结果和索引，没有发布大型数据Release或个人操作数据库。原发布清单及许可保持不变。

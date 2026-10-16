@@ -1,0 +1,70 @@
+{
+  "version": "prospective-itinerary-features-v1",
+  "evaluated_at": "2026-10-16T00:46:17+00:00",
+  "users": 10000,
+  "counts": {
+    "no_feasible_quote": 6100,
+    "alternative_requires_confirmation": 2198,
+    "original_conditions_feasible": 1702
+  },
+  "strict_budget_candidate_rate": 0.39,
+  "changes": {
+    "destination": 1874,
+    "date": 277,
+    "connecting": 255,
+    "cost_tier": 904
+  },
+  "prospective_feature_rows": 11378,
+  "prospective_features": [
+    "city_attention_score",
+    "booking_lead_days",
+    "date_shift_days",
+    "airfare_band_width",
+    "trip_band_width",
+    "outbound_cap_ratio",
+    "inbound_cap_ratio",
+    "roundtrip_trip_cap_share",
+    "max_stops",
+    "outbound_departure_hour",
+    "outbound_arrival_hour",
+    "return_departure_hour",
+    "return_arrival_hour",
+    "outbound_minutes",
+    "return_minutes",
+    "quote_age_minutes",
+    "destination_changed"
+  ],
+  "query_snapshots": 72,
+  "query_statuses": {
+    "empty": 21,
+    "success": 51
+  },
+  "leg_statuses": {
+    "success": 207,
+    "empty": 10,
+    "failed": 191
+  },
+  "quotes_fresh_at_audit": true,
+  "empty_query_meaning": "no usable roundtrip was returned in this query; not proof of no market flight",
+  "uncertain_users": 1661,
+  "uncertain_users_removed_from_denominator": false,
+  "adoption_labels_observed": 0,
+  "prices_used_as_historical_training_features": false,
+  "quote_change_is_not_model_gain": true,
+  "online_weights_replaced": false,
+  "budget_policy": "unchanged predefined 80%-120% synthetic bands; strict upper bounds; no airfare reallocation",
+  "scope": "8 representative original routes plus predefined date/city alternatives, not national inventory",
+  "nonflight_cost_basis": "three declared scenario tiers plus 10% reserve; not merchant quotations",
+  "ranking_basis": "production city-attention model retained because new learned model failed promotion gate",
+  "original_model_sha256": "e729fccdac96dd149880fce00f2bdc39500b41e663683490688aafed92a58bf3",
+  "artifacts": {
+    "traveler_plans.jsonl": {
+      "sha256": "24edaf2d027d5dbf5b90b221e8a75e124cf9979b2b6ab7f036c79b33633f713e",
+      "bytes": 22552755
+    },
+    "prospective_itinerary_features.jsonl": {
+      "sha256": "556defeca439a078d00178ad91de4c787b9d4a84ffb7f1f0c8a8002111be18c5",
+      "bytes": 9620721
+    }
+  }
+}

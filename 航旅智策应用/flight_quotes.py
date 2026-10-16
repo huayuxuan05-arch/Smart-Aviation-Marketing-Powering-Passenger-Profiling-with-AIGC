@@ -208,7 +208,7 @@ def _run(owner, ident, query):
             c.execute("UPDATE flight_observations SET status='running' WHERE id=?", (ident,))
         # 每次尝试都留下记录；错误详情不向网页或日志输出代理凭证。
         result = _search(query)
-        status = 'success' if result['options'] else 'empty'
+        status = result_status(result)
         with db() as c:
             c.execute('UPDATE flight_observations SET status=?,finished_at=?,result_json=? WHERE id=?',
                       (status, now(), json.dumps(result, ensure_ascii=False), ident))
@@ -218,6 +218,11 @@ def _run(owner, ident, query):
                       (now(), type(exc).__name__, ident))
     finally:
         _slots.release()
+
+
+def result_status(result):
+    if result.get('options'):return 'success'
+    return 'failed' if result.get('query_quality',{}).get('incomplete') else 'empty'
 
 
 def _search(query):
@@ -253,8 +258,25 @@ def _search(query):
         if item['outbound']['arrival_time'][:10] != query['departure'] or item['inbound']['arrival_time'][:10] != query['return_date']:
             continue
         options.append(item)
+    failures=[o for o in observations if o.get('status')=='failed']
     return {'source': SOURCE, 'options': options, 'leg_observations': observations,
+            'query_quality':{'leg_attempts':len(observations),'failed_leg_attempts':len(failures),
+                'incomplete':bool(failures),'failure_stages':sorted({o.get('error_stage','unknown') for o in failures})},
             'upstream_commit': UPSTREAM_COMMIT, 'fare_basis': '所选成人数的两张单程查询价之和；税费、行李、退改和最终可售性以预订页为准'}
+
+
+def upstream_rpc_error(body):
+    """Read only numeric RPC error codes, never persist service tokens or raw bodies."""
+    for line in body.splitlines():
+        if not line.lstrip().startswith(b'[['):continue
+        try:outer=json.loads(line)
+        except (ValueError,UnicodeDecodeError):continue
+        if not isinstance(outer,list):continue
+        for row in outer:
+            if (isinstance(row,list) and len(row)>5 and row[0]=='wrb.fr' and row[2] is None
+                and isinstance(row[5],list) and row[5] and type(row[5][0]) is int):
+                return row[5][0]
+    return None
 
 
 def _search_leg(origin, destination, departure_date, adults, cabin_class, observations):
@@ -270,20 +292,31 @@ def _search_leg(origin, destination, departure_date, adults, cabin_class, observ
     entry = {'origin': origin, 'destination': destination, 'date': departure_date.isoformat(),
              'adults': adults, 'observed_at': observed_at, 'currency': 'CNY', 'options': []}
     observations.append(entry)
+    stage='airport_parameters'
     try:
         segments, trip_type = build_flight_segments(origin=resolve_airport(origin), destination=resolve_airport(destination),
             departure_date=departure_date.isoformat(), return_date=None, time_restrictions=None)
         filters = FlightSearchFilters(trip_type=trip_type, passenger_info=PassengerInfo(adults=adults),
             flight_segments=segments, stops=parse_max_stops('ANY'), seat_type=parse_cabin_class(cabin_class),
             sort_by=parse_sort_by('CHEAPEST'), show_all_results=True)
+        stage='http_request'
         client = SearchFlights()
         response = client.client.post(url=with_locale_params(client.BASE_URL, 'CNY', 'zh-CN', 'CN'),
             data=f'f.req={filters.encode()}', impersonate='chrome', allow_redirects=True,
             timeout=12, proxy=configured_proxy(), verify=certificate_bundle())
+        entry['response_meta']={'http_status':response.status_code,
+            'content_type':response.headers.get('content-type',''),'bytes':len(response.content)}
         response.raise_for_status()
-        inner = parse_first_wrb_payload(response.text)
+        stage='wire_decode'
+        # Wire frame lengths count bytes; avoid any HTTP client's text recoding.
+        inner = parse_first_wrb_payload(response.content)
         if not isinstance(inner, list):
+            code=upstream_rpc_error(response.content)
+            if code is not None:
+                stage='upstream_rpc'
+                entry['upstream_rpc_code']=code
             raise ValueError('Flight source returned no usable payload')
+        stage='flight_rows'
         options = []
         for raw in _iter_flight_rows(inner):
             try:
@@ -299,7 +332,7 @@ def _search_leg(origin, destination, departure_date, adults, cabin_class, observ
         entry.update(status='success' if options else 'empty', options=[o.model_dump(mode='json') for o in options], finished_at=now())
         return options
     except Exception as exc:
-        entry.update(status='failed', error_code=type(exc).__name__, finished_at=now())
+        entry.update(status='failed', error_code=type(exc).__name__,error_stage=stage, finished_at=now())
         raise RuntimeError(type(exc).__name__) from None
 
 

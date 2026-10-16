@@ -1,0 +1,659 @@
+{
+  "version": "lambdamart-2026-10-16-v1",
+  "local_root": "航旅智策应用/runtime/independent-evaluation/annual-2026-10-16-v1/lambdamart-v1",
+  "storage": "local only; model/data/raw quote payloads not committed or released",
+  "artifacts": [
+    {
+      "path": "attention-calibration-v1/assessment/behavior_arrays.npz",
+      "bytes": 6924201,
+      "sha256": "f1eb76dca852116de57e6eda35d2606070662aae966e3989eea5d1d627b405d5"
+    },
+    {
+      "path": "attention-calibration-v1/assessment/manifest.json",
+      "bytes": 2300,
+      "sha256": "d5aa4cf3d060afa578e5b6df23c36369d9f781e3e68ff754cb395c7446904535"
+    },
+    {
+      "path": "attention-calibration-v1/assessment/users.jsonl",
+      "bytes": 866509,
+      "sha256": "08904c56af31b642e8a79e2842fa84091ee95add1d9844693c9dc63824af3634"
+    },
+    {
+      "path": "attention-calibration-v1/protocol.json",
+      "bytes": 786,
+      "sha256": "9a43877f4cf3cede047269344116ed1baa28dab33c8f93e2ec7d07eefd4de16e"
+    },
+    {
+      "path": "attention-calibration-v1/report.json",
+      "bytes": 4128,
+      "sha256": "367ca251e04803287631df8c4e37a4d9de9762649654308c507ef32300f1e08a"
+    },
+    {
+      "path": "attention-calibration-v1/sigmoid.joblib",
+      "bytes": 847,
+      "sha256": "aa9542fa95d7d6fa686025c63ee1a9fed13afffc006261931f634529060fcf06"
+    },
+    {
+      "path": "diagnostic_queries.json",
+      "bytes": 228,
+      "sha256": "57ca3e69f1578830375df04ed1ce43dd40ebecff0e78bcc55aa70fa22419dd9d"
+    },
+    {
+      "path": "diagnostic_result.json",
+      "bytes": 1290,
+      "sha256": "db6775db70719594cf65a29422e16f460bc4a7db374f05dda52c4a7c088040ec"
+    },
+    {
+      "path": "expanded-quotes-v1/protocol.json",
+      "bytes": 7978,
+      "sha256": "bc79ec6f94d02696c69a8cc5dada06b1bd558207223b500bd52f2ca325d03a13"
+    },
+    {
+      "path": "expanded-quotes-v1/query_000.json",
+      "bytes": 830108,
+      "sha256": "815631ddee6e74a3aa5b16a27126befabeac9170c85ae20f776777251e800fc9"
+    },
+    {
+      "path": "expanded-quotes-v1/query_001.json",
+      "bytes": 1446787,
+      "sha256": "c87a8540e6afb342ad6ed417431f900f194c2ce0ecbc845fcc73693696bd38c2"
+    },
+    {
+      "path": "expanded-quotes-v1/query_002.json",
+      "bytes": 1263765,
+      "sha256": "fb232df04c09f9016f14f2f417c9e91b96d635c1bc9606e57b3551db85ba5ebd"
+    },
+    {
+      "path": "expanded-quotes-v1/query_003.json",
+      "bytes": 1287056,
+      "sha256": "7277904cd33b5c4429b7fbc9b05a19e871a3bcd786b6daaa86c111ac6c730b3d"
+    },
+    {
+      "path": "expanded-quotes-v1/query_004.json",
+      "bytes": 946393,
+      "sha256": "fb28a0caaeda78458e05b30ffc102a92205dc0a0e38b27e71bae527a6d66ada3"
+    },
+    {
+      "path": "expanded-quotes-v1/query_005.json",
+      "bytes": 849367,
+      "sha256": "2ee1a5a56ddac186ec031a37a2503e23241a42ceda2a12c2ae10e8a4d23d07c0"
+    },
+    {
+      "path": "expanded-quotes-v1/query_006.json",
+      "bytes": 945104,
+      "sha256": "3edba29a5ee5df6a7f80de71ef1c6753b4185d4cc505995bbefaa8f837d53836"
+    },
+    {
+      "path": "expanded-quotes-v1/query_007.json",
+      "bytes": 830808,
+      "sha256": "8345cfa8c90542547c880726fb7648162ede7a4725575d8e585dcf6d9adbbdad"
+    },
+    {
+      "path": "expanded-quotes-v1/query_008.json",
+      "bytes": 855071,
+      "sha256": "8afad0dc8ae146047d95d09932c51252c8da39c1e7289bfa06f8736ca6fc7857"
+    },
+    {
+      "path": "expanded-quotes-v1/query_009.json",
+      "bytes": 874041,
+      "sha256": "4761f94ba2a328a081a8b488d55153e6a764e3f2c17458a14eb1efa04ed85f9c"
+    },
+    {
+      "path": "expanded-quotes-v1/query_010.json",
+      "bytes": 864533,
+      "sha256": "5e6d4daa248aacd42fc746dac50a47caf991d605ab3906d4e229a5f5409aadb6"
+    },
+    {
+      "path": "expanded-quotes-v1/query_011.json",
+      "bytes": 455511,
+      "sha256": "7608285f0700d261a167e82ea6c91ac1a2e9309ded9060b556c06e6d1eef025a"
+    },
+    {
+      "path": "expanded-quotes-v1/query_012.json",
+      "bytes": 978895,
+      "sha256": "5c3bb3023ee1e0028d4f4c78acc2fab35cfd24eb6bc09bef3145ecb417a7747a"
+    },
+    {
+      "path": "expanded-quotes-v1/query_013.json",
+      "bytes": 1039659,
+      "sha256": "267107194fb98325b40efc920380ab7c4138b7995ba96122d464031842fba600"
+    },
+    {
+      "path": "expanded-quotes-v1/query_014.json",
+      "bytes": 535925,
+      "sha256": "36c66c55c0ab3ffce922f57a7bf75d951557173a13dd3df8561915c4221dae28"
+    },
+    {
+      "path": "expanded-quotes-v1/query_015.json",
+      "bytes": 1074268,
+      "sha256": "b287e4854b364cc070ce594a722e0e8078ae3e61b89f99310c2a37926784914e"
+    },
+    {
+      "path": "expanded-quotes-v1/query_016.json",
+      "bytes": 1254218,
+      "sha256": "f0c38a90c56b42c536e16b51d1c426926c83ffed1ab9f31c6f19cede2ae97346"
+    },
+    {
+      "path": "expanded-quotes-v1/query_017.json",
+      "bytes": 433542,
+      "sha256": "69cbedcb4b987d32417e891f321eab1a5ae224562e307dacc44393c9571fab92"
+    },
+    {
+      "path": "expanded-quotes-v1/query_018.json",
+      "bytes": 3167,
+      "sha256": "4495e846abf185c1c3604ac88fe64e353b5f70be11cd7a46565cb0caa07e95c8"
+    },
+    {
+      "path": "expanded-quotes-v1/query_019.json",
+      "bytes": 2815,
+      "sha256": "fd918773cf88acc88f75926e07021fa07830772bb9a001c77bfbe4fd85d0aeea"
+    },
+    {
+      "path": "expanded-quotes-v1/query_020.json",
+      "bytes": 1726649,
+      "sha256": "73d9a2c630e2f543ca173cd0079ea3ccac40be7a21d0d0d81fa098ecf2723c8c"
+    },
+    {
+      "path": "expanded-quotes-v1/query_021.json",
+      "bytes": 1084433,
+      "sha256": "d0b760c0b3ea9c4464899b08da334e99c2be023733587c5f953b13454b8b6ac5"
+    },
+    {
+      "path": "expanded-quotes-v1/query_022.json",
+      "bytes": 1096634,
+      "sha256": "09d236a30f6e6842583aeb3df34622a30c5123c9800e2600537e4c3d82e033bd"
+    },
+    {
+      "path": "expanded-quotes-v1/query_023.json",
+      "bytes": 1687648,
+      "sha256": "76b319f84726f0e802f48f8d5fa51c1b39f7bb1e020038db32155970688ddc56"
+    },
+    {
+      "path": "expanded-quotes-v1/report.json",
+      "bytes": 3998,
+      "sha256": "a2c4503b0850e6a08abbe3552db835fcbf62056f6000a10232f3c782af88bcd8"
+    },
+    {
+      "path": "failed_response_shape.json",
+      "bytes": 478,
+      "sha256": "a2b9e022f7d7cb1cec16d6f5fcc915c2cf65b46b67283ced686e3e96c5841a70"
+    },
+    {
+      "path": "holdout/behavior_arrays.npz",
+      "bytes": 34642580,
+      "sha256": "8a4fc3d4610d370ac78dae2cfafaa48bbea86f4403aa2bbd8b964f9a59de6d14"
+    },
+    {
+      "path": "holdout/manifest.json",
+      "bytes": 2302,
+      "sha256": "a2ba9882d934c58bf8bae56cd40789b5768331ce097004c295e1b1a90bee8161"
+    },
+    {
+      "path": "holdout/users.jsonl",
+      "bytes": 4252484,
+      "sha256": "4c6c343dc3c75255fbaae91c2fb47899e53afcdc71af0eefc441f18e8469f861"
+    },
+    {
+      "path": "prospective_itinerary_features.jsonl",
+      "bytes": 9620721,
+      "sha256": "556defeca439a078d00178ad91de4c787b9d4a84ffb7f1f0c8a8002111be18c5"
+    },
+    {
+      "path": "protocol.json",
+      "bytes": 3006,
+      "sha256": "71b0861a20e259920398681f69cb2102cf9ae5baf385c8eb74892990fc6580e8"
+    },
+    {
+      "path": "quote_audit.json",
+      "bytes": 28959,
+      "sha256": "d1bb6a539d87a99d3e8ab6ce0d6c0b7169508ed24a2ec39110b8e3fa974a1516"
+    },
+    {
+      "path": "quote_quality.json",
+      "bytes": 238,
+      "sha256": "01f477543b04b2a8254289372dc95e0c64fc84327ae672f16267c5a8c0071241"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/03715b89697efd1cb8d3dd86c53a53cc464e613847702b5aa1938a0d65dbe32b.json",
+      "bytes": 523201,
+      "sha256": "7afa6c0f17ad4dcdc56696d36a6f305005816e03047e64bbe749df1f2719b631"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/076df5c7f0f26a036dfd350d6faeec40090d21d9dfe186dcb101f93082d4c925.json",
+      "bytes": 599472,
+      "sha256": "9bbbb98af59d8cec971e7187c2eccdfe3dbfa8d91f6b86b95d94d2cf90925334"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/0b4d45e8aae244a0d4ea3c366a0774b6bf8c4025f3f642695cf1982c0ea1289e.json",
+      "bytes": 1169448,
+      "sha256": "830d7b27790a869d44f85ab66106a6f1f53853f02f6927ace876a6ffedad1bdc"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/0d10449d08388e69c9f3acc945e34dadaae748f9f6d7acc1eccb8da732ed0261.json",
+      "bytes": 734415,
+      "sha256": "fdc7bfd7b290a9aba34fc651e88f132644c9e405883cfd1dd2858236e2dd869b"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/116e5e9de2aee8bad5427eafc98a069f1e017995a9c2ada87fc6101a00f8a8d2.json",
+      "bytes": 2861,
+      "sha256": "d23ba9bfbfd9ef4301d1d5db25f1fba98319c2c7544172c2228eee1fdd6b46ed"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/1e4cff48354be1b9ea694cd7b29a1b949c994530f44ad71145ba6c23ed9e2924.json",
+      "bytes": 1131727,
+      "sha256": "876f6531453574aee557a3a65b27a848c8dbadb07af572a07cce57e85ff93f2b"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/1eb9c7f996b1a03cbeaae515a15d9ca4885fce8c470be2890a4ef9923089109e.json",
+      "bytes": 785788,
+      "sha256": "2c07f0fbe582e2f0a57b8f72978ddf19da7da834515c89d987ec98f663f74118"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/2fe963248305f9573bee0d6accc6303d81b7097b187928e4dd6b3a09a5e7af31.json",
+      "bytes": 796060,
+      "sha256": "4c4f3e7c193ab836767b2e0c18a953b95f1f3e87ca85ec8ad1a5432c206b9920"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/327a4cb17be9c29e5aaeb17af9668889388c07a9ef858e5d56d27e092624abe4.json",
+      "bytes": 1236197,
+      "sha256": "2472926b3649600af2626506854c65ec059d1ffcaa0373472e6a0526c233dcf6"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/39cd35a7de40de7e73a83ddba3d6280d872ecba6426fe1cec56a6c5c65c17ce1.json",
+      "bytes": 1341942,
+      "sha256": "210f278bae0794dab2c9f2e2598f1edc67f0e85084547e18fa514c84c161ce4b"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/3b5372769dec5382a2d176058448d4e4044a02ccaa17207608279996f8360acf.json",
+      "bytes": 1121352,
+      "sha256": "9d33138595120704817e0f841ae4717d80160aa852218bf2ede276dc5919dd9d"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/3c0afcdd8d7e899383ba21a66aa2af7f5f9b8c872f563885c272ced050dc6d04.json",
+      "bytes": 1046482,
+      "sha256": "4eb0daeb9cb542b8edbd3321df0bd5eb82a5d88ea7b202bdf79817e1ac601570"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/3e067399f52aad3bae11466edeb27b218a15a824a953a45187f4fd28ee740d33.json",
+      "bytes": 1433359,
+      "sha256": "e9920bee1f74909c1a3300f9aea353eea273cf767422e34a1b82628967e4b5ee"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/45a504f6dec59e6cb05893da21f1d9fd7dfe282bd9dc4e31840596860b7d94b7.json",
+      "bytes": 915123,
+      "sha256": "26be2868f0f7a04be6709dec7b4c403cef9b11f3bb52fa02e20860a31a8d9d70"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/4793a78d4689a608bedcf233d3ace3b49e51cc43e9972ae3358be0329625c9e7.json",
+      "bytes": 590779,
+      "sha256": "9dcd70b95994603c6efb7d16ffa2ee88f7c2191256cdafa4613a7950fa803009"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/49eba1f38dd5c830925086a2ef46d9093325c4b133000403749446e4dcfda1e9.json",
+      "bytes": 1145536,
+      "sha256": "3b4646811ba52ee4ea6533fe1fb2993eb3f02905c84684e2280e3a22864c597f"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/4b0a844f61a21c9403af005e9ed8251597ebb06cecbec84f3535aac2d4197b55.json",
+      "bytes": 1468138,
+      "sha256": "4784b18e4c40879c746f7d0b4170f7b0e1184bf74c358d59c2dd3ae6db1813b5"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/4b7eb71a1f64a047192ee422983b2a26845a2bb6fe75a00d97b6fc0847aff21c.json",
+      "bytes": 880113,
+      "sha256": "81e8b2c0818f135c4f7f5e7d28b4ea647a417b109ccdaea5dcb328746e531e5b"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/5185824cf40ed3b53b39b9bddac3623fea0e0cc3cf3052d81337f52251fdecdc.json",
+      "bytes": 1076011,
+      "sha256": "60f1dfc7949373f6880553ba11c488be9b6cec7b9cef60b2657f37075e65fb63"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/59dae04bcd5d145e040ffde973ad56a0ee07e37be7f52e0b9219928591eca844.json",
+      "bytes": 1216835,
+      "sha256": "caf4bcd583f9c929d757770ff9119a1a84312afa3a337830d4bc14adcd77daef"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/614b580522d7699ebce74526df7a08f27f3654e33cc27756a65ed7f6a81e09a9.json",
+      "bytes": 1294162,
+      "sha256": "db773540efdf908e939f12b3c12d558da3371634804765119cc2457bba2ee3f9"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/6351839eac3ea36b88610cd77c7f5e1e8a8e47bea6a1f4b110a484e70689874f.json",
+      "bytes": 734440,
+      "sha256": "73166b8b5c57747b8de01715fe0dab77565b170f821ea60b3ce8790b2314768f"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/6dc8238fe2a7c0d26a93cd647ffcc8542583bfcb5f6f61c08536e70764bf68a8.json",
+      "bytes": 1283009,
+      "sha256": "6430fefc2d171a1ddc7804933e65a1a7ccae198e37f209d5aeaa946e36aedea1"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/6ea8890d0423924ead75326ad4127cacefdd3d5895d07463c62429bf7c6d2a32.json",
+      "bytes": 1139315,
+      "sha256": "50e6ce3bea13988f15272220ad48d33651573e72e25e5099f830cc783dff1f8b"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/7160e995a59fb5a36b827c0bf52937ce89c84783910539a93ffb6c942558744d.json",
+      "bytes": 1211469,
+      "sha256": "1b0c6fa1c3af81c681fb607ba4d30d00197f112d28371fba35e43446f827f5a1"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/78d9ab7657eb4b0dcd9fc33d9f31cb055aa3624281b9704b134b30ba0c2dc658.json",
+      "bytes": 1444881,
+      "sha256": "961053b80713cecca9458016cbec5349319948ab8ae100a675acec7e7f0726b5"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/78ec89af0cef31171f8c2c283a370fe624ca7abb367fcfc80a1a13187d65903d.json",
+      "bytes": 1242616,
+      "sha256": "7ab0d7d3058f4653ca4fa70dd4f6f19bef8f64d22a84674f9e88724043795c6e"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/8164dcd99896736390b4006a52cade5d79d10991406c5efffe7253dfb97bfd64.json",
+      "bytes": 1220667,
+      "sha256": "66a0ece378570ae6cee405dcd84927cec42e8f814a6d7095d5f3ac0ea224106b"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/844047b0515af6cc924fecd41d6eea6631ea3823ce925d8349eb623ea071f5c9.json",
+      "bytes": 1076461,
+      "sha256": "513f707672693a18071c1ca9faf74054b1e01b8ecef60870e38003cad7d4ab1b"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/949a3e0ac33fe32172219a697da59c6afdf299c8e2ac6867819d37e681b34598.json",
+      "bytes": 456119,
+      "sha256": "20e92d8a72a96ed44fcfc6a72f35d94df1e6a824d1d6bbc132693a71e44fb5d7"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/9d090d1d9701f1d16b9d6a5e39488e43653165e81950e02a4f223bf0a5f9e8c2.json",
+      "bytes": 1429201,
+      "sha256": "5ca93117f841de5d389d3794b3315d60c0e77f397b0954b135ef911acca02d3e"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/a15889d0a677fc1c3fbd38b8d9ae0fa834d0f33a5689865f29c49752f79bbfb6.json",
+      "bytes": 1541436,
+      "sha256": "c1c09f5dd1c8abf25457abccbf4b6d8ff2a727109baf62cdf2b56b983c76b4a2"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/a51bbf503d223bfe4bcfab72c70260c54787df46f7c406165526dfac65275729.json",
+      "bytes": 1041888,
+      "sha256": "e40de53ea4ce343681de15a318879551d34caca96bd532d47e8786975978e5f4"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/ac2f84193405186b83e4606e010f96328f178a74e6acb51a0d049525640ce595.json",
+      "bytes": 1665761,
+      "sha256": "3480dfd83dc39add1e2ede92e86cbb6f6b4e5f7c7ec1ab3313f1a9b56ac2b0be"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/ad963a61222aee80acdcdfd727a0589e40bf5d8c2506aa95b2260fd28fb44874.json",
+      "bytes": 1057898,
+      "sha256": "12d520d7e9776105e36b62e0d6be6ab7b198fc4beed2016299272e93e345bd5d"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/ba1e370a0a928663d96747679167d7be4bb7773fc07ed2f6ba384f534957d7ed.json",
+      "bytes": 1022577,
+      "sha256": "6fa5fecb2de3f38e1a48a2344d9858338ded7777b1f4b00f352491994fed45e1"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/bdac687271ebf0c6f7197019d1667f0c18a50f2f378fa556b3b0e858938230de.json",
+      "bytes": 1252424,
+      "sha256": "9f9d748a46dcf155707966e029f739cc4673a09115044ab71aeae5776381168b"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/dfdf52beca84214c3d085d64742c7be1c178d4fcb6d49f9efb8430ab32804c94.json",
+      "bytes": 1324932,
+      "sha256": "8456bc71e8f41cd0fc03fa64b73979acad651035d00b8090c9727efb34dc9781"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/ea618913babbab607864d47f33339a0ae5cc19a7e7cdeb875b0d69f92ba635f5.json",
+      "bytes": 649387,
+      "sha256": "5f297e26768210c6e1eafa2aba79424b68a78d365a9ca29c694ac938236a2d39"
+    },
+    {
+      "path": "quotes/alternative-flights/20261016T084131/ee7158ba49102bb5676efa9292ac05c845e4497dd4df304954cf78845001754f.json",
+      "bytes": 824731,
+      "sha256": "c718ae056f748a3faa35d8f1946c33cf0284263ef945d50bf632b2790ec08c28"
+    },
+    {
+      "path": "quotes/latest_alternative_flights.json",
+      "bytes": 316,
+      "sha256": "132622e47e35691322af72a1e0fab2b2e3fe9af6cfa7bc0c1289c17862ac9a68"
+    },
+    {
+      "path": "quotes/latest_flight_report.json",
+      "bytes": 936,
+      "sha256": "160fb53a07622e4b96f72595985ecd8fd52c2cd56aabd8c28fc920c6634ab545"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/08976b85e14102777b12c6e33a59676b6ee1d7bae8c59bb27d43da9ed8a88473.json",
+      "bytes": 1666338,
+      "sha256": "fc6504918eb97b38c33bba0a8247b2e08ba1e3385f92ca3b088ea8c2723896de"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/09f1a9de3f213a8524151de24ea689f59ef026f945dbcf2094d0d82ed5e63a64.json",
+      "bytes": 1048875,
+      "sha256": "b9bbc25c27530d0741f3b6ef2a16f9c7f3bb381a38ae71666b5b199d1b68b369"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/23a61033e1a85b2e1da6f498d1ca86fa217b1f9718b3ab33dc353ee43cf9e314.json",
+      "bytes": 2674775,
+      "sha256": "bc0d7db24ca56f5738fb82a39c8586fe54cb59cdd79b9f66b1eb69cd22728d37"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/2594202a1587a7f7abb032ab3cb60a8dd933f874eab252466e41e9f4dd2683eb.json",
+      "bytes": 2512258,
+      "sha256": "469ef28a02818faed900e74d04c068cbdced2a587a9faeff888279f71ea01c13"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/314295c33f32610e22d0241bb5baa5d2f3d3a4fc38cf38ce51a2e1eb58077862.json",
+      "bytes": 1558520,
+      "sha256": "c4ab68f1ac61b4b05ba44046e542f93b5662bce68c2624c05a164e6dcace0a3e"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/33492026b3520a19b121f9b279a0365d9322bc4d4346ed2b52714bb461ebc1ea.json",
+      "bytes": 2272,
+      "sha256": "74fe6201f6cc5c46a26050b594b1bca379d4831e531a360ae2c2728a3a9e201c"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/3d8e772a2e3bc0c5f401278fe3c8c4a4228c44c5046f5048f574ff92918bacf9.json",
+      "bytes": 385569,
+      "sha256": "28937efa13dfd261c251651fdb9d362d75545e78d0eb055f14d7c8161a972558"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/5070667ed81c00da9b7d921d53bd10293c0f6112078bf5678e637d4026e2900e.json",
+      "bytes": 2272,
+      "sha256": "9c20c1e79cecf93f71033d52bcc4312ff41dbdc995caa69123f794572e01530a"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/569b69285f8125cbc68835f9f6962e90c509343a06b32c6bf8454095313f1670.json",
+      "bytes": 499672,
+      "sha256": "bbcf0d9c5c203246605411dc2b49b49fcaee6d3fa5d5ba2459bb51a5c9a6a3fb"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/5782978e62aa53109af01ce7fc1b48564f8832aa2694a3d2ab96f01496e46882.json",
+      "bytes": 837038,
+      "sha256": "dc37b1a739a002aece75feaca8f226f594b8d4227b07e85b3e76e474ded95b2f"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/58466d091d0c6974ec49cebb81e07fc4fad17c2eeb277392eceefeab7dfc85d5.json",
+      "bytes": 1369732,
+      "sha256": "82f51a5b37efba3b88dd68eccb060d22fb12b02b321ced6849d41768b2e53554"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/5c90101123ef5349062a6465cd1cf1051ec6bb732eb41d2f101842e682eac7ed.json",
+      "bytes": 1062850,
+      "sha256": "7a406784988bc97185254cb30e3af05da45fad03e68ba879b84df79f7d1c3371"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/66edc019d00ddc08bf7aa8ac834d4d3cd22d3b3e63807bd14ec5f6ff2b1c41fa.json",
+      "bytes": 1369462,
+      "sha256": "442ec576f71aba5803ea514520138ef5cd9bd294ecf1327e8d0117e6c951cd1c"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/85b0a137d68a55f75d0e5e692fe743aa8059a45e2f4b3ffbaa5c7a23e72d8da7.json",
+      "bytes": 1337885,
+      "sha256": "21b2e5dacfa01952901eef070822853243a13a22fde5b60e1d8f0b02ee7dc770"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/8f864ad447c34fe147abecc9ef65e83eadd8e4167aad7a9ec00fc418131cbed5.json",
+      "bytes": 2074134,
+      "sha256": "f90bbca6cd5b60d3d1a06e1e58a8cd91d40d100f90242d275db5efd43bce6f7c"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/9073c303994dbb346c7147fd49304db9c4e4ae4c48410f943a2ba7c5174a2492.json",
+      "bytes": 1753629,
+      "sha256": "774f6c0c2713518ead6e09e92ee3c46469183cf613673e23c97109b62d7b6f48"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/9213d5be41f08b15f24d41fa15f8499415a5139a767b9423d83bfe2374de5777.json",
+      "bytes": 716856,
+      "sha256": "d69014a11c766c8f2da9cc75a0b60e1403156ab1b829131d201defc5b0b893ab"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/933827940c3e6d82b05d819445b696e06808ed5efde7444cb439fb8056e2eb8c.json",
+      "bytes": 2650613,
+      "sha256": "6a97184232efa277018835ce255d9f7ae4f5009ae7bcc7577307d9e0cef9c823"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/9433fb2797ee6a2538215674b64887d75afeaed507b8e0987b3da8521cc839b2.json",
+      "bytes": 312455,
+      "sha256": "2bb28440664cb8b3720f2c4bb6fb6bc70510ea2bbc0f8bda784acc81b795bf32"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/980dac05bfac1c1e1c06cec2e342fddcad0fb6b6a236dcc616cbb6f9f605b07b.json",
+      "bytes": 1056108,
+      "sha256": "e9cf76b81d945bdab211c0b40f22abc71ddfe0f679094193eff611099b589b25"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/9aa7da898f2761edbd8b1a888fb008dd645717fb307f27e58adb59b8bade24da.json",
+      "bytes": 636293,
+      "sha256": "780f83462d8808fd25e19a66b7a0f3914c770e81013ef20d91e09bcb5980a266"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/b9e5d873031258d1e220b37301042e86272448f230befc1b5938e596d02272ce.json",
+      "bytes": 1210184,
+      "sha256": "4ef2122773baccd8bc82d38e6996b4abf8906666afeb2088bedae6ca1c229dbb"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/bb8bd1f45d3718a16212be404fefe38fac63990356d911ed21be70ae9f374b58.json",
+      "bytes": 1255667,
+      "sha256": "c776f26dfe9993796086248580fa44716bd92c9d337748f0cedad4a1a9447ed6"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/c66f4a8575225642a3a1086d9aa219111e7c21396241eae20e8780d3f79ee255.json",
+      "bytes": 796903,
+      "sha256": "432e1852027f713cfbcb316031ddb72e262f68fd9a1cd4cde658710874d3cdde"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/cb3bf51708386ac43d08578927d9abc485ec3775cfd82e9b3231302bce198c53.json",
+      "bytes": 275026,
+      "sha256": "129ec37ef4ca33674fcce7e0d62a06e4b2313c6c70e77166ee281eab5b72134f"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/cc5da5e722924dbde514c41bdeac0fc9653279a04309951044d42e0cb0503435.json",
+      "bytes": 347076,
+      "sha256": "b4f6e2219ee014efc06186bb72f116d9689b628f582ef8b359dca66d63503315"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/d9f2e0d66ee8632c02e55458eb08e361f3519965e71eb5a9325c914ff5191a40.json",
+      "bytes": 1514014,
+      "sha256": "dce3b95d6ffbaa8b988c2b6a9bf85f432747d31accb98491dda3d37261143cf0"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/daea4ef2e4bbaefee8915248bc66bf65ac99bc246c657b33dba7853ed2bedfbf.json",
+      "bytes": 1766091,
+      "sha256": "b5a1fad501cfd01d612fc127d5b3817cf4484dab1de5a806ef0cfdc9efa74b58"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/df86891432a827aae58b54f6df56c59b0a7d8fa3a3505cbd900ac1243421fc6f.json",
+      "bytes": 3680,
+      "sha256": "afecfc7780d83bd7353e057d713d7d9ed8b5d954e0c0856ef8bed809a329ddd3"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/e8adb2cabed31eeb67e40b6d484afe353649f3c532c9a6d2173bc20511e39f5e.json",
+      "bytes": 832151,
+      "sha256": "050fb9fca23d726a8db0263f4871052f6478664fc5c212a38b0c81e3570942a6"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/edf63a053eceb52172b1634052c1ff7a417eaed8912233329bbb874b532687cf.json",
+      "bytes": 2652015,
+      "sha256": "0a972c194a2c1a779d0eb0d2b6b33b32546ea218d092f26b041264ac3071cb88"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/f60851f993579c7356cbd05f13962af8da2af6901e1f9ed39705a7ea554bce07.json",
+      "bytes": 609989,
+      "sha256": "3c5f2c9efec9bd1a1ebc7353efd073e8d7e1ebac0a92922fd9ee1936a22a721c"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/report.json",
+      "bytes": 710,
+      "sha256": "f0677266e771ac68cf214d65806e32db2fffe24564eb094251ad267f645612d1"
+    },
+    {
+      "path": "quotes/live-flights/20261016T083339/traveler_results.jsonl",
+      "bytes": 3674230,
+      "sha256": "21856a982250218ad9fe5e3c6035eaf2e332a3154b08214804347d70e0ab1f83"
+    },
+    {
+      "path": "quotes/test/users.jsonl",
+      "bytes": 4122595,
+      "sha256": "1882c0ceb920c0a21407a1e321782169733b74679b506b2b771fffb36c4f27a8"
+    },
+    {
+      "path": "ranker_0.ubj",
+      "bytes": 117952,
+      "sha256": "729c9864ce6b1b12415639b5f6401d982201e9b46f705236d8ba79360000c80e"
+    },
+    {
+      "path": "ranker_1.ubj",
+      "bytes": 445207,
+      "sha256": "a53bb95fb5ccccebecbacb434a4757fbf3b2ec893f6046d03be46a4fdb4aed75"
+    },
+    {
+      "path": "ranker_2.ubj",
+      "bytes": 240247,
+      "sha256": "89136ca87dfd21a50cd184aac0cd575cc44978767b40bbfb36af3031bae29b6e"
+    },
+    {
+      "path": "real-choice-readiness/protocol.json",
+      "bytes": 657,
+      "sha256": "1fa99a20a83ca95f925494841944bafce60b1235e3109e918615733cbe8d492d"
+    },
+    {
+      "path": "real-choice-readiness/readiness.json",
+      "bytes": 238,
+      "sha256": "a79577e140666adee0dae178324b1d53d56f737a37e00cd61ce00ec18a8c01da"
+    },
+    {
+      "path": "report.json",
+      "bytes": 13923,
+      "sha256": "bacdc7f57ab50afccc4b81d3a8620677b7d65722445d6b5b59ed972237196c55"
+    },
+    {
+      "path": "selection_before_holdout.json",
+      "bytes": 2126,
+      "sha256": "f0ed569668937527314082f2360a8ed3be467180d3f62891a8f5d9bf529efc0b"
+    },
+    {
+      "path": "training_provenance.json",
+      "bytes": 1111,
+      "sha256": "421ca80a58384999ee60f57dbd80d5c5b5bf9e255417cdfa3b5f842c706e9fb9"
+    },
+    {
+      "path": "transport_classification_check.json",
+      "bytes": 514,
+      "sha256": "a985d9e4091ea71c19b60cd39727eab346ddbcf0f4013e7b1e463c9cbea1e2d9"
+    },
+    {
+      "path": "transport_recheck.json",
+      "bytes": 1380,
+      "sha256": "8ffa67176c08aa800f318e78a60a5d4ed1b316e2ca8295b04bea3f74a514912b"
+    },
+    {
+      "path": "traveler_plans.jsonl",
+      "bytes": 22552755,
+      "sha256": "24edaf2d027d5dbf5b90b221e8a75e124cf9979b2b6ab7f036c79b33633f713e"
+    }
+  ],
+  "original_source_license": "retain original distribution licenses; no additional raw-data rights asserted",
+  "original_model_sha256": "e729fccdac96dd149880fce00f2bdc39500b41e663683490688aafed92a58bf3"
+}
