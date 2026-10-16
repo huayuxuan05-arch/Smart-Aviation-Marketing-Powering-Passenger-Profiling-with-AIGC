@@ -3,8 +3,9 @@ from __future__ import annotations
 import math
 
 
-def optimize(candidates,preferences,*,allow_alternatives=False):
-    """Hard upper bounds stay hard; changed dates/cities/stops require confirmation."""
+def optimize(candidates,preferences,*,allow_alternatives=False,budget_policy='strict'):
+    """Versioned policy: strict replay or budget-preferred recommendations."""
+    if budget_policy not in ('strict','prefer'):raise ValueError('Unsupported budget policy')
     air=preferences['one_way_airfare'];total=preferences['adult_trip_budget']
     days=preferences['days'];original_city=preferences['destination'];original_date=preferences['start_date']
     feasible=[];closest=[]
@@ -37,6 +38,16 @@ def optimize(candidates,preferences,*,allow_alternatives=False):
         return dict(status='original_conditions_feasible' if original else 'alternative_requires_confirmation',
             selected=(original or feasible)[0],alternatives=feasible[:3],accepted=False)
     closest.sort(key=lambda r:(r['one_way_budget_gap']+r['total_budget_gap'],r['estimated_total']))
+    if budget_policy=='prefer' and closest:
+        # Budget remains the recorded preference; no invented enlarged upper bound.
+        closest.sort(key=lambda r:(r['changes']['destination'] or r['changes']['date'],
+            -float(r.get('interest_score',0)),r['one_way_budget_gap']+r['total_budget_gap'],r['estimated_total']))
+        selected=closest[0]
+        def proposal(row):
+            return {**row,'requires_confirmation':True,'within_budget':False,
+                'original_budget':{'one_way_airfare':dict(air),'adult_trip_budget':dict(total)}}
+        return dict(status='over_budget_recommendation',selected=proposal(selected),
+            alternatives=[proposal(r) for r in closest[:3]],accepted=False,budget_policy='prefer')
     return dict(status='no_feasible_quote',selected=None,nearest=closest[:3],accepted=False)
 
 

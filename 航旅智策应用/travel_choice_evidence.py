@@ -50,9 +50,9 @@ def candidate_features(plan,option,adults):
     nonflight=[c.get('value') for c in budget.get('components',[]) if c['name'] not in ('去程航空','返程航空','机动预留')]
     estimate=round((sum(prices)+sum(nonflight))*1.1,2) if nonflight and all(v is not None for v in nonflight) else None
     stops=max(len(out['segments'])-1,len(back['segments'])-1)
-    feasible=((cap is None or max(prices)<=cap) and
-        (total is None or estimate is not None and estimate<=total) and
-        (constraints.get('fallback_policy')!='只接受直飞' or stops==0))
+    within_budget=((cap is None or max(prices)<=cap) and
+        (total is None or estimate is not None and estimate<=total))
+    feasible=(constraints.get('fallback_policy')!='只接受直飞' or stops==0)
     return dict(outbound_per_adult=prices[0],inbound_per_adult=prices[1],
         one_way_upper=cap,trip_upper=total,one_way_lower=air_min,trip_lower=trip_min,
         one_way_band_width=cap-air_min if cap is not None and air_min is not None else None,
@@ -61,6 +61,7 @@ def candidate_features(plan,option,adults):
         roundtrip_trip_cap_share=sum(prices)/total if total else None,
         estimated_total_per_adult=estimate,total_budget_ratio=estimate/total if total and estimate is not None else None,
         hard_constraints_satisfied=bool(feasible),
+        within_budget=bool(within_budget),budget_policy='prefer',
         outbound_cap_ratio=prices[0]/cap if cap else None,inbound_cap_ratio=prices[1]/cap if cap else None,
         days=plan['days'],adults=adults,
         booking_lead_days=(datetime.fromisoformat(plan['start_date']).date()-recorded.astimezone().date()).days,

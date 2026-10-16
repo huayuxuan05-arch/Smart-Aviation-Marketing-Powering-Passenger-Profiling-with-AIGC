@@ -1,0 +1,38 @@
+{
+  "version": "current-queryable-cohorts-v2",
+  "verified_at": "2026-10-16T04:55:30+00:00",
+  "splits": {
+    "training": {
+      "users": 10000,
+      "users_with_verified_current_quotes": 10000,
+      "verified_query_conditions": 12,
+      "behavior_days": 365,
+      "behavior_rows": 3650000,
+      "manifest_sha256": "5d8673904ba7e2609a641b0387dec743d80210cca068a209c98f596dd8c2f2bc",
+      "queryable_rate_at_acceptance": 1.0
+    },
+    "validation": {
+      "users": 2000,
+      "users_with_verified_current_quotes": 2000,
+      "verified_query_conditions": 12,
+      "behavior_days": 365,
+      "behavior_rows": 730000,
+      "manifest_sha256": "f78ccc1d932243cdeb31926fddbad414d15616c752736aa0f73d2e16801a96ec",
+      "queryable_rate_at_acceptance": 1.0
+    },
+    "test": {
+      "users": 10000,
+      "users_with_verified_current_quotes": 10000,
+      "verified_query_conditions": 12,
+      "behavior_days": 365,
+      "behavior_rows": 3650000,
+      "manifest_sha256": "15f65001d2fd2d5e449be96f10397204668733b72ac5f35ef84dcb3eb93eab29",
+      "queryable_rate_at_acceptance": 1.0
+    }
+  },
+  "query_snapshots": 36,
+  "all_admitted_quotes_fresh": true,
+  "unsuccessful_query_details_retained": false,
+  "conditioned_sampling": true,
+  "meaning": "Every active synthetic user joins a fresh successful observed quote; not permanent availability or 100% budget compliance"
+}

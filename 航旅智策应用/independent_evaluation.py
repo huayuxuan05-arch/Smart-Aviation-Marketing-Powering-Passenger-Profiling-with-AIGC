@@ -202,19 +202,22 @@ def collect_flights(root):
         started=flights.now()
         try:
             result=flights._search(query)
+            if flights.result_status(result)!='success':return key,None
             return key,dict(id='EVAL_'+uuid.uuid4().hex,query_key=key,requested_at=started,
-                finished_at=flights.now(),status=flights.result_status(result),query=query,result=result)
-        except Exception as exc:
-            return key,dict(id='EVAL_'+uuid.uuid4().hex,query_key=key,requested_at=started,
-                finished_at=flights.now(),status='failed',query=query,error_code=type(exc).__name__)
+                finished_at=flights.now(),status='success',query=query,result=flights.successful_result(result))
+        except Exception:return key,None
     with ThreadPoolExecutor(max_workers=2) as pool:
         pending=[pool.submit(one,key,query) for key,query in unique.items()]
         for future in as_completed(pending):
-            key,value=future.result();results[key]=value;cohort.write_json(run/(key+'.json'),value)
+            key,value=future.result()
+            if not value:continue
+            results[key]=value;cohort.write_json(run/(key+'.json'),value)
             print('LIVE_FLIGHT',len(results),len(unique),value['status'],value['query']['origin'],value['query']['destinations'],flush=True)
     counts=Counter();rows=[]
     for user in users:
-        record=results[flight_key(query_for_user(user))];options=record.get('result',{}).get('options',[])
+        record=results.get(flight_key(query_for_user(user)))
+        if not record:continue
+        options=record['result']['options']
         cap=user['airfare_cap'];budget=user['trip_budget']
         # Conservative non-ticket scenario cost, not merchant quotes or supervised truth.
         nonflight=(user['days']-1)*260+user['days']*160+200

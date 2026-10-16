@@ -40,6 +40,15 @@ class ConstraintTests(unittest.TestCase):
         result=optimize([self.candidate(price=900)],self.preferences)
         self.assertGreater(result['nearest'][0]['one_way_budget_gap'],0)
         self.assertIsNone(result['selected'])
+    def test_budget_preferred_policy_returns_priced_over_budget_result(self):
+        result=optimize([self.candidate(price=900)],self.preferences,budget_policy='prefer')
+        self.assertEqual(result['status'],'over_budget_recommendation')
+        self.assertIsNotNone(result['selected']);self.assertFalse(result['accepted'])
+        self.assertEqual(result['selected']['original_budget']['adult_trip_budget']['max'],1600)
+    def test_budget_preferred_policy_keeps_within_budget_first(self):
+        result=optimize([self.candidate(price=900,score=100),self.candidate(price=300,score=.1)],self.preferences,budget_policy='prefer')
+        self.assertEqual(result['status'],'original_conditions_feasible')
+        self.assertLessEqual(result['selected']['estimated_total'],1600)
 
     def test_price_interval_keeps_upper_bound_and_labels_lower_price(self):
         self.assertEqual(band(1000)['min'],800);self.assertEqual(band(1000)['max'],1200)

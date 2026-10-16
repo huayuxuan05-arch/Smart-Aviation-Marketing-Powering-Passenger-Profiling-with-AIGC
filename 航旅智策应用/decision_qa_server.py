@@ -20,6 +20,11 @@ def main():
     app.RUNTIME.mkdir()
     personal.RUNTIME = app.RUNTIME
     flights.RUNTIME = app.RUNTIME
+    if __import__('os').environ.get('AEROLENS_TEST_CURRENT_COHORT')=='1':
+        from data_layer import RUNTIME as project_runtime
+        pointer=project_runtime/'current-cohorts'/'active.json'
+        destination=app.RUNTIME/'current-cohorts'/'active.json';destination.parent.mkdir()
+        destination.write_bytes(pointer.read_bytes())
     # 常规浏览器验收不访问外部航班源；专项夹具也不冒充真实报价。
     if __import__('os').environ.get('AEROLENS_TEST_FLIGHT_FIXTURE')=='1':
         from test_flight_quotes import fixture_result

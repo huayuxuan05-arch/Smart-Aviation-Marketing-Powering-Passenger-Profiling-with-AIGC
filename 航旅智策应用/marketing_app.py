@@ -107,9 +107,10 @@ def build_audience(c,raw=None):
  return clean({'settings':cfg,'holiday':h,'model':s['model'],'learned':s['learned'],'population':n,'potential':pool,'unsubscribe_blocked':sum(r['unsubscribed'] for r in rows),'audience':audience,'audience_count':len(audience),'eligible_before_cap':len(eligible),'matched_flights':matched,'business_ready_count':sum(r['business_ready'] for r in audience),'decision_version':decision.DECISION_VERSION,'strategy_comparison':comparison,'selection_funnel':funnel,'candidate_coverage':coverage,'estimated_cost':round(len(audience)*cfg['unit_cost'],2),'hotspots':[{'name':k,'count':v} for k,v in hotspots.most_common(12)],'regions':[{'name':k,'count':v} for k,v in regions.most_common(12)],'segments':[{'name':name,'id':i,'count':sum(r['segment']==i for r in rows)} for i,name in names.items()],'channels':[{'name':k,'count':v} for k,v in channels.most_common()],'basis':'未来7天关注代理；营销名单默认先筛选历史产品候选再截取人数；本次明确预算才作硬约束；访问习惯不代表可触达或最优转化。','source_version':VERSION})
 
 def metadata(c):
+ import current_population
  generation=content_generation.configuration()
  report=ml.model_pack()['report'];users=[dict(r) for r in c.execute('SELECT * FROM users')]
- return {'holidays':HOLIDAYS,'provinces':sorted({u['residence_province'] for u in users}),'departures':sorted({u['usual_departure_city'] for u in users}),'destinations':report['protocol']['candidate_destinations'],'segments':[{'id':i,'name':name} for i,name in segment_names().items()],'defaults':settings(),'report':report,'source_version':VERSION,'llm':generation['label'],'generation':generation,'campaigns':campaign_list()}
+ return {'holidays':HOLIDAYS,'provinces':sorted({u['residence_province'] for u in users}),'departures':sorted({u['usual_departure_city'] for u in users}),'destinations':report['protocol']['candidate_destinations'],'segments':[{'id':i,'name':name} for i,name in segment_names().items()],'defaults':settings(),'report':report,'source_version':VERSION,'llm':generation['label'],'generation':generation,'campaigns':campaign_list(),'current_dataset':current_population.metadata(RUNTIME)}
 
 def campaign_list(deleted=False):
  with db() as c:

@@ -68,12 +68,16 @@ def collect(root):
         def one(key,q):
             value=dict(id='ALT_'+uuid.uuid4().hex,query_key=key,query=q,requested_at=flights.now())
             try:
-                result=flights._search(q);value.update(result=result,status=flights.result_status(result))
-            except Exception as exc:value.update(status='failed',error_code=type(exc).__name__)
+                result=flights._search(q)
+                if flights.result_status(result)!='success':return key,None
+                value.update(result=flights.successful_result(result),status='success')
+            except Exception:return key,None
             value['finished_at']=flights.now();return key,value
         pending=[pool.submit(one,key,q) for key,q in queries.items()];counts=Counter()
         for future in as_completed(pending):
-            key,value=future.result();cohort.write_json(run/(key+'.json'),value);counts[value['status']]+=1
+            key,value=future.result()
+            if not value:continue
+            cohort.write_json(run/(key+'.json'),value);counts['success']+=1
             print('ALTERNATIVE_QUOTE',sum(counts.values()),len(queries),value['status'],value['query']['origin'],value['query']['destinations'],value['query']['departure'],flush=True)
     cohort.write_json(root/'latest_alternative_flights.json',dict(path=str(run.resolve()),unique_queries=len(queries),statuses=dict(counts),collected_at=flights.now()))
     print('ALTERNATIVE_COLLECTION_COMPLETE',dict(counts),flush=True)

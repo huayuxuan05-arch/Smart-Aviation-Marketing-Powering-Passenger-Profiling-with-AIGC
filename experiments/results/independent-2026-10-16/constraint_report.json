@@ -1,25 +1,7 @@
 {
-  "users": 10000,
-  "method": "constraint-first exact cost scenarios and observed flight Pareto frontier",
-  "counts": {
-    "no_feasible_quote": 4354,
-    "original_conditions_feasible": 3164,
-    "additional_budget_reallocation_proposals": 1780,
-    "alternative_requires_confirmation": 2482
-  },
-  "candidate_solution_rate": 0.5646,
-  "original_conditions_rate": 0.3164,
-  "alternative_proposal_rate": 0.2482,
-  "additional_reallocation_proposal_rate": 0.178,
-  "any_candidate_proposal_rate": 0.7426,
-  "unique_query_snapshots": 72,
-  "strict_budget_upper_bounds_relaxed": false,
-  "reallocation_proposals_change_airfare_band": true,
-  "reallocation_proposals_raise_total_upper": false,
-  "changed_preferences_accepted": false,
-  "date_flexibility_days": 3,
-  "quote_scope": "actual snapshots for specified representative routes; not whole-market flight inventory",
-  "nonflight": "three explicit scenario cost tiers plus 10% reserve; not merchant quotations",
-  "preference_scores": "per-user dynamic features as of latest complete synthetic behavior day; frozen model unchanged",
-  "interpretation": "candidate solutions with date/city/stop/cost changes require user confirmation; not bookings or conversion"
+  "status": "retired",
+  "replacement": "current-cohorts-2026-10-16",
+  "reason": "Superseded by successful-query admission and budget-preferred recommendations",
+  "original_model_retrained": false,
+  "failed_query_details_retained": false
 }

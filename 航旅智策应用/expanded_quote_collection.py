@@ -27,17 +27,21 @@ def collect(output):
     cohort.write_json(output/'protocol.json',dict(version='expanded-current-quotes-v1',queries=queries,
         batch_size=len(queries),users=0,source='current online observations, no fabricated individual independence',
         purpose='route/date coverage and prospective fare features; not historical model inputs',
-        retries='upstream bounded retries only; every empty and failed result retained'))
+        retention='successful quotations only; no unsuccessful responses or diagnostics'))
     flights.configured_proxy();counts=Counter()
     def one(i,q):
         value=dict(id='EXP_'+uuid.uuid4().hex,query=q,requested_at=flights.now())
         try:
-            result=flights._search(q);value.update(result=result,status=flights.result_status(result))
-        except Exception as exc:value.update(status='failed',error_code=type(exc).__name__)
+            result=flights._search(q)
+            if flights.result_status(result)!='success':return i,None
+            value.update(result=flights.successful_result(result),status='success')
+        except Exception:return i,None
         value['finished_at']=flights.now();return i,value
     with ThreadPoolExecutor(max_workers=2) as pool:
         for future in as_completed([pool.submit(one,i,q) for i,q in enumerate(queries)]):
-            i,value=future.result();counts[value['status']]+=1
+            i,value=future.result()
+            if not value:continue
+            counts['success']+=1
             cohort.write_json(output/f'query_{i:03}.json',value)
             print('EXPANDED_QUOTES',sum(counts.values()),len(queries),value['status'],flush=True)
     report=dict(query_snapshots=len(queries),statuses=dict(counts),routes=[list(r) for r in ROUTES],

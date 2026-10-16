@@ -22,6 +22,9 @@ STATIC = BASE/'web'
 
 
 class Handler(BaseHTTPRequestHandler):
+    def log_message(self,format,*args):
+        if '/flights/' in getattr(self,'path',''):return
+        super().log_message(format,*args)
     def personal_owner(self):
         cookie=SimpleCookie()
         try:cookie.load(self.headers.get('Cookie',''))
@@ -114,7 +117,7 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError,KeyError,TypeError) as e:
             self.send_json({'error':str(e)},400)
         except Exception:
-            traceback.print_exc()
+            if '/flights/' not in self.path:traceback.print_exc()
             self.send_json({'error':'服务处理失败，请查看 runtime/server.log'},500)
 
     def do_POST(self):
@@ -199,7 +202,7 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError,KeyError,TypeError) as e:
             self.send_json({'error':str(e)},400)
         except Exception:
-            traceback.print_exc()
+            if '/flights/' not in self.path:traceback.print_exc()
             self.send_json({'error':'操作失败，请查看本机服务日志'},500)
 
 

@@ -81,10 +81,10 @@ class ChoiceEvidenceTests(unittest.TestCase):
         self.assertEqual(len(personal.state(self.owner)['plans']),before)
         with personal.db() as c:self.assertEqual(c.execute("SELECT COUNT(*) FROM itinerary_feedback WHERE event='choose'").fetchone()[0],0)
 
-    def test_hard_budget_violations_are_logged_but_excluded_from_training(self):
+    def test_budget_preference_and_actual_hard_constraints_are_separate(self):
         plan={**self.plan,'budget':{**self.plan['budget'],'one_way_airfare_cap':100}}
         f=evidence.candidate_features(plan,self.q['options'][0],2)
-        self.assertFalse(f['hard_constraints_satisfied'])
+        self.assertTrue(f['hard_constraints_satisfied']);self.assertFalse(f['within_budget'])
         self.assertGreater(f['outbound_cap_ratio'],1)
     def test_explicit_interval_width_uses_actual_user_bounds(self):
         plan={**self.plan,'budget':{**self.plan['budget'],

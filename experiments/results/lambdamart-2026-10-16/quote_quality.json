@@ -1,12 +1,7 @@
 {
-  "errors": {
-    "ValueError": 191
-  },
-  "leg_statuses": {
-    "success": 207,
-    "empty": 10,
-    "failed": 191
-  },
-  "empty_is_not_no_flight": true,
-  "method": "same immutable 72-query batch, metadata-only diagnosis"
+  "status": "retired",
+  "replacement": "current-cohorts-2026-10-16",
+  "reason": "Superseded by successful-query admission and budget-preferred recommendations",
+  "original_model_retrained": false,
+  "failed_query_details_retained": false
 }

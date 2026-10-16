@@ -189,6 +189,9 @@ def context(raw=None):
 
 
 def make_plan(source, user_id, raw=None, compact=False):
+    if str(user_id).startswith('LIVE_V2_TEST_'):
+        import current_population
+        return current_population.make_plan(source,user_id,raw,compact)
     config, (arrays, users, destinations, snapshot, lookup) = context(raw)
     if user_id not in lookup:
         raise ValueError('旅客不存在')
@@ -354,6 +357,9 @@ def compose_plan(summary, intent, outbound, return_route, theme_index, config, p
 
 def list_plans(source, raw=None):
     raw = raw or {}
+    if raw.get('cohort')=='current':
+        import current_population
+        return current_population.list_plans(source,raw)
     config, (_, users, _, _, _) = context(raw)
     query = str(raw.get('q', '')).strip().lower()
     page = max(1, int(raw.get('page', 1)))

@@ -1,0 +1,46 @@
+{
+  "version": "current-queryable-budget-preferred-v2",
+  "generated_at": "2026-10-16T04:55:43+00:00",
+  "splits": {
+    "training": {
+      "users": 10000,
+      "results": 10000,
+      "quoted_results": 10000,
+      "over_budget": 8337,
+      "within_budget": 1663,
+      "result_coverage": 1.0,
+      "quoted_result_coverage_at_export": 1.0,
+      "within_budget_rate": 0.1663,
+      "plans_sha256": "6d69199bc339c461a79678b8f5c21faccbaa6d87c91043ea8be57c8137a9394f"
+    },
+    "validation": {
+      "users": 2000,
+      "results": 2000,
+      "quoted_results": 2000,
+      "within_budget": 321,
+      "over_budget": 1679,
+      "result_coverage": 1.0,
+      "quoted_result_coverage_at_export": 1.0,
+      "within_budget_rate": 0.1605,
+      "plans_sha256": "1dfd5fb11ed1274f56a299620351a86d07ebd1ce02770e95d7886b0258152c32"
+    },
+    "test": {
+      "users": 10000,
+      "results": 10000,
+      "quoted_results": 10000,
+      "over_budget": 8345,
+      "within_budget": 1655,
+      "result_coverage": 1.0,
+      "quoted_result_coverage_at_export": 1.0,
+      "within_budget_rate": 0.1655,
+      "plans_sha256": "5287144f97bae26551e15057b5eaf731b4077c60d0b8387370c34bf22bd1b62a"
+    }
+  },
+  "query_conditions": 36,
+  "conditioned_sampling": true,
+  "original_model_retrained": false,
+  "model_role": "frozen original attention model plus dynamic annual features; scenario-cost enumeration and budget-preferred selection",
+  "attention_score_is_purchase_probability": false,
+  "retention": "successful observations only",
+  "interpretation": "Coverage is conditional on live-quote admission; neither model accuracy nor unconditional market coverage. Nonflight costs are estimates."
+}

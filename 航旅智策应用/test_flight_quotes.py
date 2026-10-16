@@ -77,14 +77,13 @@ class FlightQuoteTests(unittest.TestCase):
         self.assertEqual(cached['id'],q['id'])
         with self.assertRaises(ValueError):quotes.get(self.other,q['id'])
         self.assertEqual(quotes.history(self.other,q['query'])['items'],[])
-    def test_failures_and_empty_results_are_recorded_without_zero_prices(self):
+    def test_unsuccessful_queries_are_deleted_without_zero_prices(self):
         with patch.object(quotes,'_search',side_effect=TimeoutError('private endpoint')):
-            failed=quotes.submit(self.owner,self.plan,{'adults':3})
-        self.assertEqual(failed['status'],'failed');self.assertNotIn('error',failed)
-        self.assertIsNone(quotes.history(self.owner,failed['query'])['items'][0]['minimum_total_cny'])
+            with self.assertRaises(ValueError):quotes.submit(self.owner,self.plan,{'adults':3})
+        self.assertEqual(quotes.history(self.owner,quotes.query_for(self.plan,{'adults':3}))['items'],[])
         with patch.object(quotes,'_search',return_value={'options':[]}):
-            empty=quotes.submit(self.owner,self.plan,{'adults':4})
-        self.assertEqual(empty['status'],'empty')
+            with self.assertRaises(ValueError):quotes.submit(self.owner,self.plan,{'adults':4})
+        with quotes.db() as c:self.assertEqual(c.execute('SELECT COUNT(*) FROM flight_observations').fetchone()[0],0)
     def test_preview_uses_group_quote_per_adult_without_saving(self):
         q=self.quote();before=personal.get_plan(self.owner,self.plan['id'])
         preview=quotes.preview(self.owner,self.plan,{'query_id':q['id'],'option_index':0})
@@ -104,13 +103,16 @@ class FlightQuoteTests(unittest.TestCase):
         self.assertNotEqual(saved['id'],self.plan['id']);self.assertEqual(saved['parent_plan_id'],self.plan['id'])
         self.assertEqual(personal.get_plan(self.owner,self.plan['id']),self.plan)
         self.assertEqual(personal.state(self.owner)['revision'],state['revision'])
-    def test_confirm_cannot_override_explicit_hard_budget(self):
+    def test_over_budget_recommendation_can_be_saved_without_changing_original_budget(self):
         q=self.quote();state=personal.state(self.owner)
         body={'plan_id':self.plan['id'],'query_id':q['id'],'option_index':0,'expected_revision':state['revision'],'confirmed':True}
         preview=personal.preview_flight_quote(self.owner,self.plan,body)
-        self.assertFalse(preview['candidate_constraints']['allowed'])
-        with self.assertRaisesRegex(ValueError,'超出'):personal.apply_flight_quote(self.owner,body)
-        self.assertEqual(len(personal.state(self.owner)['plans']),1)
+        self.assertTrue(preview['candidate_constraints']['allowed'])
+        self.assertEqual(preview['candidate_constraints']['budget_status'],'over_budget')
+        saved=personal.apply_flight_quote(self.owner,body)
+        self.assertEqual(saved['budget']['specified_total'],2000)
+        self.assertEqual(personal.state(self.owner)['preferences']['trip_budget'],2000)
+        self.assertEqual(len(personal.state(self.owner)['plans']),2)
     def test_cheaper_than_preferred_interval_is_still_allowed(self):
         q=self.quote();p=quotes.preview(self.owner,self.plan,{'query_id':q['id'],'option_index':0})
         p['budget'].update(specified_total=6000,one_way_airfare_cap=1500,
@@ -202,12 +204,12 @@ class FlightQuoteTests(unittest.TestCase):
             destination=Path(quotes.certificate_bundle())
         self.assertEqual(destination.read_bytes(),source.read_bytes())
         str(destination).encode('ascii')
-    def test_restart_records_interrupted_attempt_without_deleting_it(self):
+    def test_restart_removes_interrupted_attempt(self):
         q=self.quote()
         with quotes.db() as c:c.execute("UPDATE flight_observations SET status='running' WHERE id=?",(q['id'],))
         quotes.recover_interrupted()
-        self.assertEqual(quotes.get(self.owner,q['id'])['status'],'failed')
-        self.assertEqual(len(quotes.history(self.owner,q['query'])['items']),1)
+        with self.assertRaises(ValueError):quotes.get(self.owner,q['id'])
+        self.assertEqual(len(quotes.history(self.owner,q['query'])['items']),0)
 
 
 if __name__=='__main__':unittest.main()

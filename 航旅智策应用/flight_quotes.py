@@ -1,10 +1,11 @@
-"""当前航班查询和只追加的观测记录；2024航班仅用于离线训练与评估。"""
+"""当前航班查询仅保留成功观测；2024航班仅用于离线训练与评估。"""
 from __future__ import annotations
 
 import asyncio
 import copy
 import importlib.util
 import json
+import logging
 import math
 import os
 import re
@@ -55,6 +56,7 @@ def now():
 def db():
     RUNTIME.mkdir(parents=True, exist_ok=True)
     c = sqlite3.connect(RUNTIME / 'flight_quotes.sqlite3', timeout=30)
+    c.execute('PRAGMA secure_delete=ON')
     c.row_factory = sqlite3.Row
     try:
         c.execute('''CREATE TABLE IF NOT EXISTS flight_observations(
@@ -115,7 +117,23 @@ def configuration():
 
 def recover_interrupted():
     with db() as c:
-        c.execute("UPDATE flight_observations SET status='failed',finished_at=?,error_code='ServerRestart' WHERE status IN ('queued','running')",(now(),))
+        c.execute('PRAGMA secure_delete=ON')
+        c.execute("DELETE FROM flight_observations WHERE status!='success'")
+        for row in c.execute("SELECT id,result_json FROM flight_observations WHERE status='success'").fetchall():
+            value=json.loads(row['result_json'] or '{}')
+            if not value.get('options'):c.execute('DELETE FROM flight_observations WHERE id=?',(row['id'],));continue
+            c.execute('UPDATE flight_observations SET result_json=?,error_code=NULL WHERE id=?',
+                (json.dumps(successful_result(value),ensure_ascii=False),row['id']))
+        c.commit();c.execute('VACUUM')
+
+
+def successful_result(result):
+    """Retain usable quotations only; failed attempts and diagnostics are discarded."""
+    value=copy.deepcopy(result)
+    value['leg_observations']=[o for o in value.get('leg_observations',[])
+        if o.get('status')=='success' and o.get('options')]
+    value.pop('query_quality',None)
+    return value
 
 
 def query_for(plan, body=None):
@@ -198,6 +216,7 @@ def submit(owner, plan, body=None):
             _pool.submit(_run, owner, ident, query)
         except Exception:
             _slots.release()
+            with db() as c:c.execute('DELETE FROM flight_observations WHERE id=?',(ident,))
             raise
     return get(owner, ident)
 
@@ -206,16 +225,16 @@ def _run(owner, ident, query):
     try:
         with db() as c:
             c.execute("UPDATE flight_observations SET status='running' WHERE id=?", (ident,))
-        # 每次尝试都留下记录；错误详情不向网页或日志输出代理凭证。
+        # User retention policy: unsuccessful queries are removed, never logged.
         result = _search(query)
         status = result_status(result)
         with db() as c:
-            c.execute('UPDATE flight_observations SET status=?,finished_at=?,result_json=? WHERE id=?',
-                      (status, now(), json.dumps(result, ensure_ascii=False), ident))
-    except Exception as exc:
+            if status!='success':c.execute('DELETE FROM flight_observations WHERE id=?',(ident,))
+            else:c.execute('UPDATE flight_observations SET status=?,finished_at=?,result_json=? WHERE id=?',
+                      (status, now(), json.dumps(successful_result(result), ensure_ascii=False), ident))
+    except Exception:
         with db() as c:
-            c.execute("UPDATE flight_observations SET status='failed',finished_at=?,error_code=? WHERE id=?",
-                      (now(), type(exc).__name__, ident))
+            c.execute('DELETE FROM flight_observations WHERE id=?',(ident,))
     finally:
         _slots.release()
 
@@ -226,7 +245,13 @@ def result_status(result):
 
 
 def _search(query):
-    os.environ['ADV_SEARCH_FLIGHTS_LOG_DIR'] = str(RUNTIME / 'flight-logs')
+    # Provide a standard NullHandler before the provider configures any log files.
+    for name in ['adv_search_flights','fli']:
+        logger=logging.getLogger(name)
+        if not all(isinstance(h,logging.NullHandler) for h in logger.handlers) or not logger.handlers:
+            for handler in logger.handlers[:]:handler.close();logger.removeHandler(handler)
+            logger.addHandler(logging.NullHandler())
+        logger.propagate=False
     from adv_search_flights.control.rate_limit import DataCallController
     from adv_search_flights.domain.models import SearchRequest
     from adv_search_flights.providers.fli import FliProvider

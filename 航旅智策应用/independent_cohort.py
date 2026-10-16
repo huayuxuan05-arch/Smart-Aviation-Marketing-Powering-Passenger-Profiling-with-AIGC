@@ -36,14 +36,16 @@ def write_json(path, value):
     Path(path).write_text(json.dumps(value,ensure_ascii=False,indent=2),encoding='utf-8')
 
 
-def generate(directory, count, split, anchor, seed=SEED, export_behaviors=True):
+def generate(directory, count, split, anchor, seed=SEED, export_behaviors=True,flight_contexts=None):
     """365 daily episodes per person; simulated outcomes are never model outputs."""
     directory=Path(directory);directory.mkdir(parents=True,exist_ok=True)
     manifest_path=directory/'manifest.json'
+    context_hash=hashlib.sha256(json.dumps(flight_contexts,ensure_ascii=False,sort_keys=True).encode()).hexdigest() if flight_contexts else None
     if manifest_path.exists():
         m=json.loads(manifest_path.read_text(encoding='utf-8'))
         if (m['users'],m['split'],m['anchor'],m['seed'])!=(count,split,anchor,seed):
             raise ValueError('Existing cohort has different immutable generation settings')
+        if m.get('flight_context_sha256')!=context_hash:raise ValueError('Flight admission contexts changed')
         for name,spec in m['files'].items():
             if digest(directory/name)!=spec['sha256']:raise ValueError('Cohort fingerprint mismatch')
         return m
@@ -61,14 +63,19 @@ def generate(directory, count, split, anchor, seed=SEED, export_behaviors=True):
         rows=marginals[key];weights=np.array([r[1] for r in rows],float)
         return rng.choice([r[0] for r in rows],count,p=weights/weights.sum())
     parties,ages=sample('travel_party'),sample('age_band')
-    route_ids=np.arange(count)%len(ROUTES);rng.shuffle(route_ids)
+    route_ids=np.arange(count)%(len(flight_contexts) if flight_contexts else len(ROUTES));rng.shuffle(route_ids)
     groups=np.arange(count)%len(SCENARIOS);rng.shuffle(groups)
-    provinces={'北京':'北京','上海':'上海','广州':'广东','深圳':'广东','成都':'四川'}
+    provinces={'北京':'北京','上海':'上海','广州':'广东','深圳':'广东','成都':'四川',
+        '武汉':'湖北','杭州':'浙江','西安':'陕西','重庆':'重庆','南京':'江苏','长沙':'湖南'}
     users=[]
     for j in range(count):
-        origin,destination=ROUTES[route_ids[j]]
+        origin,destination=ROUTES[route_ids[j]%len(ROUTES)]
         departure=(datetime.fromisoformat(anchor)+timedelta(days=7+7*((j//8)%2))).date().isoformat()
         days=[3,5][(j//16)%2]
+        context=flight_contexts[route_ids[j]] if flight_contexts else None
+        if context:
+            query=context['query'];origin=query['origin'];destination=query['destinations'][0]
+            departure=query['departure'];days=(datetime.fromisoformat(query['return_date'])-datetime.fromisoformat(departure)).days+1
         users.append(dict(user_id=f'{split.upper()}_{anchor.replace("-","")}_{j+1:05}',
             residence_province=provinces[origin],residence_city=origin,usual_departure_city=origin,
             age_band=str(ages[j]),travel_party=str(parties[j]),creative_group='AB'[j%2],
@@ -76,6 +83,8 @@ def generate(directory, count, split, anchor, seed=SEED, export_behaviors=True):
             requested_destination=destination,start_date=departure,days=days,
             trip_budget=int(rng.choice([2500,4000,6000,9000])),
             airfare_cap=int(rng.choice([600,1000,1600,2400]))))
+        if context:users[-1].update(current_flight_query_key=context['query_key'],allowed_max_stops=query['max_stops'],
+            simulation_version='annual-queryable-v2',budget_policy='prefer')
     if old_ids&{u['user_id'] for u in users}:raise ValueError('Original and new IDs overlap')
     shape=(365,count)
     a={name:np.zeros(shape,dtype=dtype) for name,dtype in [
@@ -139,7 +148,7 @@ def generate(directory, count, split, anchor, seed=SEED, export_behaviors=True):
                         destinations[a['dest'][z,j]],ml.TYPES[a['type'][z,j]],ml.CHANNELS[a['channel'][z,j]],
                         int(a['dwell'][z,j]),int(a['repeat'][z,j]),{-1:'remove',0:'none',1:'add'}[int(a['action'][z,j])],
                         fav.isoformat(' ') if fav else '',float(a['budget'][z,j]) if np.isfinite(a['budget'][z,j]) else '',
-                        travel.date().isoformat() if travel else '',1,VERSION])
+                        travel.date().isoformat() if travel else '',1,u['simulation_version']])
                 writer.writerows(rows)
                 if z%60==0:print('EXPORT_DAY',z,flush=True)
         names.append('behaviors.csv.gz')
@@ -151,6 +160,11 @@ def generate(directory, count, split, anchor, seed=SEED, export_behaviors=True):
         flight_scope='8 representative domestic routes × 2 departure dates × 2 trip lengths; shared queries, not 10000 independent flight observations',
         original_model_sha256=digest(ml.ROOT/'marketing_models.joblib'),
         files={name:dict(sha256=digest(directory/name),bytes=(directory/name).stat().st_size) for name in names})
+    if flight_contexts:
+        m.update(version='annual-queryable-v2',flight_context_sha256=context_hash,
+            admission='conditioned on verified current roundtrip queries; not unconditional population coverage',
+            route_scope=sorted({(c['query']['origin'],c['query']['destinations'][0]) for c in flight_contexts}),
+            flight_scope=f'{len(flight_contexts)} shared verified query conditions, not {count} independent flight observations')
     write_json(manifest_path,m);return m
 
 

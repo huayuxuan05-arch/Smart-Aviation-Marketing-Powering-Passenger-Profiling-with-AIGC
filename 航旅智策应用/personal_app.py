@@ -226,7 +226,9 @@ def apply_flight_quote(owner,body):
     original=get_plan(owner,body['plan_id'])
     plan=flight_quotes.preview(owner,original,body)
     check=flight_constraint_check(plan)
-    if not check['allowed']:raise ValueError('该候选超出已保存的预算或直飞要求，请先调整偏好或重新选择')
+    if not check['allowed']:raise ValueError('该候选不符合已选择的航程要求，请重新选择')
+    plan['candidate_constraints']=check
+    plan['recommendation_policy']='budget-preferred-v1'
     with db() as c:
         c.execute('BEGIN IMMEDIATE')
         current=c.execute('SELECT revision FROM personal_sessions WHERE owner=?',(owner,)).fetchone()
@@ -250,18 +252,23 @@ def preview_flight_quote(owner,original,body):
 
 
 def flight_constraint_check(plan):
-    """Lower bounds are preferred spend; explicit upper bounds and direct-only are hard."""
-    live=plan.get('live_flights');violations=[]
+    """Budget is a preference; quote identity, chronology and direct-only stay hard."""
+    live=plan.get('live_flights');violations=[];budget_violations=[]
     if not live:return {'allowed':False,'violations':['missing_current_quote']}
     option=live['option'];adults=live['adults'];budget=plan['budget']
     cap=budget.get('one_way_airfare_cap');total=budget.get('specified_total')
     if cap is not None and max(option[leg]['price_cny']/adults for leg in ['outbound','inbound'])>cap:
-        violations.append('one_way_upper')
+        budget_violations.append('one_way_upper')
     if total is not None and (budget.get('estimated_total') is None or budget['estimated_total']>total):
-        violations.append('trip_upper')
+        budget_violations.append('trip_upper')
     if plan.get('preference_constraints',{}).get('fallback_policy')=='只接受直飞' and any(len(option[leg]['segments'])>1 for leg in ['outbound','inbound']):
         violations.append('direct_only')
-    return {'allowed':not violations,'violations':violations}
+    return {'allowed':not violations,'violations':violations,'budget_violations':budget_violations,
+        'budget_status':'over_budget' if budget_violations else 'within_budget' if cap is not None or total is not None else 'unspecified',
+        'budget_policy':'prefer','original_budget':{'trip':dict(budget.get('trip_budget_range',{'min':None,'max':total})),
+            'one_way_airfare':dict(budget.get('one_way_airfare_range',{'min':None,'max':cap}))},
+        'trip_budget_gap':max(0,(budget.get('estimated_total') or 0)-(total or float('inf'))),
+        'one_way_budget_gap':max(0,max(option[leg]['price_cny']/adults for leg in ['outbound','inbound'])-(cap or float('inf')))}
 
 
 def reject_candidate(owner,body):

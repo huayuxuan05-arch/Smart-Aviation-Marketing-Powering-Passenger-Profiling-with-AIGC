@@ -98,8 +98,11 @@ class IndependentTests(unittest.TestCase):
         (root/'test'/'users.jsonl').write_text(json.dumps(user),encoding='utf-8')
         with patch.object(evaluation.flights,'configured_proxy',return_value='http://127.0.0.1:1'),patch.object(evaluation.flights,'_search',side_effect=RuntimeError('offline')):
             result=evaluation.collect_flights(root)
-        self.assertEqual(result['statuses'],{'failed':1});self.assertEqual(result['user_route_match_rate'],0)
+        self.assertEqual(result['statuses'],{});self.assertEqual(result['user_route_match_rate'],0)
         self.assertEqual(result['constraint_match_rate'],0)
+        files=list((root/'live-flights').rglob('*.json'))
+        self.assertEqual([p.name for p in files],['report.json'])
+        self.assertEqual(next((root/'live-flights').rglob('traveler_results.jsonl')).read_text(encoding='utf-8'),'')
 
 
 if __name__=='__main__':unittest.main()

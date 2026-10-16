@@ -68,8 +68,8 @@ def exploration_state(snapshot, row):
 
 
 def rank(candidates, preferences, observed_asof, *, allow_alternatives=False,
-         max_quote_age_minutes=15, max_date_shift_days=3, offline_snapshot=False):
-    """No learned score can buy its way through a hard cap or stale live quote."""
+         max_quote_age_minutes=15, max_date_shift_days=3, offline_snapshot=False,budget_policy='strict'):
+    """Budget policy is explicit; stale quotes and unpermitted dates stay invalid."""
     valid=[]; rejected={}; feature_rows=[]
     for candidate in candidates:
         try: shift=abs((timestamp(candidate['start_date'])-timestamp(preferences['start_date'])).days)
@@ -84,7 +84,7 @@ def rank(candidates, preferences, observed_asof, *, allow_alternatives=False,
         if abs(features['date_shift_days'])>max_date_shift_days:
             rejected['date_outside_permission']=rejected.get('date_outside_permission',0)+1; continue
         valid.append(candidate);feature_rows.append(features)
-    result=optimize(valid,preferences,allow_alternatives=allow_alternatives)
+    result=optimize(valid,preferences,allow_alternatives=allow_alternatives,budget_policy=budget_policy)
     return {**result,'feature_rows':feature_rows,'rejected':rejected,
         'offline_snapshot':offline_snapshot,'requires_quote_refresh_before_use':offline_snapshot,
         'ranking_basis':'explicit constraints, city attention and declared cost scenarios; no trained adoption labels'}

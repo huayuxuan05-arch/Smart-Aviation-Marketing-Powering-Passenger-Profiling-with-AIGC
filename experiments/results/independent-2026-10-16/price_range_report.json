@@ -1,53 +1,7 @@
 {
-  "protocol": {
-    "version": "budget-range-v1",
-    "original_test_manifest_sha256": "f7a8071fff3f66eceb5ee4373424d2e878842e18a45ca62380fea11087fed806",
-    "budget_profiles_sha256": "d296137bdc28fe3cb619efd24684f552c1d191b8c26f7923cd545a5c46bf3ee4",
-    "annual_budget_ranges_sha256": "5321fcc62af2496b01c51c73023e36c2fd79c92752d2df78a5c323b2c369828e",
-    "flight_source": "D:\\GITHUB\\数字技术应用\\航旅智策应用\\runtime\\independent-evaluation\\annual-2026-10-16-v1\\live-flights\\20261016T002114",
-    "flight_source_sha256": "7b9b37b76575964dd9ce38d268f7c620a2db16053200af9165e8ad60ca8569ec",
-    "policy": "fixed original assumptions versus budget bands; upper bounds increase by predefined 20%, not learned from holdout outcomes",
-    "transfer_policy": "one-stop alternatives are scenario comparisons requiring confirmation, not automatic acceptance",
-    "lower_bound": "preferred spend, not a minimum that excludes cheaper options",
-    "evaluation_scope": "budget policy comparison, not an improvement in demand prediction accuracy"
-  },
-  "scenarios": {
-    "fixed_direct": {
-      "users": 10000,
-      "counts": {
-        "airfare_above_max": 4623,
-        "within_target_band": 2238,
-        "no_quote": 2177,
-        "trip_total_above_max": 962
-      },
-      "feasible": 2238,
-      "match_rate": 0.2238
-    },
-    "range_direct": {
-      "users": 10000,
-      "counts": {
-        "airfare_above_max": 3673,
-        "below_target_band": 2696,
-        "no_quote": 2177,
-        "trip_total_above_max": 986,
-        "within_target_band": 468
-      },
-      "feasible": 3164,
-      "match_rate": 0.3164
-    },
-    "range_one_stop_option": {
-      "users": 10000,
-      "counts": {
-        "trip_total_above_max": 1478,
-        "below_target_band": 2291,
-        "airfare_above_max": 4890,
-        "within_target_band": 1341
-      },
-      "feasible": 3632,
-      "match_rate": 0.3632
-    }
-  },
-  "evaluated_at": "2026-10-15T16:47:27+00:00",
-  "quotes_fresh_at_evaluation": false,
-  "warning": "Snapshot comparison only; quote freshness must be rechecked before travel. One-stop availability is conditional, not accepted user demand."
+  "status": "retired",
+  "replacement": "current-cohorts-2026-10-16",
+  "reason": "Superseded by successful-query admission and budget-preferred recommendations",
+  "original_model_retrained": false,
+  "failed_query_details_retained": false
 }
