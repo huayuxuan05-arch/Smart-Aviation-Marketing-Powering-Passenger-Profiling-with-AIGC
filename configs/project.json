@@ -1,6 +1,6 @@
 {
   "project_name": "航旅智策——节假日航空智慧营销决策系统",
-  "framework_version": "4.4",
+  "framework_version": "4.5",
   "updated_date": "2026-10-16",
   "delivery_scope": "local_account_owned_profiles_and_consented_behavior_analysis",
   "scenario": {
@@ -128,5 +128,21 @@
     "destinations": "41个模拟目的地，按兴趣与历史航班筛选",
     "decision_cutoff": "2024-09-30T23:59:59+08:00",
     "other_holidays": "支持2024元旦、清明、五一、端午、中秋等历史场景"
+  },
+  "model_choices": {
+    "default": "4b",
+    "4b": {
+      "model": "Qwen3-4B-Q4_K_M",
+      "backends": [
+        "CPU",
+        "Vulkan"
+      ]
+    },
+    "9b": {
+      "model": "Qwen3.5-9B-Q4_K_M",
+      "backends": [
+        "CUDA"
+      ]
+    }
   }
 }

@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "release_tag": "portable-2026-10-16",
+  "repository": "huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC",
+  "model": {
+    "name": "Qwen3-4B-Q4_K_M.gguf",
+    "bytes": 2497280256,
+    "sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+    "revision": "bc640142c66e1fdd12af0bd68f40445458f3869b",
+    "repository": "https://huggingface.co/Qwen/Qwen3-4B-GGUF",
+    "license": "Apache-2.0"
+  },
+  "model_parts": [
+    {
+      "name": "Qwen3-4B-Q4_K_M.gguf.part-001",
+      "bytes": 1073741824,
+      "sha256": "b2bef48525252f79b303b7f15f26ddfce90f15b7c8272bd7c1e5cbf3c63946ba"
+    },
+    {
+      "name": "Qwen3-4B-Q4_K_M.gguf.part-002",
+      "bytes": 1073741824,
+      "sha256": "b62067fdef520baf575e199470d3e48015ea92a166f5f0114e3635c24c44bf48"
+    },
+    {
+      "name": "Qwen3-4B-Q4_K_M.gguf.part-003",
+      "bytes": 349796608,
+      "sha256": "db210a3f62c5a85c4e78f9f20e44e5bbf8112da98d0da5720ee8d3ae9f3c36ae"
+    }
+  ],
+  "runtimes": {
+    "CPU": {
+      "name": "llama-b11371-bin-win-cpu-x64.zip",
+      "bytes": 19352488,
+      "sha256": "085d650f1b4b0725a32c2421b970da5c5d2f769202cd16f89591ac9dcce835c6"
+    },
+    "Vulkan": {
+      "name": "llama-b11371-bin-win-vulkan-x64.zip",
+      "bytes": 33281583,
+      "sha256": "dfc666fdf3137595e7d440b994bed0fa1f1dc726099685c1a75291c4bab2013f"
+    }
+  },
+  "data_bundle": {
+    "name": "demo-data-models.zip",
+    "bytes": 257973254,
+    "sha256": "733f835d877832acf8200ff64539f6f075797839e67745ca7d22d0334081eb85"
+  },
+  "data_contract": "distribution/manifest.json",
+  "legacy_9b_release": "demo-2026-10-12",
+  "choices": {
+    "4b": {
+      "backends": [
+        "CPU",
+        "Vulkan"
+      ],
+      "default_backend": "CPU"
+    },
+    "9b": {
+      "backends": [
+        "CUDA"
+      ],
+      "default_backend": "CUDA"
+    }
+  },
+  "private_state_included": false
+}

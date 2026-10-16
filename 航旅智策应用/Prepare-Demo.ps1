@@ -1,4 +1,4 @@
-param([switch]$DataOnly, [switch]$NoBrowser, [switch]$EnableLocalModel)
+param([switch]$DataOnly, [switch]$NoBrowser, [switch]$EnableLocalModel, [ValidateSet('4b','9b')][string]$Model='4b', [ValidateSet('Auto','CPU','Vulkan','CUDA')][string]$Backend='Auto')
 $ErrorActionPreference = 'Stop'
 if ($DataOnly -and $EnableLocalModel) { throw 'Use either -DataOnly or -EnableLocalModel.' }
 if ([IO.Path]::GetPathRoot($PSScriptRoot) -eq 'C:\') { throw 'Move the repository to D: or another non-C: drive first.' }
@@ -18,16 +18,16 @@ if (-not (Test-Path -LiteralPath $taskPython)) {
     $taskBundledPython = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
     $taskLauncher = Get-Command py -ErrorAction SilentlyContinue
     if (Test-Path -LiteralPath $taskBundledPython) { & $taskBundledPython -m venv $taskVenv }
-    elseif ($taskLauncher) { & $taskLauncher.Source -3 -m venv $taskVenv }
+    elseif ($taskLauncher) { & $taskLauncher.Source -3.12 -m venv $taskVenv }
     else {
         $taskBasePython = Get-Command python -ErrorAction SilentlyContinue
-        if (-not $taskBasePython) { throw 'Install Python 3.11+ first, then run this script again.' }
+        if (-not $taskBasePython) { throw 'Install Python 3.12+ first, then run this script again.' }
         & $taskBasePython.Source -m venv $taskVenv
     }
-    if ($LASTEXITCODE -ne 0) { throw 'Cannot create the project Python environment. Python 3.11+ is required.' }
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot create the project Python environment. Python 3.12+ is required.' }
 }
-& $taskPython -c "import sys; assert sys.version_info >= (3,11), 'Python 3.11+ required'"
-if ($LASTEXITCODE -ne 0) { throw 'Python 3.11+ is required.' }
+& $taskPython -c "import sys; assert sys.version_info >= (3,12), 'Python 3.12+ required'"
+if ($LASTEXITCODE -ne 0) { throw 'Python 3.12+ is required.' }
 $taskProxy = $env:HTTPS_PROXY
 if (-not $taskProxy) { $taskProxy = $env:https_proxy }
 if (-not $taskProxy) { throw 'Configure HTTPS_PROXY/https_proxy before downloading dependencies and release data.' }
@@ -35,7 +35,16 @@ if (-not $taskProxy) { throw 'Configure HTTPS_PROXY/https_proxy before downloadi
 if ($LASTEXITCODE -ne 0) { throw 'Dependency installation failed. Check the network and retry.' }
 $taskArgs = @((Join-Path $PSScriptRoot 'bootstrap_demo.py'))
 if (-not $EnableLocalModel) { $taskArgs += '--data-only' }
+if ($EnableLocalModel) {
+    if ($Model -eq '9b' -and $Backend -notin @('Auto','CUDA')) { throw 'The 9B option currently requires NVIDIA CUDA. Use 4B for CPU or Vulkan.' }
+    if ($Model -eq '4b' -and $Backend -eq 'CUDA') { throw 'The 4B portable option supports CPU or Vulkan.' }
+    $taskArgs += @('--model',$Model,'--backend',$Backend)
+}
+$taskRunning=$null
+try { $taskRunning=Invoke-RestMethod 'http://127.0.0.1:8765/api/health' -TimeoutSec 2 } catch { }
+$taskMode=if($EnableLocalModel){'local-model'}else{'template'}
+$taskSwitch=$taskRunning -and ($EnableLocalModel -or $taskRunning.generation.mode -ne $taskMode)
+if ($taskSwitch) { & (Join-Path $PSScriptRoot 'Stop-Local.ps1') }
 & $taskPython @taskArgs
 if ($LASTEXITCODE -ne 0) { throw 'Demo preparation failed. Downloads can resume on the next run.' }
-$taskMode = if ($EnableLocalModel) { 'local-model' } else { 'template' }
 & (Join-Path $PSScriptRoot 'Start-Local.ps1') -NoBrowser:$NoBrowser -GenerationMode $taskMode

@@ -1,0 +1,8 @@
+{
+  "provider": "serpapi",
+  "currency": "JPY",
+  "country": "jp",
+  "language": "ja",
+  "hourly_limit": 50,
+  "monthly_limit": 250
+}

@@ -1,6 +1,6 @@
 # 华翼朝阳 · 个性化旅游定制
 
-本机已显式接入现有Qwen3-4B，以AMD Vulkan运行；个人页整套旅行卡片由本地模型整理，航班由工具按用户自主选择的标签实时查询。公开启动参数仍支持模板模式；用 Start-Local.ps1 -GenerationMode local-model 启用模型，若存在本机active_model.json则复用指定本地权重，未配置时使用原Qwen3.5-9B下载配置。
+同时保留Qwen3-4B与Qwen3.5-9B两种本地模型，安装入口按需选择；本机当前复用4B并以AMD Vulkan运行。个人页整套旅行卡片由所选本地模型整理，航班按用户自主选择的标签实时查询。Start-Local.ps1自动读取本机active_model.json，两个模型的权重和配置分别保留。
 
 航旅智策——节假日航空智慧营销决策系统的当前实现，保留数据、算法、AIGC、应用、评估五层。
 
@@ -23,11 +23,11 @@
 
 ## 本地运行
 
-1. 下载或克隆本仓库，解压至D盘，安装Python 3.11或以上。
-2. 双击根目录的“准备并启动Demo.cmd”。
+1. 下载或克隆本仓库，解压至D盘，安装Python 3.12或以上。
+2. 双击根目录的“准备并启动Demo.cmd”，选择4B CPU、4B Vulkan、9B NVIDIA CUDA，或仅准备网站数据。
 3. 自动下载、校验并恢复原有数据与模型后，访问 `http://127.0.0.1:8765/`。
 
-现有[发布资产](https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/tag/demo-2026-10-12)提供三份模拟/历史原始Excel、需求模型和Qwen3.5-9B量化权重；最新网站源码以本仓库主分支为准。完整本地语言模型推理使用Windows x64与NVIDIA CUDA；仅准备网站数据时，在应用目录运行 `./Prepare-Demo.ps1 -DataOnly`。
+现有[9B发布资产](https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/tag/demo-2026-10-12)及[4B便携发布](https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/tag/portable-2026-10-16)提供原始Excel、需求模型和所选Qwen权重。4B支持Windows x64 CPU/Vulkan，9B保留NVIDIA CUDA运行方式；两个版本均保留、按需安装。换电脑的步骤、航班密钥及账号说明见[迁移使用说明](docs/new-computer.md)。最新源码以main为准，私有用户数据库和密钥不发布。
 
 后续通过应用目录中的“启动本地测试版.cmd”和“停止本地测试版.cmd”管理服务。网站无需云端模型密钥，不调用收费模型或真实营销平台。详见[应用使用说明](航旅智策应用/README.md)。
 

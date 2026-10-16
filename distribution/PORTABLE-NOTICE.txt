@@ -1,0 +1,20 @@
+Huayi Chaoyang portable model distribution, 2026-10-16.
+
+4B option: Qwen/Qwen3-4B-GGUF, official Q4_K_M quantization.
+Pinned revision: bc640142c66e1fdd12af0bd68f40445458f3869b.
+Model SHA256: 7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5.
+License: Apache-2.0; LICENSE-Qwen3.txt is included unchanged.
+Source: https://huggingface.co/Qwen/Qwen3-4B-GGUF
+
+Inference runtimes: ggml-org/llama.cpp b11371, Windows x64 CPU and Vulkan.
+License: MIT; LICENSE-llama.cpp.txt and original runtime archives are included.
+Source: https://github.com/ggml-org/llama.cpp/releases/tag/b11371
+
+9B option remains available from the demo-2026-10-12 release, including its
+fixed Qwen3.5-9B weights, Apache-2.0 notice and Windows CUDA runtime recipe.
+Users select one model during setup; downloading both is optional.
+
+The data bundle preserves the original project-supplied synthetic/historical
+Excel workbooks and frozen training artifacts byte for byte. Model weights
+have not been fine-tuned using personal travelers or private surveys.
+No private accounts, activity databases, API credentials or logs are included.

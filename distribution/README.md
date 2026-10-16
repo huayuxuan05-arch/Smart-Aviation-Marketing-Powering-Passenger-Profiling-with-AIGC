@@ -11,7 +11,9 @@
 
 Qwen权重由发布任务从固定Unsloth源版本取回并校验后上传GitHub Release，最终还原文件与本机现用权重的SHA256一致。用户活动数据库、名单导出、服务日志与进程信息不进入发布包。
 
-换电脑使用：下载仓库源码到D盘，安装Python3.11或以上，双击仓库根目录的 `准备并启动Demo.cmd`。脚本在项目内建立虚拟环境，安装依赖，下载校验数据及权重，重建SQLite索引并打开网站。需求模型直接加载已训练产物，无需重新训练。
+换电脑使用：下载仓库源码到D盘，安装Python3.12或以上，配置该电脑的HTTPS代理后双击仓库根目录的 `准备并启动Demo.cmd`，选择4B CPU、4B Vulkan、9B NVIDIA CUDA或仅数据。脚本建立虚拟环境，下载校验数据及所选权重，重建SQLite索引并打开网站。需求模型加载已有训练产物，无需重新训练。步骤见[另一台电脑使用](../docs/new-computer.md)。
+
+4B新增便携发布 portable-2026-10-16：包含与本机使用权重SHA256一致的官方Qwen3-4B分卷、CPU/Vulkan程序、原始七项数据文件的既有压缩包、许可和来源清单。固定清单见[portable-manifest.json](portable-manifest.json)。9B原发布及清单保持可用。两个模型的本机配置分别保留，安装时选择，已下载权重不会因切换被删除。大文件走Release，不进入main提交树。
 
 发布流程位于 `.github/workflows/publish-demo.yml`，只用GitHub Actions自带的仓库令牌上传当前仓库Release，不要求用户提供密钥。发布成功前，请勿将Release描述为已可下载。GitHub负责文件分发，Python服务与模型仍在本地运行。
 

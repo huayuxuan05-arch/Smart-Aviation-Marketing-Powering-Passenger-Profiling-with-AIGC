@@ -3,9 +3,10 @@ on:
   push:
     branches: [main]
     paths:
-      - 'distribution/**'
+      - 'distribution/manifest.json'
+      - 'distribution/LICENSE-Qwen3.5.txt'
+      - 'distribution/MODEL-NOTICE.txt'
       - 'scripts/prepare_release.py'
-      - '.github/workflows/publish-demo.yml'
   workflow_dispatch:
 permissions:
   contents: read

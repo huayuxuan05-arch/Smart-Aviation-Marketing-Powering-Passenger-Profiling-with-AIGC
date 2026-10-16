@@ -2,6 +2,7 @@
 import urllib.request,json,hashlib,zipfile,time
 from concurrent.futures import ThreadPoolExecutor
 from aigc_config import *
+from distribution_io import configure_download_proxy
 
 def digest(path):
  with path.open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
@@ -34,6 +35,7 @@ def download(spec):
  temp.replace(target);print('VERIFIED',name,expected,flush=True);return target
 
 def main():
+ configure_download_proxy()
  ROOT.mkdir(parents=True,exist_ok=True)
  with ThreadPoolExecutor(max_workers=3) as pool:files=list(pool.map(download,FILES))
  dest=ROOT/RUNTIME_DIR

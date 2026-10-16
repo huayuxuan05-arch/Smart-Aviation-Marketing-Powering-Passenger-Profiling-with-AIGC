@@ -1,6 +1,15 @@
 """发布包的流式下载、分卷合并、校验和安全还原。仅使用Python标准库。"""
 from pathlib import Path
 import hashlib,json,os,shutil,time,urllib.request,zipfile
+import ssl
+from urllib.parse import urlsplit
+
+def configure_download_proxy():
+ proxy=os.environ.get('HTTPS_PROXY') or os.environ.get('https_proxy')
+ if not proxy or urlsplit(proxy).scheme not in ('http','https') or not urlsplit(proxy).hostname:raise ValueError('请先配置HTTPS_PROXY/https_proxy，下载不会绕过代理')
+ import certifi
+ context=ssl.create_default_context(cafile=os.environ.get('REQUESTS_CA_BUNDLE') or certifi.where())
+ urllib.request.install_opener(urllib.request.build_opener(urllib.request.ProxyHandler({'http':proxy,'https':proxy}),urllib.request.HTTPSHandler(context=context)))
 
 def sha256(path):
  with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()

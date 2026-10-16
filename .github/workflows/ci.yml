@@ -15,3 +15,5 @@ jobs:
         run: python3 scripts/validate_dataset.py
       - name: Check portable package verification and restore
         run: python3 -m unittest discover -s 航旅智策应用 -p test_distribution.py -v
+      - name: Check independent model restore and model selection
+        run: python3 -m unittest discover -s 航旅智策应用 -p test_portable_models.py -v

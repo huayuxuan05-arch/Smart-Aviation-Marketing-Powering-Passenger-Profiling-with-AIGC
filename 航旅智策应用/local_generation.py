@@ -46,7 +46,7 @@ def ensure():
   cache=ROOT/'cache'/'cuda';temp=ROOT/'tmp'
   cache.mkdir(parents=True,exist_ok=True);temp.mkdir(parents=True,exist_ok=True)
   environment=os.environ.copy();environment.update({'CUDA_CACHE_PATH':str(cache),'TEMP':str(temp),'TMP':str(temp),'TMPDIR':str(temp),'HF_HOME':str(ROOT/'cache'/'huggingface')})
-  args=[str(exe),'-m',str(model),'--alias',ALIAS,'--host','127.0.0.1','--port',str(PORT),'-c','8192','-np','1','-t','8','-tb','8','-ngl','99','--device',_ACTIVE['device'],'--flash-attn','on','--jinja','--reasoning','off','--no-ui']
+  args=[str(exe),'-m',str(model),'--alias',ALIAS,'--host','127.0.0.1','--port',str(PORT),'-c','8192','-np','1','-t','8','-tb','8','-ngl','0' if _ACTIVE['device']=='none' else '99','--device',_ACTIVE['device'],'--flash-attn','on','--jinja','--reasoning','off','--no-ui']
   _PROC=subprocess.Popen(args,cwd=str(ROOT),env=environment,stdout=log,stderr=log,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0));log.close()
   (ROOT/'process.json').write_text(json.dumps({'pid':_PROC.pid,'exe':str(exe),'port':PORT,'model':MODEL_NAME,'model_file':str(model),'backend':_ACTIVE['backend'],'context':8192,'parallel':1,'thinking':False}),encoding='utf-8')
  for _ in range(240):

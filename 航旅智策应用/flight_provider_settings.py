@@ -22,7 +22,7 @@ def settings():
     value=read()
     provider=os.environ.get('AEROLENS_FLIGHT_PROVIDER') or value.get('provider') or ('serpapi' if os.environ.get('SERPAPI_API_KEY') else 'fli')
     if provider not in ('fli','serpapi'):raise ValueError('航班服务配置不支持该数据源')
-    currency=str(value.get('currency','CNY')).upper();country=str(value.get('country','cn')).lower();language=str(value.get('language','zh-cn')).lower()
+    currency=str(value.get('currency','JPY')).upper();country=str(value.get('country','jp')).lower();language=str(value.get('language','ja')).lower()
     if not re.fullmatch('[A-Z]{3}',currency) or not re.fullmatch('[a-z]{2}',country) or not re.fullmatch('[a-z]{2}(?:-[a-z]{2})?',language):raise ValueError('航班服务地区或币种配置无效')
     limits={}
     for key,default,ceiling in [('hourly_limit',50,100000),('monthly_limit',250,1000000)]:
@@ -63,6 +63,6 @@ def save_key(value):
     if not re.fullmatch(r'[A-Za-z0-9_-]{20,256}',value.strip()):raise ValueError('密钥格式无效，请复制完整 API Key')
     encrypted=base64.b64encode(_crypt(value.strip().encode(),True)).decode('ascii')
     config=read();config.update(provider='serpapi',api_key_encrypted=encrypted)
-    for key,default in [('currency','CNY'),('country','cn'),('language','zh-cn'),('hourly_limit',50),('monthly_limit',250)]:config.setdefault(key,default)
+    for key,default in [('currency','JPY'),('country','jp'),('language','ja'),('hourly_limit',50),('monthly_limit',250)]:config.setdefault(key,default)
     CONFIG.parent.mkdir(parents=True,exist_ok=True)
     temporary=CONFIG.with_suffix('.tmp');temporary.write_text(json.dumps(config,ensure_ascii=False,indent=2),encoding='utf-8');temporary.replace(CONFIG)
