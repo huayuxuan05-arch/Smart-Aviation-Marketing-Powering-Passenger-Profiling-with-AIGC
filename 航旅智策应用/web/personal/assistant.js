@@ -23,7 +23,7 @@ function renderAssistant(){
 async function assistantRun(action){
  if(personalWorking)return;personalWorking=true;renderPersonal();$('#assistant-error').textContent='';$('#assistant-parse').textContent='正在理解需求并规划…';
  for(const b of document.querySelectorAll('.assistant-card button'))b.disabled=true;
- try{await action();}catch(e){$('#assistant-error').textContent=e.message;}finally{personalWorking=false;renderPersonal();$('#assistant-parse').disabled=false;$('#assistant-parse').textContent='理解需求并生成草稿';$('#assistant-example').disabled=false;renderAssistant();}
+ try{await action();}catch(e){$('#assistant-error').textContent=e.message;}finally{personalWorking=false;renderPersonal();$('#assistant-parse').disabled=false;$('#assistant-parse').textContent='理解需求并生成草稿';renderAssistant();}
 }
 $('#assistant-request').addEventListener('submit',e=>{
  e.preventDefault();assistantRun(async()=>{
@@ -32,10 +32,6 @@ $('#assistant-request').addEventListener('submit',e=>{
   assistantDraft=null;
   assistantDraft=await personalApi('assistant/drafts',{text:$('#assistant-text').value,kind,expected_revision:personalState.revision,plan_id:kind==='feedback'?tripPlan.id:undefined});
  });
-});
-$('#assistant-example').addEventListener('click',()=>{
- $('#assistant-text').value=$('[name=assistant-kind]:checked').value==='feedback'?'行程太赶，想轻松一点，酒店太贵，日期不变。':`从北京出发去杭州，${personalState.preferences.start_date||'2026-11-15'}出发，玩四天，亲子出行，每名成人全程预算4000元，机票单程不超过1000元，想轻松一点，住宿安静。`;
- $('#assistant-text').focus();
 });
 $('#assistant-draft').addEventListener('change',e=>{if(e.target.id==='assistant-consent')$('#assistant-confirm').disabled=!e.target.checked;});
 $('#assistant-draft').addEventListener('submit',e=>{
