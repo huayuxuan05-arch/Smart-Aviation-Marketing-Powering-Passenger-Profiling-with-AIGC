@@ -27,6 +27,7 @@ function updatePersonalDisclosures(){
  personalSection(document.querySelector('#personal-preferences')?.closest('.card'),'preferences');
  personalSection(document.querySelector('.personal-history'),'history');
  personalSection(document.querySelector('.personal-profile'),'profile');
+ personalSection(document.querySelector('.personal-feedback'),'feedback');
  personalSection(document.querySelector('[data-current-flights]'),'flights');
  for(const section of document.querySelectorAll('[data-trip-detail]>section.trip-subsection')){
   const title=section.querySelector(':scope > h3,:scope > .row>h3')?.textContent||'';

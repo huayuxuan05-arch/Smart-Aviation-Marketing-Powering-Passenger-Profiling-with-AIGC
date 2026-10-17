@@ -8,21 +8,21 @@
 
 | 选项 | 模型与运行方式 | 适用条件 |
 | --- | --- | --- |
-| 1 | Qwen3-4B，CPU | 默认方式，无需独立显卡 |
-| 2 | Qwen3-4B，Vulkan | 兼容 Vulkan 的显卡；默认设备 Vulkan0 |
-| 3 | Qwen3.5-9B，NVIDIA CUDA | 兼容 CUDA 13.4 的 NVIDIA 驱动和足够显存 |
+| 1 | Qwen3.5-4B，CPU | 默认方式，无需独立显卡 |
+| 2 | Qwen3.5-4B，Vulkan | 兼容 Vulkan 的显卡；默认设备 Vulkan0 |
+| 3 | Qwen3.5-4B，NVIDIA CUDA | 兼容 CUDA 13.4 的 NVIDIA 驱动和足够显存 |
 | 4 | 网站及训练数据 | 暂不启用语言模型 |
 
-脚本安装依赖，恢复三份原始 Excel、已训练需求模型，校验所选权重和推理程序并建立索引。4B 权重约2.5GB，9B约5.7GB；每次只准备所选模型，已经校验的文件复用。两个模型均可留在本机，重新运行安装入口可切换，原权重保留；切换时会先停止本项目原服务，然后使用新配置启动。CPU推理耗时与GPU不同。
+脚本安装依赖，恢复三份原始Excel及冻结需求模型，按固定版本和SHA256下载Qwen3.5-4B并建立索引。当前4B推理文件为2,740,937,888字节，来源见[4B清单](../distribution/qwen4b-2026-10-17.json)。NVIDIA使用CUDA，其他电脑可选CPU或Vulkan；已有校验通过的文件直接复用。旧9B选项已取消。
 
-4B包见[便携发布](https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/tag/portable-2026-10-16)，9B继续使用[原模型发布](https://github.com/huayuxuan05-arch/Smart-Aviation-Marketing-Powering-Passenger-Profiling-with-AIGC/releases/tag/demo-2026-10-12)。安装脚本自动处理分卷，无需手动合并。两种模型及其许可证和固定来源都保留。
+当前30,000名模拟用户及需求预测评估产物是本机数据，尚未上传新Release。需要继续模型实验时另外复制runtime/synthetic-users和runtime/demand-models，保留SHA256。4B语言模型微调已取消，不需要训练环境或训练检查点。网页只需要应用虚拟环境、数据索引及runtime/local_aigc中的推理模型与运行程序。
 
 也可在应用目录执行：
 
 ```powershell
 ./Prepare-Demo.ps1 -EnableLocalModel -Model 4b -Backend CPU
 ./Prepare-Demo.ps1 -EnableLocalModel -Model 4b -Backend Vulkan
-./Prepare-Demo.ps1 -EnableLocalModel -Model 9b -Backend CUDA
+./Prepare-Demo.ps1 -EnableLocalModel -Model 4b -Backend CUDA
 ```
 
 ## 航班服务与账号

@@ -1,4 +1,4 @@
-"""下载固定版本Qwen3.5-9B量化权重与CUDA运行时；不读取旅客数据。"""
+"""下载固定版本Qwen3.5-4B量化权重与CUDA运行时；不读取旅客数据。"""
 import urllib.request,json,hashlib,zipfile,time
 from concurrent.futures import ThreadPoolExecutor
 from aigc_config import *
@@ -44,8 +44,6 @@ def main():
    if any(not (dest/p).resolve().is_relative_to(dest.resolve()) for p in z.namelist()):raise ValueError('压缩包路径不合法')
    z.extractall(dest)
  old=ROOT/'model_manifest.json'
- if old.exists() and 'Qwen2.5' in old.read_text(encoding='utf-8'):
-  (ROOT/'model_manifest_qwen2.5.json').write_bytes(old.read_bytes())
  manifest={'model':MODEL_NAME,'base_repository':BASE_REPOSITORY,'repository':REPOSITORY,'quantizer':'Unsloth（基于官方Qwen权重的GGUF量化）','revision':REVISION,'sha256':MODEL_SHA256,'bytes':MODEL_BYTES,'license':'Apache-2.0','runtime':'llama.cpp '+RUNTIME_VERSION+' CUDA13.4','runtime_directory':RUNTIME_DIR,'runtime_sha256':{f[0]:f[2] for f in FILES[:2]},'context':8192,'parallel':1,'thinking':False,'mode':'本地GPU推理；模型未经本旅客数据微调；需求模型另用10000用户训练'}
  temp=ROOT/'model_manifest.json.tmp';temp.write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding='utf-8');temp.replace(old)
  print('LOCAL_AIGC_READY',MODEL_NAME,flush=True)

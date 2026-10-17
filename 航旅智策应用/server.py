@@ -117,6 +117,14 @@ class Handler(BaseHTTPRequestHandler):
                     tail=path.removeprefix('/api/mkt/real/')
                     if tail=='dashboard':return self.send_json(real.dashboard(q))
                     if tail=='export':return self.send_json(real.export_case(q))
+                    if tail.startswith('campaigns/'):
+                        import real_marketing_workflow as workflow
+                        parts=tail.split('/')
+                        if len(parts)==3 and parts[2]=='observations':return self.send_json(workflow.observe(parts[1]))
+                        return self.send_json(workflow.get(parts[1]))
+                    if tail.startswith('forecasts/'):
+                        import real_forecast
+                        return self.send_json(real_forecast.evaluate(tail.split('/')[1]))
                     if tail.startswith('profiles/'):return self.send_json(real.profile(tail.split('/')[1]))
                     if tail.startswith('plans/'):return self.send_json(real.plan(tail.split('/')[1]))
                     return self.send_json({'error':'接口不存在'},404)
@@ -197,8 +205,14 @@ class Handler(BaseHTTPRequestHandler):
                     else:
                         with connect() as c:plan=planner.make_plan(c,body['user_id'],body.get('settings',{}))
                 if tail=='queries':
-                    result=flights.submit(owner,plan,body)
+                    try:result=flights.submit(owner,plan,body)
+                    except ValueError:
+                        if owner!='marketing':real.record_search_request(owner,plan)
+                        raise
                     if owner!='marketing':
+                        real.record_search_request(owner,plan,result)
+                        if result['status'] in ('success','empty','flights_only'):
+                            real.record_flight_result(owner,result['id'],result['query'],result['status'],len(result.get('options',[])),plan['profile_revision'])
                         with personal.db() as pc:real.record_event(pc,owner,'flight_search',plan['destination'])
                     return self.send_json(result,202)
                 if tail=='returns':return self.send_json(flights.query_returns(owner,plan,body))
@@ -210,6 +224,15 @@ class Handler(BaseHTTPRequestHandler):
                 tail=path.removeprefix('/api/mkt/real/')
                 if tail=='campaigns':return self.send_json(real.create_campaign(body),201)
                 if tail=='analysis':return self.send_json(real.decision_summary(body))
+                parts=tail.split('/')
+                if len(parts)==3 and parts[0]=='campaigns':
+                    import real_marketing_workflow as workflow
+                    if parts[2]=='materials':return self.send_json(workflow.generate(parts[1],body))
+                    if parts[2]=='review':return self.send_json(workflow.review(parts[1],body))
+                    if parts[2]=='package':return self.send_json(workflow.package(parts[1],body))
+                    if parts[2]=='forecast':
+                        import real_forecast
+                        return self.send_json(real_forecast.freeze(parts[1]),201)
                 return self.send_json({'error':'接口不存在'},404)
             if path.startswith('/api/personal/'):
                 if not isinstance(body,dict):raise ValueError('请求参数须为对象')
@@ -229,6 +252,9 @@ class Handler(BaseHTTPRequestHandler):
                         if parts[3]=='cancel':return self.send_json(assistant.cancel(owner,parts[2],body))
                     if len(parts)==3 and parts[0]=='plans' and parts[2]=='explain':return self.send_json(personal.explain(owner,parts[1]))
                     if len(parts)==3 and parts[0]=='plans' and parts[2]=='delete':return self.send_json(personal.delete_plan(owner,parts[1],body))
+                    if len(parts)==3 and parts[0]=='plans' and parts[2]=='feedback':
+                        import traveler_feedback
+                        return self.send_json(traveler_feedback.submit(owner,parts[1],body),201)
                 return self.send_json({'error':'接口不存在'},404)
             if path.startswith('/api/mkt/'):
                 if real.mode()=='real':return self.send_json({'error':'正式营销端仅处理真实旅客；不会使用模拟名单或发送外部营销信息'},400)

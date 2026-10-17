@@ -1,11 +1,11 @@
 $ErrorActionPreference = 'Stop'
 $taskModelRecord = Join-Path $PSScriptRoot 'runtime\local_aigc\process.json'
 if (Test-Path -LiteralPath $taskModelRecord) {
-    $taskModelInfo = Get-Content -LiteralPath $taskModelRecord -Raw | ConvertFrom-Json
+    $taskModelInfo = Get-Content -LiteralPath $taskModelRecord -Raw -Encoding UTF8 | ConvertFrom-Json
     $taskModelAllowed = @((Join-Path $PSScriptRoot 'runtime\local_aigc\llama\llama-server.exe'), (Join-Path $PSScriptRoot 'runtime\local_aigc\llama-cuda\llama-server.exe'))
     $taskActiveProfile = Join-Path $PSScriptRoot 'runtime\local_aigc\active_model.json'
     if (Test-Path -LiteralPath $taskActiveProfile) {
-        $taskActiveModel = Get-Content -LiteralPath $taskActiveProfile -Raw | ConvertFrom-Json
+        $taskActiveModel = Get-Content -LiteralPath $taskActiveProfile -Raw -Encoding UTF8 | ConvertFrom-Json
         if ($taskModelInfo.model_file -eq $taskActiveModel.model_file) { $taskModelAllowed += $taskActiveModel.executable }
     }
     $taskModelProc = Get-CimInstance Win32_Process -Filter "ProcessId=$($taskModelInfo.pid)" -ErrorAction SilentlyContinue
@@ -20,7 +20,7 @@ if (Test-Path -LiteralPath $taskModelRecord) {
 }
 $taskRecord = Join-Path $PSScriptRoot 'runtime\server-process.json'
 if (-not (Test-Path -LiteralPath $taskRecord)) { Write-Host 'No managed local server.'; exit 0 }
-$taskInfo = Get-Content -LiteralPath $taskRecord -Raw | ConvertFrom-Json
+$taskInfo = Get-Content -LiteralPath $taskRecord -Raw -Encoding UTF8 | ConvertFrom-Json
 $taskProc = Get-CimInstance Win32_Process -Filter "ProcessId=$($taskInfo.pid)" -ErrorAction SilentlyContinue
 $taskExpected = Join-Path $PSScriptRoot 'server.py'
 if ($taskProc -and $taskProc.CommandLine.Contains($taskExpected) -and $taskInfo.server -eq $taskExpected) {

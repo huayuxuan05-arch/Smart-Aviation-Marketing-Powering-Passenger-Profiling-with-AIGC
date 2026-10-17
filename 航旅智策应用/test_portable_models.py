@@ -3,6 +3,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 import hashlib,json,unittest,zipfile
+import shutil
 import portable_models as models
 import distribution_io
 
@@ -49,5 +50,22 @@ class PortableModelTests(unittest.TestCase):
         with patch.object(models,'download',side_effect=self.download):
             with self.assertRaises(ValueError):models.prepare_4b(self.manifest,'CPU',self.root/'bad')
         self.assertFalse((self.root/'escape.exe').exists())
+
+    def test_current_qwen35_4b_uses_pinned_source_and_four_b_profile(self):
+        root=self.root/'current'
+        model={**self.model,'name':'Qwen3.5-4B-Q4_K_M.gguf','url':'https://example.invalid/pinned-4b.gguf'}
+        manifest={**self.manifest,'model':model}
+        def fetch(url,target,spec):
+            if spec['name']=='runtime.zip':return self.archive
+            self.assertEqual(url,model['url'])
+            target.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copyfile(self.part,target)
+            return target
+        with patch.object(models,'download',side_effect=fetch):profile=models.prepare_4b(manifest,'Vulkan',root)
+        self.assertEqual(profile['model_name'],'Qwen3.5-4B-Q4_K_M')
+        self.assertEqual(profile['alias'],'aerolens-qwen3.5-4b')
+        self.assertTrue((root/'profiles/4b.json').exists())
+        self.assertFalse((root/'profiles/9b.json').exists())
+        self.assertTrue(distribution_io.valid(Path(profile['model_file']),model))
 
 if __name__=='__main__':unittest.main()

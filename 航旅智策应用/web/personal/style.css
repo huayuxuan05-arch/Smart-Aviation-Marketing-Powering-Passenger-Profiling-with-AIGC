@@ -14,3 +14,5 @@
 .personal-sharing{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:14px}.personal-sharing input{width:18px;height:18px;flex:none}.personal-sharing-note{font-size:13px;line-height:1.8;color:var(--muted,#62718f);margin-top:9px}
 
 .airline-tags{border:0;padding:0;margin:16px 0;min-width:0}.airline-tags legend{font-size:14px;margin-bottom:10px}.airline-tags>div{display:flex;flex-wrap:wrap;gap:8px}.airline-tags label{display:flex;align-items:center;gap:6px;border:1px solid var(--line,#d9e3de);border-radius:7px;padding:7px 9px;cursor:pointer;font-size:13px;min-height:40px}.airline-tags label:has(input:checked){background:#e7f1eb;border-color:#91b5a3}.airline-tags input{width:15px;height:15px;flex:none}.airline-tags label:focus-within{outline:2px solid #78a695;outline-offset:2px}
+
+.personal-feedback-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.personal-feedback fieldset{margin:16px 0}.personal-feedback .feedback-status{min-height:1.5em}@media(max-width:600px){.personal-feedback-grid{grid-template-columns:1fr}}

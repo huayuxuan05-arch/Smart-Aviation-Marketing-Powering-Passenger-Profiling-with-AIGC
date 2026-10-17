@@ -29,6 +29,7 @@ FIELDS += list(airlines.FIELDS)
 FIELDS += ['travel_request']
 FLIGHT_BUDGET_POLICIES=['预算优先','只看预算内']
 FIELDS += ['flight_budget_policy']
+FIELDS += ['theme_source']
 
 
 def now():return datetime.now(CST).isoformat(timespec='microseconds')
@@ -47,6 +48,8 @@ def db():
     CREATE INDEX IF NOT EXISTS personal_plan_owner ON personal_plans(owner,created_at);''')
     choice_evidence.initialize(c)
     real_travelers.initialize(c)
+    import traveler_feedback
+    traveler_feedback.initialize(c)
     import accounts
     accounts.initialize(c)
     # Migrate identities without enrolling old or QA sessions in shared analysis.
@@ -74,7 +77,7 @@ def session(token=None):
 
 def defaults():
     return {'origin':'北京','destination':'杭州','start_date':(datetime.now(CST).date()+timedelta(days=30)).isoformat(),
-            'days':3,'party':'独行','pace':'按同行方式安排','theme':'城市初访','trip_budget':None,'airfare_cap':None,
+            'days':3,'party':'独行','pace':'按同行方式安排','theme':'','theme_source':'unfilled','trip_budget':None,'airfare_cap':None,
             'date_flexibility':FLEXIBILITY[0],'lodging_priority':LODGING[0],'fallback_policy':FALLBACKS[0],
             'overbudget_policy':OVERBUDGET[0],'preferred_attractions':[],'planning_stage':STAGES[0],
             'trip_budget_min':None,'airfare_min':None,'required_airlines':[],'excluded_airlines':[],'travel_request':'','flight_budget_policy':FLIGHT_BUDGET_POLICIES[0]}
@@ -103,7 +106,9 @@ def validate(source,raw):
     else:
         if str(result['days']) not in ('2','3','4','5','6','7','8'):raise ValueError('请选择2至8天行程')
         result['days']=int(result['days'])
-    if result['party'] not in PARTIES or result['pace'] not in PACES or result['theme'] not in THEMES:raise ValueError('同行、节奏或兴趣选项不支持')
+    if result['theme'] is None:result['theme']=''
+    if result['party'] not in PARTIES or result['pace'] not in PACES or result['theme'] not in ['',*THEMES]:raise ValueError('同行、节奏或兴趣选项不支持')
+    result['theme_source']='explicit' if result['theme'] else 'unfilled'
     for key,allowed in [('date_flexibility',FLEXIBILITY),('lodging_priority',LODGING),('fallback_policy',FALLBACKS),('overbudget_policy',OVERBUDGET)]:
         if result[key] not in allowed:raise ValueError('日期弹性、住宿或备选处理选项不支持')
     attractions=result['preferred_attractions']
@@ -139,7 +144,7 @@ def make_plan(source,prefs):
         '自然与景区':['三亚','昆明','桂林','厦门','杭州','青岛'],
         '舒适休闲':['杭州','厦门','三亚','苏州','成都','海口'],
         '交通与预算':['成都','西安','武汉','长沙','南京','重庆'],
-        '文化与攻略':['西安','北京','苏州','南京','杭州','成都']}[prefs['theme']] if prefs['destination']=='为我推荐' else [prefs['destination']]
+        '文化与攻略':['西安','北京','苏州','南京','杭州','成都']}.get(prefs['theme'],['北京','上海','杭州','成都','西安','厦门']) if prefs['destination']=='为我推荐' else [prefs['destination']]
     candidates=[]
     for destination in choices:
         if destination==origin or destination=='苏州' and origin in ('上海','南京'):continue
@@ -166,14 +171,17 @@ def make_plan(source,prefs):
              'start_date':start,'end_date':end,'days':prefs['days'],'party':prefs['party'],'theme':prefs['theme'],'pace':pace,
              'date_basis':'按你选择的出发日期规划','selection_reason':'按你当前选择的目的地安排' if prefs['destination']!='为我推荐' else '按你选择的兴趣主题提出目的地建议，可随时调整',
              'budget_excess':excess,'bookable':False,'profile_source':'self_report','plan_version':'personal-survey-constraints-v2'}
-    priorities=[f'你选择了{prefs["theme"]}主题，计划从{origin}出发，旅行{prefs["days"]}天。',f'按{prefs["party"]}的同行方式，采用{pace}节奏。',
+    priorities=[(f'你选择了{prefs["theme"]}主题，计划从{origin}出发，旅行{prefs["days"]}天。' if prefs['theme'] else f'兴趣主题未填写，按已确认的目的地与条件安排{prefs["days"]}天行程。'),f'按{prefs["party"]}的同行方式，采用{pace}节奏。',
                 '将逐项情景费用与你本次填写的全程预算对照，超预算明确提示，并按你选择的方式提出调整。' if prefs['trip_budget'] is not None else '你尚未填写全程预算，先提供逐项估算供比较。']
     alternatives=[{'destination':d,'target_date':start,'reference_fare':o['reference_fare'],'kind':o['kind'],'status':o['status']} for d,o,b in candidates[1:]]
     if prefs['destination']=='为我推荐' and prior:
         priorities.append('先比较往返参考完整性、直飞要求与所填预算，再以模拟用户训练期城市关注先验打破同等条件并列；样本热度不代表你的购票概率。')
     priorities.extend([f'日期弹性：{prefs["date_flexibility"]}；备选许可：{prefs["fallback_policy"]}。原日期与目的地的调整均需你确认。',
                        f'住宿侧重：{prefs["lodging_priority"]}；超预算处理：{prefs["overbudget_policy"]}。'])
-    plan=planner.compose_plan(summary,intent,outbound,back,THEMES.index(prefs['theme']),{'days':prefs['days'],'trip_budget':prefs['trip_budget'],'preferred_attractions':prefs['preferred_attractions'],'adjust_lodging':prefs['overbudget_policy']=='优先降低住宿与付费体验'},priorities,alternatives)
+    plan=planner.compose_plan(summary,intent,outbound,back,THEMES.index(prefs['theme']) if prefs['theme'] else 0,{'days':prefs['days'],'trip_budget':prefs['trip_budget'],'preferred_attractions':prefs['preferred_attractions'],'adjust_lodging':prefs['overbudget_policy']=='优先降低住宿与付费体验'},priorities,alternatives)
+    if not prefs['theme']:
+        for day in plan['daily_itinerary']:
+            if '城市初访' in day['title']:day['title']='目的地体验'
     plan['preference_constraints']={k:prefs[k] for k in FIELDS[9:]}
     plan['budget']['trip_budget_range']={'min':prefs['trip_budget_min'],'max':prefs['trip_budget'],'source':'self_report'}
     plan['budget']['one_way_airfare_range']={'min':prefs['airfare_min'],'max':prefs['airfare_cap'],'source':'self_report'}
@@ -286,7 +294,7 @@ def apply_flight_quote(owner,body):
         observation=flight_quotes.get(owner,body['query_id'])
         request_id=choice_evidence.exposure(c,owner,original,observation)
         choice_evidence.event(c,owner,'choose',{'saved_plan_id':plan['id'],'booking':False},request_id,int(body['option_index']))
-        real_travelers.record_event(c,owner,'flight_selected',plan['destination'],{'booking':False})
+        real_travelers.record_event(c,owner,'flight_selected',plan['destination'],{'booking':False,'query_id':body['query_id'],'plan_id':plan['id'],'profile_revision':plan['profile_revision'],'option_index':int(body['option_index'])})
     return plan
 
 
@@ -297,6 +305,7 @@ def preview_flight_quote(owner,original,body):
     with db() as c:
         request_id=choice_evidence.exposure(c,owner,original,observation)
         choice_evidence.event(c,owner,'preview',{},request_id,int(body['option_index']))
+        real_travelers.record_event(c,owner,'flight_previewed',original['destination'],{'query_id':body['query_id'],'plan_id':original['id'],'profile_revision':original['profile_revision'],'option_index':int(body['option_index'])})
     return {**plan,'choice_request_id':request_id,'candidate_constraints':flight_constraint_check(plan)}
 
 
@@ -339,7 +348,7 @@ def reject_flight_quote(owner,original,body):
     with db() as c:
         request_id=choice_evidence.exposure(c,owner,original,observation)
         choice_evidence.explicit_rejection(c,owner,request_id,int(body['option_index']))
-        real_travelers.record_event(c,owner,'flight_rejected',original['destination'])
+        real_travelers.record_event(c,owner,'flight_rejected',original['destination'],{'query_id':body['query_id'],'plan_id':original['id'],'profile_revision':original['profile_revision'],'option_index':int(body['option_index'])})
     return {'recorded':True}
 
 
@@ -354,19 +363,25 @@ def explain(owner,plan_id):
 
 
 def state(owner):
+    from preference_provenance import effective
+    import traveler_feedback
     with db() as c:
         row=c.execute('SELECT revision,preferences FROM personal_sessions WHERE owner=?',(owner,)).fetchone()
         plans=[json.loads(r[0]) for r in c.execute('SELECT payload FROM personal_plans WHERE owner=? ORDER BY created_at DESC LIMIT 20',(owner,))]
         history=[{'revision':r['revision'],'recorded_at':r['recorded_at'],'changed_fields':json.loads(r['changed_fields'])} for r in c.execute('SELECT revision,recorded_at,changed_fields FROM personal_preferences WHERE owner=? ORDER BY revision DESC LIMIT 10',(owner,))]
         collection=real_travelers.consent_view(c,owner)
-    return {'preferences':{**defaults(),**(json.loads(row['preferences']) if row['preferences'] else {})},'revision':row['revision'],
+        prefs=effective(c,owner,json.loads(row['preferences']) if row['preferences'] else {},row['revision'])
+        feedback=traveler_feedback.latest(c,owner)
+    return {'preferences':{**defaults(),**prefs},'revision':row['revision'],
             'plans':[{'id':p['id'],'origin':p['origin'],'destination':p['destination'],'days':p['days'],'start_date':p['start_date'],'created_at':p['created_at'],'profile_revision':p['profile_revision']} for p in plans],
-            'latest_plan':plans[0] if plans else None,'profile_history':history,'collection':collection}
+            'latest_plan':plans[0] if plans else None,'profile_history':history,'collection':collection,'plan_feedback':feedback}
 
 
 def bootstrap(source,owner):
     import content_generation
+    import traveler_feedback
     network=planner.network(source)
     return {**state(owner),'airlines':{code:names[0] for code,names in airlines.AIRLINES.items()},'cities':sorted(network.outgoing),'destinations':sorted(planner.PLACES),'themes':THEMES,'parties':PARTIES,'paces':PACES,
             'date_flexibilities':FLEXIBILITY,'lodging_priorities':LODGING,'fallback_policies':FALLBACKS,'overbudget_policies':OVERBUDGET,'flight_budget_policies':FLIGHT_BUDGET_POLICIES,
-            'attractions':{d:attraction_options(d) for d in planner.PLACES},'planning_stages':STAGES,'generation':content_generation.configuration()}
+            'attractions':{d:attraction_options(d) for d in planner.PLACES},'planning_stages':STAGES,'generation':content_generation.configuration(),
+            'feedback_options':{'suitability':traveler_feedback.SUITABILITY,'reasons':traveler_feedback.REASONS}}

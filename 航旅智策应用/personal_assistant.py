@@ -139,7 +139,7 @@ def build_view(source,payload):
         except ValueError as e:error=str(e)
     changes=[{'field':key,'label':LABELS[key],'before':payload['baseline'].get(key),'after':prefs[key],
               'evidence':payload['spans'].get(key,'目的地改变后清空原景点' if key=='preferred_attractions' else '首次仅保存意向，未确定条件保留为空')}
-             for key in personal.FIELDS if prefs.get(key)!=payload['baseline'].get(key) or (payload['base_revision']==0 and key in payload['patch'])]
+             for key in personal.FIELDS if key in LABELS and (prefs.get(key)!=payload['baseline'].get(key) or (payload['base_revision']==0 and key in payload['patch']))]
     baseline_plan=payload.get('baseline_plan')
     def metrics(p):
         if not p:return None
@@ -151,8 +151,8 @@ def build_view(source,payload):
     delta=round(after['estimated_total']-before['estimated_total'],2) if before and after and before['estimated_total'] is not None and after['estimated_total'] is not None else None
     view={**{k:payload[k] for k in ['id','version','base_revision','created_at','kind','engine','notes','status']},
           'changes':changes,'questions':[question(k,v,cities) for k,v in issues.items()],
-          'inherited':[LABELS[k] for k in personal.FIELDS if k not in payload['patch']] if payload['base_revision'] else [],
-          'defaults_applied':[{'label':LABELS[k],'value':prefs[k]} for k in personal.FIELDS if k not in payload['patch'] and k not in REQUIRED] if payload['base_revision']==0 else [],
+          'inherited':[LABELS[k] for k in personal.FIELDS if k in LABELS and k not in payload['patch']] if payload['base_revision'] else [],
+            'defaults_applied':[{'label':LABELS[k],'value':prefs[k]} for k in personal.FIELDS if k in LABELS and k not in payload['patch'] and k not in REQUIRED] if payload['base_revision']==0 else [],
           'can_confirm':not issues and error is None,'error':error,'preferences':checked,
           'comparison':{'before':before,'after':after,'estimated_delta':delta},
           'preview':plan,'basis':'非机票费用按每名成人估算；航班由本次联网查询后加入预算。'}

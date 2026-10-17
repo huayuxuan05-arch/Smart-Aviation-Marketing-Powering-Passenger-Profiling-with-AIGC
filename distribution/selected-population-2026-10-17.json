@@ -1,0 +1,90 @@
+{
+  "version": "selected-synthetic-30000-v1",
+  "status": "selected_and_verified",
+  "seed": 20261017,
+  "total_users": 30000,
+  "training_users": 26000,
+  "validation_users": 2000,
+  "test_users": 2000,
+  "original_training_users": 10000,
+  "selected_expanded_training_users": 16000,
+  "removed_existing_users": 46000,
+  "training_behavior_rows": 9810000,
+  "total_behavior_rows": 11270000,
+  "original_workbooks": {
+    "01_航班信息.xlsx": "4f82b8901f75e86aaf55d99d367a8cfb41ef69495ee1dba19a35b90578d9b73f",
+    "02_用户行为.xlsx": "d894e544ddc47170d00c9fed62675bc2b81992aadb0588a5b447f71c44f66291",
+    "03_营销反馈.xlsx": "cde6d737fc174c1f06f8d9adc2459f8b49c1657e487ee053e7471bcc85b71860"
+  },
+  "original_model_manifest_sha256": "815037d5bcb87620abc27dfd83b93e659c3b119da1c956ffcaae79a1545cac29",
+  "selection": "proportional strata: source, original departure, age, travel party, first-30-day dwell; seeded hash within strata",
+  "no_future_or_model_score_selection": true,
+  "owner_overlap": 0,
+  "sources": [
+    {
+      "source": "current-cohorts\\2026-10-16-v2\\test",
+      "path": "development\\batch-01",
+      "users": 2579,
+      "parent_users": 10000,
+      "manifest_sha256": "c1e67fbd4d1a7e36124bff5dba1cba1cc7428230240fb4000292937c881eac19"
+    },
+    {
+      "source": "current-cohorts\\2026-10-16-v2\\training",
+      "path": "development\\batch-02",
+      "users": 2578,
+      "parent_users": 10000,
+      "manifest_sha256": "afdfdad832c6243e9382132417cf0770432d5b556ce466335ef69d6614549751"
+    },
+    {
+      "source": "current-cohorts\\2026-10-16-v2\\validation",
+      "path": "development\\batch-03",
+      "users": 514,
+      "parent_users": 2000,
+      "manifest_sha256": "317fba24fb30f3978613cfedd35ef1d09859fcf2211d47168c4d62e5b6355165"
+    },
+    {
+      "source": "independent-evaluation\\annual-2026-10-16-v1\\confirmation",
+      "path": "development\\batch-04",
+      "users": 2583,
+      "parent_users": 10000,
+      "manifest_sha256": "9331ce43e6d9efe7c0d41eccc3331461c35c64c9da017d2628db000846dd23ab"
+    },
+    {
+      "source": "independent-evaluation\\annual-2026-10-16-v1\\lambdamart-v1\\attention-calibration-v1\\assessment",
+      "path": "development\\batch-05",
+      "users": 521,
+      "parent_users": 2000,
+      "manifest_sha256": "897f03ce2306636c0018e68f4c7cebadf0c184711269adc7cba3b85a05b4d4c3"
+    },
+    {
+      "source": "independent-evaluation\\annual-2026-10-16-v1\\lambdamart-v1\\holdout",
+      "path": "development\\batch-06",
+      "users": 2579,
+      "parent_users": 10000,
+      "manifest_sha256": "a49461f66154103116e69c80cbbc95325c85d93763d28bd251e1cc583f93ae43"
+    },
+    {
+      "source": "independent-evaluation\\annual-2026-10-16-v1\\test",
+      "path": "development\\batch-07",
+      "users": 2577,
+      "parent_users": 10000,
+      "manifest_sha256": "42007c984d61573672dde82745427591f92f985ee3bc1a143b49fef538db54e7"
+    },
+    {
+      "source": "independent-evaluation\\annual-2026-10-16-v1\\training",
+      "path": "development\\batch-08",
+      "users": 1549,
+      "parent_users": 6000,
+      "manifest_sha256": "f7495e82ba918e0feb7e0926d61a33bb971d0ac9076276fdc7efc552cd4798b7"
+    },
+    {
+      "source": "independent-evaluation\\annual-2026-10-16-v1\\validation",
+      "path": "development\\batch-09",
+      "users": 520,
+      "parent_users": 2000,
+      "manifest_sha256": "517ed2822605ccd99ec6cfb8c9ad6c9f641f2034aa2914d20f97336a1d278002"
+    }
+  ],
+  "independent_evaluation": "Existing newly generated validation/test people, same simulator; not real-world generalization",
+  "personal_or_marketing_activity_deleted": false
+}

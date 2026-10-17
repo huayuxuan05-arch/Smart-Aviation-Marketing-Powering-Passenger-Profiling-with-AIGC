@@ -1,4 +1,5 @@
 'use strict';
+let realCohort="",realCampaign=null,realObservation=null,realForecast=null;
 let realData=null,realWindow=30,realSearch='',realPage=1,realDecision=null,realBusy=false;
 let realStage='',realAirline='',realDestination='',realPageSize=20,realSort='recent',realOnlyUnmatched=false;
 const realSelected=new Set();
@@ -25,7 +26,7 @@ function realMetrics(){return `<div class="metric-grid real-metrics">${metric('�
 function realIntentGroups(){return realDistribution(realData.intent_groups);}
 function realAirlines(){return `<section class="card"><div class="real-panel-heading"><h2>航司偏好</h2><span>本人主动选择 · 可多选</span></div>${realData.airline_preferences.length?`<div class="table-container"><table><thead><tr><th>航空公司</th><th>指定</th><th>排除</th><th>待匹配</th></tr></thead><tbody>${realData.airline_preferences.map(a=>`<tr><td>${realButton(a.name,'filter-airline',`data-code="${esc(a.code)}"`)}</td><td>${a.preferred_users}</td><td>${a.excluded_users}</td><td>${a.unmatched_users}</td></tr>`).join('')}</tbody></table></div>`:'<p class="real-empty">尚无主动指定或排除的航司。</p>'}<p class="real-caption">无报价保留偏好，不自动改推其他航司。</p></section>`;}
 function realPortrait(){return `<div class="real-profile-grid">${[['兴趣主题','theme'],['同行方式','party'],['住宿要求','lodging_priority'],['日期弹性','date_flexibility']].map(([title,key])=>`<section class="card"><h2>${title}</h2>${realDistribution(realData.profile_dimensions[key])}</section>`).join('')}<section class="card"><h2>预算分布</h2>${realDistribution(realData.budget_groups)}<p class="real-caption">用户填写的每名成人全程预算</p></section><section class="card"><h2>浏览操作</h2>${realDistribution(realData.behavior_groups)}<p class="real-caption">观察窗口内记录次数；不等于成交</p></section></div>`;}
-function realDecisionView(){return `<section class="card"><div class="row"><h2>决策建议</h2>${realButton(realBusy?'正在整理…':'整理客群建议','analyze',realBusy||!realData.population?'disabled':'')}</div>${realDecision?`<p>${esc(realDecision.summary)}</p><ul>${realDecision.actions.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><small>本地模型草稿 · ${esc(realDecision.status)}</small>`:'<p>结合真实意向阶段、近期目的地关注和主动偏好，整理营销决策草稿。</p>'}</section>`;}
+function realDecisionView(){return `<section class="card"><div class="row"><h2>决策建议</h2>${realButton(realBusy?'正在整理…':'整理客群建议','analyze',realBusy||!realData.population?'disabled':'')}</div>${realDecision?`<p>${esc(realDecision.summary)}</p><ul>${realDecision.actions.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><small>${realDecision.model_called?'本地模型整理':'规则整理'} · ${esc(realDecision.status)}</small>`:'<p>结合真实意向阶段、近期目的地关注和主动偏好，整理营销决策草稿。</p>'}</section>`;}
 function realOverview(){return realMetrics()+`<div class="real-overview-grid"><section class="card"><div class="real-panel-heading"><h2>客群画像</h2>${realButton('查看全部','navigate','data-to="insights"')}</div><div class="real-summary-grid"><div><h3>兴趣主题</h3>${realDistribution(realData.profile_dimensions.theme,4)}</div><div><h3>同行方式</h3>${realDistribution(realData.profile_dimensions.party,4)}</div></div></section><section class="card"><h2>意向阶段</h2>${realIntentGroups()}</section><section class="card"><h2>近期热门</h2>${realHotspots()}</section><section class="card"><h2>浏览操作</h2>${realDistribution(realData.behavior_groups,5)}</section></div>`+realDecisionView();}
 function realFilters(){return `<div class="real-audience-filters"><label class="field real-search"><span>检索用户</span><input id="real-audience-search" aria-label="搜索真实旅客" value="${esc(realSearch)}" placeholder="编号、城市、兴趣或航司"></label>${[['意向阶段','stage',realStage,Object.keys(realData.intent_groups).map(v=>[v,v])],['指定航司','airline',realAirline,Object.entries(realData.airline_names)],['目的地','destination',realDestination,[...new Set(realData.profiles.map(p=>p.destination).filter(Boolean))].sort().map(v=>[v,v])]].map(([label,key,value,options])=>`<label class="field"><span>${label}</span><select data-real-filter="${key}"><option value="">全部</option>${options.map(([v,t])=>`<option value="${esc(v)}" ${value===v?'selected':''}>${esc(t)}</option>`).join('')}</select></label>`).join('')}<label class="field"><span>排列顺序</span><select data-real-filter="sort">${[['recent','最近活跃'],['date','出发日期'],['budget','预算从低到高']].map(([v,t])=>`<option value="${v}" ${realSort===v?'selected':''}>${t}</option>`).join('')}</select></label></div>`;}
 function realAudience(forDelivery=false){
@@ -55,21 +56,22 @@ function renderRealMarketing(){
  $('#app').dataset.view=current;
  $$('[data-nav]').forEach(e=>e.classList.toggle('active',e.dataset.nav===current));
  $('#campaign-count').textContent=realData.campaigns.length;$('#active-campaign').hidden=true;
- const controls=`<div class="real-data-toolbar"><div><strong>真实用户画像</strong><small>${esc(new Date(realData.updated_at).toLocaleString('zh-CN'))} 更新 · 自动同步</small></div><label>观察窗口 <select id="real-window"><option value="7" ${realWindow===7?'selected':''}>近7天</option><option value="30" ${realWindow===30?'selected':''}>近30天</option><option value="90" ${realWindow===90?'selected':''}>近90天</option></select></label>${realButton('导出案例','export-case')}${realButton('刷新数据','refresh')}</div>`;
+ const controls=`<div class="real-data-toolbar"><div><strong>真实用户画像</strong><small>${esc(new Date(realData.updated_at).toLocaleString('zh-CN'))} 更新 · 自动同步</small></div><label>观察窗口 <select id="real-window"><option value="7" ${realWindow===7?'selected':''}>近7天</option><option value="30" ${realWindow===30?'selected':''}>近30天</option><option value="90" ${realWindow===90?'selected':''}>近90天</option></select></label>${realData.cohort_options?.length?`<label>分析样本 <select id="real-cohort"><option value="">全部当前共享用户</option>${realData.cohort_options.map(c=>`<option value="${esc(c.id)}" ${realCohort===c.id?'selected':''}>${esc(c.label)}</option>`).join('')}</select></label>`:''}${realButton('导出案例','export-case')}${realButton('刷新数据','refresh')}${realData.campaigns.length?`<label>当前活动 <select id="real-current-campaign"><option value="">选择活动</option>${realData.campaigns.map(c=>`<option value="${esc(c.id)}" ${realCampaign?.id===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>`:''}</div>`;
  const views={overview:realOverview,insights:()=>realMetrics()+realPortrait()+`<div class="real-overview-grid">${realAirlines()}<section class="card"><h2>近期热门</h2>${realHotspots()}</section></div>`+realDecisionView(),audience:realAudience,trips:realTrips,
   routes:()=>tripPlan?`<section class="card"><h2>实时航班</h2><p>${esc(tripPlan.origin)} → ${esc(tripPlan.destination)}</p>${liveFlightPanel(tripPlan)}</section>`:realTrips(),
-  creative:realDecisionView,delivery:realDelivery,evaluation:realEvaluation};
+  creative:()=>realDecisionView()+realCampaignPanel(),delivery:()=>realDelivery()+realCampaignPanel(),evaluation:()=>realEvaluation()+realCaseEvidence()+realCampaignPanel()};
  $('#app').innerHTML=heading(titles[current]||titles.overview)+controls+(views[current]||realOverview)();
 }
 async function refreshRealMarketing(quiet=false){
- const fresh=await api('real/dashboard?window_days='+realWindow),valid=new Set(fresh.profiles.map(p=>p.user_id));
+ const fresh=await api('real/dashboard?window_days='+realWindow+'&cohort='+encodeURIComponent(realCohort)),valid=new Set(fresh.profiles.map(p=>p.user_id));
  for(const id of realSelected)if(!valid.has(id))realSelected.delete(id);
  if(tripPlan){const current=fresh.profiles.find(p=>p.user_id===tripPlan.user_id);if(!current||!current.has_saved_plan||current.revision!==tripPlan.profile_revision)tripPlan=null;}
- if(realData&&JSON.stringify(realData.profiles)!==JSON.stringify(fresh.profiles))realDecision=null;realData=fresh;meta.generation=fresh.generation;
+ if(realData&&JSON.stringify(realData.profiles)!==JSON.stringify(fresh.profiles))realDecision=null;realData=fresh;meta.generation=fresh.generation;if(realCampaign)realCampaign=await api('real/campaigns/'+realCampaign.id);
  if(!quiet||(!modal.open&&!document.activeElement?.closest('form')&&!document.activeElement?.matches('input,select,textarea')))renderRealMarketing();
 }
 async function realMarketingAction(b){
  const action=b.dataset.realAction||b.dataset.action;
+ if(action.startsWith('workflow-'))return realWorkflowAction(action);
  if(action==='close'){close();return;}
  if(action==='navigate'){location.hash=b.dataset.to;return;}
  if(action==='refresh'){await refreshRealMarketing();return;}
@@ -78,7 +80,7 @@ async function realMarketingAction(b){
  if(action==='clear-selection'){realSelected.clear();renderRealMarketing();return;}
  if(action==='reset-filters'){realSearch=realStage=realAirline=realDestination='';realOnlyUnmatched=false;realPage=1;renderRealMarketing();return;}
  if(action==='filter-airline'){realAirline=b.dataset.code;realStage=realDestination=realSearch='';realOnlyUnmatched=false;realPage=1;location.hash='audience';return;}
- if(action==='export-case'){const data=await api('real/export?window_days='+realWindow);download('匿名用户案例_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(data,null,2));toast('匿名画像、偏好更新和本站行为记录已导出');return;}
+ if(action==='export-case'){const data=await api('real/export?window_days='+realWindow+'&cohort='+encodeURIComponent(realCohort));download('匿名用户案例_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(data,null,2));toast('匿名画像、偏好更新和本站行为记录已导出');return;}
  if(action==='plan'){tripPlan=await api('real/plans/'+b.dataset.user);renderRealMarketing();return;}
  if(action==='profile'){
   const p=await api('real/profiles/'+b.dataset.user);
@@ -88,7 +90,7 @@ async function realMarketingAction(b){
  }
  if(action==='analyze'){
   if(realBusy)return;realBusy=true;renderRealMarketing();
-  try{realDecision=await api('real/analysis',{window_days:realWindow});}finally{realBusy=false;renderRealMarketing();}return;
+  try{realDecision=await api('real/analysis',{window_days:realWindow,cohort:realCohort});}finally{realBusy=false;renderRealMarketing();}return;
  }
  if(action==='new-campaign'){
   if(!realSelected.size){toast('请先在潜客与画像中选择真实旅客');location.hash='audience';return;}
@@ -101,11 +103,14 @@ async function realMarketingAction(b){
 }
 async function realMarketingSubmit(form){
  if(form.id==='real-campaign-form'){
-  await api('real/campaigns',{name:new FormData(form).get('name'),user_ids:[...realSelected]});close();await refreshRealMarketing();toast('真实客群决策名单已保存');
+  const created=await api('real/campaigns',{name:new FormData(form).get('name'),user_ids:[...realSelected]});realCampaign=await api('real/campaigns/'+created.id);realObservation=null;realForecast=null;close();await refreshRealMarketing();toast('真实客群决策名单已保存');
  }
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-real-action]');if(!b||b.disabled)return;e.preventDefault();realMarketingAction(b).catch(error=>toast(error.message));});
 document.addEventListener('change',e=>{
+ if(e.target.id==='real-forecast-snapshot'&&e.target.value)api('real/forecasts/'+e.target.value).then(f=>{realForecast=f;renderRealMarketing();}).catch(error=>toast(error.message));
+ if(e.target.id==='real-current-campaign'){realCampaign=null;realObservation=null;realForecast=null;if(e.target.value)api('real/campaigns/'+e.target.value).then(c=>{realCampaign=c;renderRealMarketing();}).catch(error=>toast(error.message));else renderRealMarketing();}
+ if(e.target.id==='real-cohort'){realCohort=e.target.value;realDecision=null;realSelected.clear();realPage=1;refreshRealMarketing().catch(error=>toast(error.message));}
  if(e.target.id==='real-window'){realWindow=Number(e.target.value);realDecision=null;refreshRealMarketing().catch(error=>toast(error.message));}
  if(e.target.matches('[data-real-select]')){e.target.checked?realSelected.add(e.target.dataset.realSelect):realSelected.delete(e.target.dataset.realSelect);const count=$('[data-real-selection-count]');if(count)count.textContent=realSelected.size;const panel=$('[data-delivery-selection]');if(panel)panel.innerHTML=realDeliverySelection();}
  if(e.target.matches('[data-real-filter]')){const k=e.target.dataset.realFilter,v=e.target.value;if(k==='stage')realStage=v;if(k==='airline')realAirline=v;if(k==='destination')realDestination=v;if(k==='sort')realSort=v;realPage=1;renderRealMarketing();}
@@ -113,3 +118,30 @@ document.addEventListener('change',e=>{
  if(e.target.matches('[data-real-unmatched]')){realOnlyUnmatched=e.target.checked;realPage=1;renderRealMarketing();}
 });
 document.addEventListener('input',e=>{if(e.target.id==='real-audience-search'){realSearch=e.target.value;realPage=1;const pos=e.target.selectionStart;renderRealMarketing();const input=$('#real-audience-search');input.focus();input.setSelectionRange(pos,pos);}});
+
+function realCaseEvidence(){
+ const e=realData.case_evidence;if(!e)return '';const p=e.people,f=e.feedback,q=e.interest_quality;
+ return `<section class="section two-cols"><div class="card"><h2>查询流程</h2><p>${realData.cohort?esc(realData.cohort.label)+' · ':''}当前共享 ${fmt(e.population)} 个账号，以下各项按用户去重，可交叉。</p>${realDistribution({'已保存方案':p.saved_plan,'发起查询':p.search_requested,'返回有效报价':p.priced_result,'仅返回航班目录':p.unpriced_inventory,'数据源未返回报价':p.confirmed_empty,'查询未完成':p.query_failed,'请求暂不可用':p.unavailable_request,'比较候选':p.flight_previewed,'选择并保存':p.flight_selected,'主动排除候选':p.flight_rejected})}<p>兴趣已主动表达 ${fmt(q.explicit_people)} 人；未填写或历史待确认 ${fmt(q.unfilled_or_unverified_people)} 人。历史缺失操作不补造，选择不等于购票。</p></div><div class="card"><h2>使用评价</h2><p>另行同意共享评价 ${fmt(f.respondents)} 人；已评分 ${fmt(f.rating_respondents)} 人。${f.mean_rating==null?'尚无评分。':'平均方案评分 '+f.mean_rating.toFixed(2)+' / 5。'}</p>${realDistribution(f.suitability)}${realDistribution(f.nonadoption_reasons)}<p>仅计观察窗口内每人最新一份共享评价。未填写不解释为不满意，评分不代表购票转化。</p></div></section>`;
+}
+
+function realCampaignPanel(){
+ if(!realCampaign)return '<section class="card"><h2>活动流程</h2><p>先创建活动，或从顶部选择已有活动，继续素材、审核和执行准备。</p></section>';
+ const c=realCampaign,approved=c.review?.approved&&!c.stale;
+ return `<section class="card real-campaign-workflow"><h2>活动流程</h2><p><strong>${esc(c.name)}</strong> · ${esc(c.status)} · 当前共享成员 ${fmt(c.user_ids.length)} 人 · 版本 ${c.revision}</p><div class="real-workflow-actions">${realButton('制作素材','workflow-generate',realBusy?'disabled':'')}${realButton('查看后续观察','workflow-observe')}${realButton('保存预测基线','workflow-forecast')}</div>${(c.materials||[]).map(m=>`<article class="real-material"><h3>${esc(m.title)}</h3><p>${esc(m.text)}</p><small>${esc(m.destination)} · ${esc(m.status)} · ${esc(m.model||'本地规则')} · ${esc(m.facts)}</small></article>`).join('')}${c.materials?.length?`<fieldset class="real-review-checks"><legend>素材审核</legend><label><input type="checkbox" data-review-check="facts_checked"> 已核对目的地与本人确认条件</label><label><input type="checkbox" data-review-check="consent_checked"> 已核对当前共享授权</label><label><input type="checkbox" data-review-check="boundary_checked"> 无虚构价格、优惠、预订或效果承诺</label></fieldset><div class="real-workflow-actions">${realButton('审核通过','workflow-approve')}${realButton('退回重做','workflow-reject')}${realButton('生成本地执行包','workflow-package',approved?'':'disabled')}</div>`:''}${c.execution_package?`<p>执行包已准备 ${fmt(c.execution_package.records.length)} 人，暂缓 ${fmt(c.execution_package.blocked.length)} 人；尚未发送消息。</p>${realButton('下载执行包','workflow-download')}`:''}${realObservation?`<section><h3>后续观察</h3><p>从 ${esc(new Date(realObservation.since).toLocaleString('zh-CN'))} 起观察 ${fmt(realObservation.currently_shared_members)} 名当前成员。</p>${realDistribution(realObservation.observed_people)}<p>${esc(realObservation.boundary)}</p></section>`:''}${c.forecast_snapshots?.length?`<label class="field"><span>已保存预测</span><select id="real-forecast-snapshot"><option value="">选择保存时点</option>${c.forecast_snapshots.map(f=>`<option value="${esc(f.id)}" ${realForecast?.id===f.id?'selected':''}>${esc(new Date(f.created_at).toLocaleString('zh-CN'))}</option>`).join('')}</select></label>`:''}${realForecast?`<section><h3>预测基线</h3><p>${esc(realForecast.status)}；可排序 ${fmt(realForecast.predictions.length)} 人，历史不足 ${fmt(realForecast.insufficient_history_people)} 人。</p><p>${esc(realForecast.target)}。截至 ${esc(new Date(realForecast.horizon_end).toLocaleString('zh-CN'))} 后验证。</p>${realButton('查看预测验证','workflow-forecast-result')}${realForecast.metrics?`<p>有相关后续行为 ${fmt(realForecast.metrics.eligible_people)} 人；Recall@3 ${realForecast.metrics.recall_at_3==null?'暂无可计算样本':pct(realForecast.metrics.recall_at_3)}。</p>`:''}</section>`:''}<p>此处只生成本地执行准备包，外部渠道未接入。匿名画像共享不等于外部联系授权，不生成曝光、点击或订单。</p></section>`;
+}
+async function realWorkflowAction(action){
+ if(!realCampaign)return toast('请先选择活动');if(realBusy)return;
+ const id=realCampaign.id,body={expected_revision:realCampaign.revision};
+ if(action==='workflow-download'){realCampaign=await api('real/campaigns/'+id);if(!realCampaign.execution_package)return toast('授权或条件已变化，请重新审核');download('真实客群_本地执行包.json',JSON.stringify(realCampaign.execution_package,null,2));return;}
+ if(action==='workflow-approve')for(const key of ['facts_checked','consent_checked','boundary_checked'])body[key]=document.querySelector('[data-review-check='+key+']')?.checked===true;
+ realBusy=true;
+ try{
+  if(action==='workflow-generate')realCampaign=await api('real/campaigns/'+id+'/materials',body);
+  if(action==='workflow-approve'||action==='workflow-reject')realCampaign=await api('real/campaigns/'+id+'/review',{...body,verdict:action==='workflow-approve'?'approve':'reject'});
+  if(action==='workflow-package')realCampaign=await api('real/campaigns/'+id+'/package',{...body,confirmed:true});
+  if(action==='workflow-observe')realObservation=await api('real/campaigns/'+id+'/observations');
+  if(action==='workflow-forecast')realForecast=await api('real/campaigns/'+id+'/forecast',{});
+  if(action==='workflow-forecast-result'&&realForecast)realForecast=await api('real/forecasts/'+realForecast.id);
+  if(['workflow-generate','workflow-approve','workflow-reject','workflow-package'].includes(action))await refreshRealMarketing(true);
+ }finally{realBusy=false;renderRealMarketing();}
+}

@@ -15,6 +15,7 @@ from airline_preferences import AIRLINES
 PUBLIC_FIELDS=['origin','destination','start_date','days','party','pace','theme','planning_stage',
     'trip_budget','trip_budget_min','airfare_cap','airfare_min','required_airlines','excluded_airlines',
     'date_flexibility','lodging_priority','fallback_policy','overbudget_policy','preferred_attractions','flight_budget_policy']
+PUBLIC_FIELDS+=['theme_source']
 ACTIVITY_SECTIONS={'page':'个人页面','assistant':'旅行需求','preferences':'旅行偏好','profile':'偏好更新','history':'历史方案',
     'plan':'旅行方案','flights':'航班搜索','daily':'每日行程','lodging':'住宿安排','budget':'费用预算',
     'backup':'调整方案','trip-ai':'旅行建议','checklist':'行前清单','dates':'日期备选','airlines':'航司标签','details':'细化需求'}
@@ -56,7 +57,7 @@ def record_preferences(c,owner,prefs,revision):
 
 def record_event(c,owner,kind,destination=None,payload=None):
     row=c.execute('SELECT enabled FROM real_traveler_consent WHERE owner=?',(owner,)).fetchone()
-    if not row or not row['enabled'] or kind not in ('preferences_confirmed','plan_saved','plan_deleted','flight_search','flight_selected','flight_rejected','destination_view','flight_search_result','section_view','workspace_action'):
+    if not row or not row['enabled'] or kind not in ('preferences_confirmed','plan_saved','plan_deleted','flight_search','flight_selected','flight_rejected','destination_view','flight_search_result','section_view','workspace_action','flight_request','flight_query_unavailable','flight_previewed','plan_feedback'):
         return
     destination=destination if destination and destination!='为我推荐' else None
     current=now()
@@ -87,18 +88,31 @@ def record_activity(owner,body):
 
 
 def record_flight_result(owner,query_id,query,status,option_count,profile_revision=None):
-    """Only source-confirmed outcomes; never store failed calls as zero availability."""
+    """Minimal outcome evidence, separate from the success-only quotation store."""
     import personal_app as personal
-    if owner=='marketing' or status not in ('success','empty'):return
+    if owner=='marketing' or status not in ('success','empty','flights_only','failed','timeout','error'):return
     with personal.db() as c:
         # Do not duplicate a completed query. Consent is checked again at completion.
-        if c.execute("SELECT 1 FROM real_traveler_events WHERE owner=? AND kind='flight_search_result' AND json_extract(payload,'$.query_id')=?",(owner,query_id)).fetchone():return
+        if c.execute("SELECT 1 FROM real_traveler_events WHERE owner=? AND kind='flight_search_result' AND json_extract(payload,'$.query_id')=? AND json_extract(payload,'$.status')=? AND json_extract(payload,'$.profile_revision') IS ?",(owner,query_id,status,profile_revision)).fetchone():return
         record_event(c,owner,'flight_search_result',query['destinations'][0],{
-            'query_id':query_id,'status':status,'option_count':option_count,'profile_revision':profile_revision,
+            'query_id':query_id,'status':status,'option_count':option_count if status in ('success','empty','flights_only') else None,'profile_revision':profile_revision,
             'required_airlines':query.get('required_airlines',[]),'excluded_airlines':query.get('excluded_airlines',[]),
             'departure':query['departure'],'return_date':query['return_date'],
             'adults':query.get('adults'),'max_stops':query.get('max_stops'),
-            'source':'Google Flights / fli','interpretation':'该数据源在查询条件下未返回报价，不代表航司没有执飞' if status=='empty' else '已返回符合条件的报价'})
+            'source':'Google Flights / SerpApi' if query.get('provider')=='serpapi' else 'Google Flights / fli',
+            'interpretation':{'success':'已返回符合条件的报价','empty':'该数据源在查询条件下未返回报价，不代表航司没有执飞',
+                'flights_only':'返回航班目录，往返报价尚未核验','failed':'查询未完整完成，可用性未知',
+                'timeout':'查询超时，可用性未知','error':'查询未完成，可用性未知'}[status]})
+
+
+def record_search_request(owner,plan,result=None):
+    import personal_app as personal
+    payload={'plan_id':plan['id'],'profile_revision':plan['profile_revision']}
+    if result is not None:
+        payload.update(query_id=result['id'],status=result['status'],cache_hit=bool(result.get('cache_hit')),reused_inflight=bool(result.get('reused_inflight')))
+    else:payload['status']='unavailable'
+    with personal.db() as c:
+        record_event(c,owner,'flight_request' if result is not None else 'flight_query_unavailable',plan['destination'],payload)
 
 
 def set_consent(owner,body):
@@ -111,6 +125,8 @@ def set_consent(owner,body):
         c.execute('INSERT INTO real_traveler_consent VALUES(?,?,?,?) ON CONFLICT(owner) DO UPDATE SET enabled=excluded.enabled,updated_at=excluded.updated_at',
             (owner,ident,int(enabled),now().isoformat()))
         if not enabled:
+            import traveler_feedback
+            traveler_feedback.withdraw(c,owner)
             c.execute('DELETE FROM real_traveler_events WHERE owner=?',(owner,))
             c.execute('DELETE FROM real_profile_snapshots WHERE owner=?',(owner,))
         elif not row or not row['enabled']:
@@ -128,14 +144,18 @@ def rows(c):
 
 
 def public_profile(c,row,window=30):
-    prefs=json.loads(row['preferences'] or '{}');clock=now();cutoff=(clock-timedelta(days=window)).isoformat()
+    from preference_provenance import effective
+    import traveler_feedback
+    prefs=effective(c,row['owner'],json.loads(row['preferences'] or '{}'),row['revision']);clock=now();cutoff=(clock-timedelta(days=window)).isoformat()
     events=[dict(e) for e in c.execute('SELECT at,kind,destination,payload FROM real_traveler_events WHERE owner=? AND at>=? AND at<=? ORDER BY id',
         (row['owner'],cutoff,clock.isoformat()))]
     for event in events:
         payload=json.loads(event.pop('payload'))
         if event['kind']=='flight_search_result':
-            event['result']={k:payload.get(k) for k in ('status','option_count','profile_revision','required_airlines','excluded_airlines','departure','return_date','adults','max_stops','source','interpretation')}
+            event['result']={k:payload.get(k) for k in ('query_id','status','option_count','profile_revision','required_airlines','excluded_airlines','departure','return_date','adults','max_stops','source','interpretation')}
         elif event['kind'] in ('section_view','workspace_action'):event['activity']={k:payload[k] for k in ('section','action','label') if k in payload}
+        elif event['kind'] in ('flight_request','flight_query_unavailable','flight_previewed','flight_selected','flight_rejected'):
+            event['flight_activity']={k:payload[k] for k in ('query_id','plan_id','profile_revision','cache_hit','reused_inflight','status','option_index','booking') if k in payload}
     planned=c.execute('SELECT payload FROM personal_plans WHERE owner=? ORDER BY created_at DESC LIMIT 1',(row['owner'],)).fetchone()
     latest=json.loads(planned[0]) if planned else None
     destination=(latest['destination'] if latest and latest.get('profile_revision')==row['revision'] else prefs.get('destination'))
@@ -157,9 +177,11 @@ def public_profile(c,row,window=30):
     snapshots=[{'at':s['at'],'revision':s['revision'],'preferences':json.loads(s['preferences'])} for s in
         c.execute('SELECT at,revision,preferences FROM real_profile_snapshots WHERE owner=? AND at>=? AND at<=? ORDER BY id DESC',(row['owner'],cutoff,clock.isoformat()))]
     known={k:prefs.get(k) for k in PUBLIC_FIELDS}
+    for snapshot in snapshots:snapshot['preferences']=effective(c,row['owner'],snapshot['preferences'],snapshot['revision'])
+    feedback=[f for f in traveler_feedback.latest(c,row['owner'],shared_only=True) if cutoff<=f['recorded_at']<=clock.isoformat()]
     return {'user_id':row['public_id'],'origin':prefs.get('origin'),'destination':destination,
         'start_date':date,'days':prefs.get('days'),'party':prefs.get('party'),'theme':prefs.get('theme'),
-        'intent_stage':intent,'next_action':next_action,'preferences':known,'revision':row['revision'],
+        'intent_stage':intent,'next_action':next_action,'preferences':known,'revision':row['revision'],'feedback':feedback,
         'events_30d':dict(counts),'observations':events,'profile_history':snapshots,
         'identity_kind':row['identity_kind'],'created_at':row['created_at'],'last_seen_at':row['last_seen_at'],'flight_search_result':search_result,
         'last_active_at':events[-1]['at'] if events else row['updated_at'],
@@ -169,11 +191,14 @@ def public_profile(c,row,window=30):
 def dashboard(raw=None):
     import personal_app as personal
     import content_generation
+    from demand_forecast import reference
+    import case_study
     raw=raw or {};window=int(raw.get('window_days',30))
     if window not in (7,30,90):raise ValueError('请选择7天、30天或90天窗口')
     clock=now();cutoff=clock-timedelta(days=window)
     with personal.db() as c:
         profiles=[public_profile(c,row,window) for row in rows(c)]
+        profiles,cohort=case_study.select(personal.RUNTIME,profiles,raw.get('cohort'))
         active_ids={p['user_id'] for p in profiles}
         campaigns=[json.loads(r[0]) for r in c.execute('SELECT payload FROM real_marketing_campaigns ORDER BY rowid DESC')]
     popularity={};seven=clock-timedelta(days=7);prior=clock-timedelta(days=14)
@@ -188,6 +213,7 @@ def dashboard(raw=None):
     hotspots=[{'destination':city,'users':len(v['users']),'events':v['events'],'users_last_7d':len(v['recent']),
         'users_previous_7d':len(v['previous']),'change_users_7d':len(v['recent'])-len(v['previous'])} for city,v in popularity.items()]
     hotspots.sort(key=lambda h:(-h['users'],-h['users_last_7d'],h['destination']))
+    campaigns=[{k:c[k] for k in ('id','name','user_ids','created_at','status','source','sent','revision') if k in c} for c in campaigns]
     for campaign in campaigns:campaign['user_ids']=[i for i in campaign['user_ids'] if i in active_ids]
     compact_profiles=[{k:v for k,v in p.items() if k not in ('observations','profile_history')} for p in profiles]
     airline_counts={}
@@ -199,22 +225,23 @@ def dashboard(raw=None):
                 item[bucket]+=1
                 if field=='required_airlines' and p['flight_search_result'] and p['flight_search_result']['status']=='empty':item['unmatched_users']+=1
     airline_preferences=sorted(airline_counts.values(),key=lambda v:(-v['preferred_users'],-v['excluded_users'],v['code']))
-    return {'data_mode':'real','generation':content_generation.configuration(),'updated_at':clock.isoformat(),'window_days':window,'window_start':cutoff.isoformat(),
+    return {'data_mode':'real','generation':content_generation.configuration(),'demand_model':reference(),'case_evidence':case_study.evidence(profiles),
+        'cohort':cohort,'cohort_options':case_study.cohorts(personal.RUNTIME),'updated_at':clock.isoformat(),'window_days':window,'window_start':cutoff.isoformat(),
         'population':len(profiles),'profiles':compact_profiles,'hotspots':hotspots,'campaigns':campaigns,
         'airline_preferences':airline_preferences,'airline_names':{k:v[0] for k,v in AIRLINES.items()},
         'unmatched_users':sum(bool(p['flight_search_result'] and p['flight_search_result']['status']=='empty') for p in profiles),
         'active_users':sum(bool(p['observations']) for p in profiles),
-        'profile_dimensions':{field:dict(Counter(str(p['preferences'].get(field) or '尚未表达') for p in profiles))
+        'profile_dimensions':{field:dict(Counter(str(p['preferences'].get(field) or ('未填写' if field=='theme' else '尚未表达')) for p in profiles))
             for field in ('theme','party','pace','lodging_priority','date_flexibility','planning_stage','fallback_policy','overbudget_policy','origin','days')},
         'budget_groups':dict(Counter('未填写' if p['preferences'].get('trip_budget') is None else
             '2000元以下' if p['preferences']['trip_budget']<2000 else '2000—4000元' if p['preferences']['trip_budget']<=4000 else
             '4000—6000元' if p['preferences']['trip_budget']<=6000 else '6000元以上' for p in profiles)),
         'behavior_groups':dict(Counter(e.get('activity',{}).get('label') or {
             'preferences_confirmed':'确认偏好','plan_saved':'保存方案','plan_deleted':'删除方案','flight_search':'查询航班','flight_search_result':'航班查询结果',
-            'flight_selected':'选择航班','flight_rejected':'排除航班','destination_view':'浏览目的地'}.get(e['kind'],e['kind'])
+            'flight_selected':'选择航班','flight_rejected':'排除航班','destination_view':'浏览目的地','flight_request':'请求航班查询','flight_query_unavailable':'查询请求暂不可用','flight_previewed':'比较航班候选','plan_feedback':'共享使用评价'}.get(e['kind'],e['kind'])
             for p in profiles for e in p['observations'])),
         'intent_groups':dict(Counter(p['intent_stage'] for p in profiles)),
-        'theme_groups':dict(Counter(p['theme'] or '尚未表达' for p in profiles)),
+        'theme_groups':dict(Counter(p['theme'] or '未填写' for p in profiles)),
         'observed_events':sum(sum(p['events_30d'].values()) for p in profiles),
         'scope':'已同意匿名共享的本站用户；账号按固定编号去重，旧匿名会话单独标记，不代表全网热度或实名人数',
         'algorithm':'本人明确意向优先；真实事件时间窗与去重热度；训练集提供内容先验，测试集仅核验',
@@ -233,8 +260,11 @@ def export_case(raw=None):
     """Fresh consent check; anonymized case observations for the chosen window."""
     import personal_app as personal
     data=dashboard(raw)
+    import case_study
     with personal.db() as c:records=[public_profile(c,row,data['window_days']) for row in rows(c)]
+    records,cohort=case_study.select(personal.RUNTIME,records,(raw or {}).get('cohort'))
     return {'exported_at':now().isoformat(),'window_days':data['window_days'],'population':len(records),
+        'cohort':cohort,'case_evidence':case_study.evidence(records),
         'unit':'按固定账号编号去重；旧匿名浏览器会话单独标记，非实名人数','scope':data['scope'],'records':records}
 
 
@@ -265,22 +295,10 @@ def create_campaign(body):
 
 
 def decision_summary(body):
-    import local_generation as model
-    from personal_plan_generation import validate
+    import real_marketing_workflow as workflow
     data=dashboard(body)
     if not data['population']:raise ValueError('尚无已同意共享的真实旅客，请先收集真实需求')
-    text={'type':'string','minLength':1,'maxLength':400}
-    spec={'type':'object','properties':{'summary':text,'actions':{'type':'array','items':text,'minItems':2,'maxItems':5}},'required':['summary','actions'],'additionalProperties':False}
-    facts={k:data[k] for k in ['updated_at','window_days','population','hotspots','intent_groups','profile_dimensions','budget_groups','behavior_groups','airline_preferences','unmatched_users','scope']}
-    prompt='整理真实旅客客群的决策草稿。仅使用以下聚合事实，不新增人数、价格、转化率或全网热门结论。按明确意向、近期趋势、主题提出服务与活动建议，不执行发送。数据不足如实说明，不用模拟样本补齐。summary概述，actions列可执行的下一步。\n'+json.dumps(facts,ensure_ascii=False)
-    with model._LOCK:
-        model.ensure();response=model.rpc('/v1/chat/completions',{'model':model.ALIAS,
-            'messages':[{'role':'system','content':'你是旅客需求分析助手，只整理给定事实。'},{'role':'user','content':prompt}],
-            'max_tokens':1000,'temperature':0.1,'response_format':{'type':'json_schema','json_schema':{'name':'real_cohort_decision','strict':True,'schema':spec}},
-            'chat_template_kwargs':{'enable_thinking':False},'stream':False},timeout=120)
-    choice=response.get('choices',[{}])[0]
-    if response.get('model')!=model.ALIAS or choice.get('finish_reason')!='stop':raise ValueError('客群建议未完整返回，请重试')
-    value=json.loads(choice['message']['content']);validate(value,spec)
+    value=workflow.decision(data)
     if not {p['user_id'] for p in data['profiles']}<={p['user_id'] for p in dashboard()['profiles']}:
-        raise ValueError('共享客群已发生变化，请刷新后重新整理建议')
-    return {**value,'updated_at':data['updated_at'],'population':data['population'],'model':model.MODEL_NAME,'status':'待营销人员审核'}
+        raise ValueError('共享客群已变化，请刷新后重新整理')
+    return value

@@ -1,0 +1,16 @@
+{
+  "version": "qwen4b-2026-10-17",
+  "inference": {
+    "model_name": "Qwen3.5-4B-Q4_K_M",
+    "revision": "e87f176479d0855a907a41277aca2f8ee7a09523",
+    "sha256": "00fe7986ff5f6b463e62455821146049db6f9313603938a70800d1fb69ef11a4",
+    "bytes": 2740937888,
+    "license": "Apache-2.0",
+    "base_repository": "Qwen/Qwen3.5-4B",
+    "base_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "finetuned": false
+  },
+  "inference_repository": "https://huggingface.co/unsloth/Qwen3.5-4B-GGUF",
+  "distribution": "Pinned public sources; no new project model Release or fine-tuned adapter has been published",
+  "training_status": "Cancelled by user; dedicated training files removed; no fine-tuned adapter deployed"
+}

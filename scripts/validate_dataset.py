@@ -28,8 +28,9 @@ def main():
     for name,spec in report['artifacts'].items():
         entry=files['航旅智策应用/runtime/models/'+name]
         assert entry['sha256']==spec['sha256'] and entry['bytes']==spec['bytes']
-    assert manifest['model']['sha256']==model['MODEL_SHA256'] and manifest['model']['bytes']==model['MODEL_BYTES']
-    assert manifest['model']['name']==model['MODEL_FILE'] and manifest['model']['revision']==model['REVISION']
+    current=json.loads((ROOT/'distribution/qwen4b-2026-10-17.json').read_text(encoding='utf-8'))['inference']
+    assert current['sha256']==model['MODEL_SHA256'] and current['bytes']==model['MODEL_BYTES']
+    assert current['model_name']+'.gguf'==model['MODEL_FILE'] and current['revision']==model['REVISION']
     for entry in [manifest['bundle'],manifest['model'],*manifest['files'],*manifest['source_chunks']]:
         assert entry['bytes']>0 and re.fullmatch('[0-9a-f]{64}',entry['sha256'])
     assert sum(x['bytes'] for x in manifest['source_chunks'])==manifest['bundle']['bytes']

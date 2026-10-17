@@ -24,11 +24,17 @@ def learned_reference():
 
 
 def guidance(preferences):
+    from demand_forecast import reference
     learned=learned_reference()
-    focus={'城市初访':'目的地信息','自然与景区':'景区关注','舒适休闲':'酒店关注','交通与预算':'机票查询','文化与攻略':'攻略准备'}[preferences['theme']]
+    focus={'城市初访':'目的地信息','自然与景区':'景区关注','舒适休闲':'酒店关注','交通与预算':'机票查询','文化与攻略':'攻略准备'}.get(preferences['theme'])
+    if focus is None:
+        return {**{k:v for k,v in learned.items() if k not in ('trained_segments','destination_training_prior')},
+            'demand_evaluation':reference(),'matched_training_segment':None,'training_content_priorities':[],
+            'match_basis':'本人未填写兴趣主题，不推定兴趣客群','rules':['本人明确城市、日期、航司和预算优先','兴趣未填写，不套用兴趣聚类侧重']}
     segment=max(learned['trained_segments'],key=lambda s:s['center'][focus])
     interests=sorted(((k,segment['center'][k]) for k in ['目的地信息','景区关注','酒店关注','机票查询','攻略准备']),key=lambda p:-p[1])
     return {**{k:v for k,v in learned.items() if k not in ('trained_segments','destination_training_prior')},
+        'demand_evaluation':reference(),
         'matched_training_segment':segment['id'],'match_basis':'按本人主动选择主题匹配训练聚类中心，未读取或伪造个人行为',
         'training_content_priorities':interests,
         'rules':['本人明确城市、日期、航司和直飞条件先执行','先比较全程与单程预算，再在允许范围内比较方案',

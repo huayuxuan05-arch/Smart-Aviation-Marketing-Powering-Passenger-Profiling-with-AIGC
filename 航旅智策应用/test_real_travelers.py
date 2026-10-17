@@ -83,7 +83,9 @@ class RealTravelerTests(unittest.TestCase):
         self.save(self.first,required_airlines=['HU'])
         self.assertEqual(real.dashboard()['unmatched_users'],0)
         real.record_flight_result(self.first,'QA_FAILED',query,'failed',0,revision)
-        self.assertEqual(real.dashboard()['profiles'][0]['events_30d']['flight_search_result'],1)
+        self.assertEqual(real.dashboard()['profiles'][0]['events_30d']['flight_search_result'],2)
+        self.assertEqual(real.dashboard()['unmatched_users'],0)
+        self.assertIsNone(real.profile(data['profiles'][0]['user_id'])['observations'][-1]['result']['option_count'])
     def test_site_activity_is_allowlisted_consented_throttled_and_exported(self):
         self.save(self.first)
         body={'kind':'section_view','section':'lodging','raw_text':'must never be retained'}

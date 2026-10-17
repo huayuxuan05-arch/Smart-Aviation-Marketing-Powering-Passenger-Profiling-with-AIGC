@@ -155,3 +155,67 @@ body.marketing-page.wd-template .delivery-selection-head h2{font-size:18px;margi
  .delivery-audience .real-list-tools button{min-height:40px;padding-inline:10px}.delivery-audience .table-container{max-height:480px}
  .delivery-audience .real-pagination{gap:12px}.delivery-audience .real-pagination>div{width:100%;justify-content:space-between}
 }
+
+/* One spacing scale for all eight real marketing chapters. */
+body.marketing-page{
+ --marketing-section-gap:24px;
+ --marketing-card-padding:24px;
+ --marketing-heading-gap:16px;
+}
+html:has(>body.marketing-page){scrollbar-gutter:stable;scroll-behavior:auto}
+body.marketing-page #app{overflow-anchor:none}
+body.marketing-page[data-login-state=ready] #app[data-view]{
+ display:grid;
+ grid-template-columns:minmax(0,1fr);
+ gap:var(--marketing-section-gap);
+}
+body.marketing-page #app[data-view]>*{min-width:0;margin-block:0}
+body.marketing-page #app[data-view]>.real-data-toolbar{
+ display:flex;
+ flex-wrap:wrap;
+ gap:12px;
+ margin-block:0;
+ padding:16px 20px;
+}
+body.marketing-page #app[data-view]>.real-data-toolbar>div:first-child{display:block}
+body.marketing-page #app[data-view]>.real-data-toolbar>label{margin-right:0}
+body.marketing-page #app[data-view] :is(.real-overview-grid,.real-profile-grid,.real-summary-grid,.real-metrics,.trip-layout,.trip-flight-grid,.delivery-workspace,.delivery-sidebar){
+ gap:var(--marketing-section-gap);
+}
+body.marketing-page #app[data-view] .real-overview-grid{align-items:stretch}
+body.marketing-page #app[data-view] .real-metrics{
+ background:none;
+ border:0;
+ border-radius:0;
+ overflow:visible;
+ -webkit-backdrop-filter:none;
+ backdrop-filter:none;
+}
+body.marketing-page #app[data-view] .real-metrics>.metric{
+ padding:var(--marketing-card-padding);
+ margin:0;
+ border:0;
+ border-radius:var(--wd-radius);
+ background:var(--marketing-surface);
+ -webkit-backdrop-filter:blur(6px);
+ backdrop-filter:blur(6px);
+}
+body.marketing-page #app[data-view] .card{padding:var(--marketing-card-padding)}
+body.marketing-page #app[data-view] .real-panel-heading,
+body.marketing-page #app[data-view] :is(.real-overview-grid,.real-profile-grid)>.card>h2{
+ margin-bottom:var(--marketing-heading-gap);
+}
+body.marketing-page #app[data-view] .trip-detail>.section-head{
+ margin:calc(-1 * var(--marketing-card-padding)) calc(-1 * var(--marketing-card-padding)) 0;
+ padding:var(--marketing-card-padding);
+}
+@media(max-width:600px){
+ body.marketing-page{
+  --marketing-section-gap:18px;
+  --marketing-card-padding:18px;
+  --marketing-heading-gap:14px;
+ }
+ body.marketing-page #app[data-view]>.real-data-toolbar{padding:14px 18px}
+}
+
+.real-workflow-actions{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}.real-material{padding:16px;border:1px solid #d4ded5;border-radius:12px;margin:16px 0;overflow-wrap:anywhere}.real-review-checks{display:grid;gap:10px;margin:16px 0}.real-data-toolbar select#real-current-campaign{max-width:360px}@media(max-width:600px){.real-data-toolbar select#real-current-campaign{max-width:210px}.real-review-checks label{display:flex;align-items:flex-start;gap:8px}}

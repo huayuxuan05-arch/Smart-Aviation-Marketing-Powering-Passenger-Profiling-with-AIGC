@@ -1,4 +1,4 @@
-param([switch]$DataOnly, [switch]$NoBrowser, [switch]$EnableLocalModel, [ValidateSet('4b','9b')][string]$Model='4b', [ValidateSet('Auto','CPU','Vulkan','CUDA')][string]$Backend='Auto')
+param([switch]$DataOnly, [switch]$NoBrowser, [switch]$EnableLocalModel, [ValidateSet('4b')][string]$Model='4b', [ValidateSet('Auto','CPU','Vulkan','CUDA')][string]$Backend='Auto')
 $ErrorActionPreference = 'Stop'
 if ($DataOnly -and $EnableLocalModel) { throw 'Use either -DataOnly or -EnableLocalModel.' }
 if ([IO.Path]::GetPathRoot($PSScriptRoot) -eq 'C:\') { throw 'Move the repository to D: or another non-C: drive first.' }
@@ -36,8 +36,6 @@ if ($LASTEXITCODE -ne 0) { throw 'Dependency installation failed. Check the netw
 $taskArgs = @((Join-Path $PSScriptRoot 'bootstrap_demo.py'))
 if (-not $EnableLocalModel) { $taskArgs += '--data-only' }
 if ($EnableLocalModel) {
-    if ($Model -eq '9b' -and $Backend -notin @('Auto','CUDA')) { throw 'The 9B option currently requires NVIDIA CUDA. Use 4B for CPU or Vulkan.' }
-    if ($Model -eq '4b' -and $Backend -eq 'CUDA') { throw 'The 4B portable option supports CPU or Vulkan.' }
     $taskArgs += @('--model',$Model,'--backend',$Backend)
 }
 $taskRunning=$null

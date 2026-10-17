@@ -235,13 +235,13 @@ def submit(owner, plan, body=None):
             with _empty_lock:
                 existing=next((v for (root,account,_),v in reversed(list(_empty_results.items())) if root==str(RUNTIME) and account==owner
                     and is_fresh(v['requested_at']) and query_key(v['query'])==key),None)
-                if existing:return copy.deepcopy(existing)
+                if existing:return {**copy.deepcopy(existing),'cache_hit':True,'reused_inflight':False}
         with db() as c:
             existing = c.execute('''SELECT id,requested_at,status FROM flight_observations
                 WHERE owner=? AND query_key=? ORDER BY requested_at DESC,rowid DESC LIMIT 1''', (owner, key)).fetchone()
             if existing and is_fresh(existing['requested_at']) and (existing['status'] in ('queued', 'running') or
                     existing['status']=='success' and not (body or {}).get('refresh')):
-                return get(owner, existing['id'])
+                return {**get(owner, existing['id']),'cache_hit':existing['status']=='success','reused_inflight':existing['status'] in ('queued','running')}
             if not _slots.acquire(blocking=False):
                 raise ValueError('航班匹配任务繁忙，请稍后再试')
             ident = 'QUOTE_' + uuid.uuid4().hex
@@ -253,14 +253,15 @@ def submit(owner, plan, body=None):
             _slots.release()
             with db() as c:c.execute('DELETE FROM flight_observations WHERE id=?',(ident,))
             raise
-    return get(owner, ident)
+    return {**get(owner, ident),'cache_hit':False,'reused_inflight':False}
 
 
 def _run(owner, ident, query, profile_revision=None):
     try:
         with db() as c:
             c.execute("UPDATE flight_observations SET status='running' WHERE id=?", (ident,))
-        # User retention policy: unsuccessful queries are removed, never logged.
+        # Quote history stores usable quotations only. Consented status counters
+        # are separate and never contain failed quote payloads or error text.
         result = _search(query)
         result['options']=flight_ranking.rank(result.get('options',[]),query)
         status = result_status(result)
@@ -277,15 +278,19 @@ def _run(owner, ident, query, profile_revision=None):
                 _empty_results[(str(RUNTIME),owner,ident)]={'id':ident,'status':status,'requested_at':now(),
                     'finished_at':now(),'fresh':True,'query':copy.deepcopy(query),'options':[],'source':result.get('source',SOURCE),
                     **{k:copy.deepcopy(result[k]) for k in ('catalog','coverage','fare_basis','native_roundtrip') if k in result}}
-        if status in ('success','empty','flights_only'):
+        if status in ('success','empty','flights_only','failed'):
             try:
                 from real_travelers import record_flight_result
                 record_flight_result(owner,ident,query,status,len(result['options']),profile_revision)
             except Exception:
                 logging.getLogger(__name__).error('Could not save consented flight outcome')
-    except Exception:
+    except Exception as error:
         with db() as c:
             c.execute('DELETE FROM flight_observations WHERE id=?',(ident,))
+        try:
+            from real_travelers import record_flight_result
+            record_flight_result(owner,ident,query,'timeout' if isinstance(error,TimeoutError) else 'error',None,profile_revision)
+        except Exception:logging.getLogger(__name__).error('Could not save consented flight outcome')
     finally:
         _slots.release()
 
