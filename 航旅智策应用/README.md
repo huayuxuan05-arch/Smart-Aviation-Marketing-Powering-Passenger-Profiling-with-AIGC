@@ -1,6 +1,6 @@
-# 华翼朝阳本地应用（航旅智策项目）
+# 华翼朝阳本地应用
 
-项目名称：航旅智策——节假日航空智慧营销决策系统。当前本机网页使用Qwen3.5-4B-Q4_K_M与NVIDIA CUDA，直接使用基础量化模型；语言模型微调已取消。当前功能、参与者使用步骤与200人现场安排统一见[应用说明](../docs/application.md)。
+项目名称：华翼朝阳——节假日智慧航旅服务平台的开发与应用。当前本机网页使用Qwen3.5-4B-Q4_K_M与NVIDIA CUDA，直接使用基础量化模型；语言模型微调已取消。正式使用及独立万人模拟案例说明见[应用说明](../docs/application.md)。
 
 ## 运行
 
@@ -38,4 +38,4 @@ node account_browser_check.cjs
 实际本地Qwen可用 `AEROLENS_TEST_LOCAL_AI=1` 后运行ai_browser_check.cjs；需要当前active_model.json配置。测试使用隔离目录，不计为真实参与者。源码CI不含原始工作簿，不能替代本机全量业务验收。当前评估、数据隔离及效果边界见[评估层](../docs/evaluation.md)和[人口划分](../docs/current-cohorts-2026-10-16.md)。
 
 
-2026-10-17真实案例改进：兴趣默认未填写，历史默认主题不作为主动兴趣；个人方案增加自愿评价与单独共享选择。营销端可选择固定首批200账号，在效果复盘查看查询流程、实际评分人数与共享评价。缺失操作不补造，不将选择保存解释为购票。详见应用说明。专项验收：`python -m unittest test_real_improvements -v`与`node real_improvements_browser_check.cjs`，全部使用隔离数据。
+2026-10-17数据整理：此前正式个人资料及案例已按要求移除，保留必要管理账号；正式营销名单为空，不载入模拟记录。依次运行`run_simulated_case.py --local-model`、`simulate_case_delivery.py`、`build_simulated_flights.py`及`run_simulated_case.py --serve`，在8766端口展示八页可视化模拟案例，正式站点仍为8765。仿真航班与票价、预算分解、客群图表、素材核验、触达漏斗和关注验证形成完整演示；支持全屏、自动换页及事件重播。场景结果不作为真实到访、并发能力或经营增量证据。

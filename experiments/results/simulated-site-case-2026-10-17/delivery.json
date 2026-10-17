@@ -1,0 +1,75 @@
+{
+  "protocol": {
+    "is_synthetic": true,
+    "seed": 20261018,
+    "channel": "本机模拟收件箱",
+    "assumed_delivery_probability": 0.94,
+    "assumed_read_given_delivered_probability": 0.68,
+    "assumed_click_given_read_probability": 0.28,
+    "assumed_plan_view_given_click_probability": 0.45,
+    "basis": "人为场景参数，仅检验队列、状态与统计展示，不是从真实人群估计。",
+    "isolation": "另库存储模拟触达与反馈，不写入正式库，也不进入原模拟未来关注标签。",
+    "external_messages_sent": 0,
+    "orders_generated": 0,
+    "ratings_generated": 0
+  },
+  "package_sha256": "a19ce873f9878092926b710b24b86b68f060d838d21b0c60977961a85b03e4f0",
+  "is_synthetic": true,
+  "counts": {
+    "queued": 419,
+    "sent": 419,
+    "delivered": 391,
+    "read": 247,
+    "clicked": 70,
+    "plan_viewed": 27,
+    "delivery_failed": 28
+  },
+  "campaigns": [
+    {
+      "id": "REAL_CAMPAIGN_729fa021901143c6ad634aa789b97f0a",
+      "name": "模拟案例：郑州行程准备",
+      "counts": {
+        "queued": 141,
+        "sent": 141,
+        "delivered": 134,
+        "read": 73,
+        "clicked": 21,
+        "plan_viewed": 10,
+        "delivery_failed": 7
+      }
+    },
+    {
+      "id": "REAL_CAMPAIGN_acc626b6b9f84d9bbd6f197cde8ed19a",
+      "name": "模拟案例：北京行程准备",
+      "counts": {
+        "queued": 141,
+        "sent": 141,
+        "delivered": 128,
+        "read": 87,
+        "clicked": 26,
+        "plan_viewed": 8,
+        "delivery_failed": 13
+      }
+    },
+    {
+      "id": "REAL_CAMPAIGN_f4e64efd42fa40f3921e6848c236338c",
+      "name": "模拟案例：兰州行程准备",
+      "counts": {
+        "queued": 137,
+        "sent": 137,
+        "delivered": 129,
+        "read": 87,
+        "clicked": 23,
+        "plan_viewed": 9,
+        "delivery_failed": 8
+      }
+    }
+  ],
+  "click_rate": {
+    "value": 0.17902813299232737,
+    "numerator": 70,
+    "denominator": 391,
+    "unit": "模拟点击人数 / 模拟送达人数"
+  },
+  "boundary": "全部为合成反馈，场景参数直接决定分布；不是外部渠道回执或真实点击，不代表营销有效、购买转化或收入。"
+}

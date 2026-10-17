@@ -1,0 +1,18 @@
+{
+  "protocol": {
+    "is_synthetic": true,
+    "seed": 20261019,
+    "unit": "每名成人、单程人民币",
+    "historical": "有相同日期、城市及航司的原表直飞记录时引用原始字段，并标注2024历史样本。",
+    "synthetic": "缺少原表记录时，按固定场景种子合成SIM-编号、时刻及票价，机场名称仅作场景地点。",
+    "constraints": "保留航司及日期，价格和全程预算不满足者明确标注待调整，不提高原预算。",
+    "boundary": "仿真供给用于展示字段、约束与费用流程，不是联网报价，不证明现实班期、库存、匹配率或可售性。"
+  },
+  "counts": {
+    "plans": 5829,
+    "historical_legs": 457,
+    "synthetic_legs": 11201,
+    "within_airfare_caps": 3431,
+    "over_total_budget": 2696
+  }
+}

@@ -1,0 +1,267 @@
+{
+  "label": "10,000名模拟用户网站回放",
+  "is_synthetic": true,
+  "protocol": {
+    "seed": 20261017,
+    "population": 10000,
+    "virtual_asof": "2024-09-24T23:59:00+08:00",
+    "source": "Original DAILY_SYN_2024_V2_SUBSET_10K users and 2024 synthetic daily behavior",
+    "origin": "unchanged usual_departure_city from original user row",
+    "consent_probability": 0.82,
+    "planning_probability": 0.72,
+    "inspiration_probability": 0.2,
+    "explicit_theme_probability": 0.82,
+    "save_plan_given_planning_probability": 0.8,
+    "query_button_given_saved_probability": 0.55,
+    "website_actions": "Seeded scenario assumptions, not estimated human behavior",
+    "flight_queries": "Disabled in batch replay; attempted requests recorded unavailable, no quotes fabricated",
+    "personal_generation": "Template business path for batch replay; no claim of 10000 Qwen calls",
+    "marketing_generation": "Actual local Qwen call if --local-model is provided, otherwise clearly labelled rules",
+    "future_labels": "Original synthetic observations after frozen asof; not website campaign outcomes",
+    "boundary": "全部为模拟数据；串行后端业务回放及代表性浏览器验收，不是实际到访、万人并发、真实授权、实时报价、满意度或营销增量证据。",
+    "review": "Automated replay of the three-check approval path, not an independent human quality evaluation",
+    "virtual_action_time": "2024-09-24T22:59:00+08:00",
+    "virtual_preparation_and_freeze_time": "2024-09-24T23:59:00+08:00"
+  },
+  "executed_paths": {
+    "total": 10000,
+    "preferences_saved": 10000,
+    "plans_saved": 5829,
+    "shared": 8210,
+    "query_button_attempts": 3188,
+    "business_path_errors": 7
+  },
+  "errors": {
+    "当前条件缺少航线网络参考，请调整目的地；不会改写历史航班日期": 7
+  },
+  "dashboard_population": 8210,
+  "case_evidence": {
+    "population": 8210,
+    "people": {
+      "saved_plan": 4809,
+      "search_requested": 2620,
+      "flight_previewed": 0,
+      "flight_selected": 0,
+      "flight_rejected": 0,
+      "priced_result": 0,
+      "unpriced_inventory": 0,
+      "confirmed_empty": 0,
+      "query_failed": 0,
+      "unavailable_request": 2620
+    },
+    "query_status_events": {},
+    "new_request_events": {
+      "unavailable": 2620
+    },
+    "interest_quality": {
+      "explicit_people": 6739,
+      "unfilled_or_unverified_people": 1471
+    },
+    "feedback": {
+      "respondents": 0,
+      "rating_respondents": 0,
+      "mean_rating": null,
+      "suitability": {},
+      "nonadoption_reasons": {}
+    },
+    "boundary": "人数按当前仍共享的固定用户编号去重；各步骤可交叉，不能相加。失败不代表无航班；未操作不代表拒绝；选择保存不代表购票。历史缺失记录不补造，评价仅计另外同意共享且在当前窗口内的每人最新一份。"
+  },
+  "intent_groups": {
+    "明确计划": 5961,
+    "探索灵感": 1576,
+    "暂缓出游": 673
+  },
+  "theme_groups": {
+    "舒适休闲": 1416,
+    "自然与景区": 1344,
+    "文化与攻略": 1155,
+    "城市初访": 1759,
+    "未填写": 1471,
+    "交通与预算": 1065
+  },
+  "top_destinations": [
+    [
+      "郑州",
+      141
+    ],
+    [
+      "北京",
+      141
+    ],
+    [
+      "兰州",
+      137
+    ],
+    [
+      "成都",
+      135
+    ],
+    [
+      "南昌",
+      132
+    ],
+    [
+      "南京",
+      131
+    ],
+    [
+      "乌鲁木齐",
+      131
+    ],
+    [
+      "沈阳",
+      130
+    ],
+    [
+      "上海",
+      124
+    ],
+    [
+      "丽江",
+      123
+    ]
+  ],
+  "external_messages_sent": 0,
+  "priced_flights_fabricated": 0,
+  "ratings_fabricated": 0,
+  "seconds": 566.94,
+  "boundary": "全部为模拟数据；串行后端业务回放及代表性浏览器验收，不是实际到访、万人并发、真实授权、实时报价、满意度或营销增量证据。",
+  "campaign_summary": [
+    {
+      "destination": "郑州",
+      "members": 141,
+      "materials": 1,
+      "actual_local_model_calls": 1,
+      "sent": 0,
+      "forecast": {
+        "recall_at_3": 0.9361702127659575,
+        "eligible_people": 141,
+        "no_relevant_people": 0
+      }
+    },
+    {
+      "destination": "北京",
+      "members": 141,
+      "materials": 1,
+      "actual_local_model_calls": 1,
+      "sent": 0,
+      "forecast": {
+        "recall_at_3": 0.9238095238095239,
+        "eligible_people": 140,
+        "no_relevant_people": 1
+      }
+    },
+    {
+      "destination": "兰州",
+      "members": 137,
+      "materials": 1,
+      "actual_local_model_calls": 1,
+      "sent": 0,
+      "forecast": {
+        "recall_at_3": 0.9622871046228711,
+        "eligible_people": 137,
+        "no_relevant_people": 0
+      }
+    }
+  ],
+  "selected_campaigns_weighted_recall_at_3": 0.9405901116427433,
+  "simulated_flights": {
+    "protocol": {
+      "is_synthetic": true,
+      "seed": 20261019,
+      "unit": "每名成人、单程人民币",
+      "historical": "有相同日期、城市及航司的原表直飞记录时引用原始字段，并标注2024历史样本。",
+      "synthetic": "缺少原表记录时，按固定场景种子合成SIM-编号、时刻及票价，机场名称仅作场景地点。",
+      "constraints": "保留航司及日期，价格和全程预算不满足者明确标注待调整，不提高原预算。",
+      "boundary": "仿真供给用于展示字段、约束与费用流程，不是联网报价，不证明现实班期、库存、匹配率或可售性。"
+    },
+    "counts": {
+      "plans": 5829,
+      "historical_legs": 457,
+      "synthetic_legs": 11201,
+      "within_airfare_caps": 3431,
+      "over_total_budget": 2696
+    }
+  },
+  "simulated_delivery": {
+    "protocol": {
+      "is_synthetic": true,
+      "seed": 20261018,
+      "channel": "本机模拟收件箱",
+      "assumed_delivery_probability": 0.94,
+      "assumed_read_given_delivered_probability": 0.68,
+      "assumed_click_given_read_probability": 0.28,
+      "assumed_plan_view_given_click_probability": 0.45,
+      "basis": "人为场景参数，仅检验队列、状态与统计展示，不是从真实人群估计。",
+      "isolation": "另库存储模拟触达与反馈，不写入正式库，也不进入原模拟未来关注标签。",
+      "external_messages_sent": 0,
+      "orders_generated": 0,
+      "ratings_generated": 0
+    },
+    "package_sha256": "a19ce873f9878092926b710b24b86b68f060d838d21b0c60977961a85b03e4f0",
+    "is_synthetic": true,
+    "counts": {
+      "queued": 419,
+      "sent": 419,
+      "delivered": 391,
+      "read": 247,
+      "clicked": 70,
+      "plan_viewed": 27,
+      "delivery_failed": 28
+    },
+    "campaigns": [
+      {
+        "id": "REAL_CAMPAIGN_729fa021901143c6ad634aa789b97f0a",
+        "name": "模拟案例：郑州行程准备",
+        "counts": {
+          "queued": 141,
+          "sent": 141,
+          "delivered": 134,
+          "read": 73,
+          "clicked": 21,
+          "plan_viewed": 10,
+          "delivery_failed": 7
+        }
+      },
+      {
+        "id": "REAL_CAMPAIGN_acc626b6b9f84d9bbd6f197cde8ed19a",
+        "name": "模拟案例：北京行程准备",
+        "counts": {
+          "queued": 141,
+          "sent": 141,
+          "delivered": 128,
+          "read": 87,
+          "clicked": 26,
+          "plan_viewed": 8,
+          "delivery_failed": 13
+        }
+      },
+      {
+        "id": "REAL_CAMPAIGN_f4e64efd42fa40f3921e6848c236338c",
+        "name": "模拟案例：兰州行程准备",
+        "counts": {
+          "queued": 137,
+          "sent": 137,
+          "delivered": 129,
+          "read": 87,
+          "clicked": 23,
+          "plan_viewed": 9,
+          "delivery_failed": 8
+        }
+      }
+    ],
+    "click_rate": {
+      "value": 0.17902813299232737,
+      "numerator": 70,
+      "denominator": 391,
+      "unit": "模拟点击人数 / 模拟送达人数"
+    },
+    "boundary": "全部为合成反馈，场景参数直接决定分布；不是外部渠道回执或真实点击，不代表营销有效、购买转化或收入。"
+  },
+  "showcase": {
+    "pages": 8,
+    "visual_presentation": true,
+    "autoplay_seconds_per_page": 10,
+    "browser_checks": 19
+  }
+}

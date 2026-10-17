@@ -1,7 +1,7 @@
 {
-  "project_name": "航旅智策——节假日航空智慧营销决策系统",
+  "project_name": "华翼朝阳——节假日智慧航旅服务平台的开发与应用",
   "framework_version": "4.5",
-  "updated_date": "2026-10-16",
+  "updated_date": "2026-10-17",
   "delivery_scope": "local_account_owned_profiles_and_consented_behavior_analysis",
   "scenario": {
     "population": "consented_real_personal_accounts_with_stable_user_ids",

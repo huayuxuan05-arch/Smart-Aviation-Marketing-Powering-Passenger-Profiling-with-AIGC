@@ -60,7 +60,8 @@ function renderRealMarketing(){
  const views={overview:realOverview,insights:()=>realMetrics()+realPortrait()+`<div class="real-overview-grid">${realAirlines()}<section class="card"><h2>近期热门</h2>${realHotspots()}</section></div>`+realDecisionView(),audience:realAudience,trips:realTrips,
   routes:()=>tripPlan?`<section class="card"><h2>实时航班</h2><p>${esc(tripPlan.origin)} → ${esc(tripPlan.destination)}</p>${liveFlightPanel(tripPlan)}</section>`:realTrips(),
   creative:()=>realDecisionView()+realCampaignPanel(),delivery:()=>realDelivery()+realCampaignPanel(),evaluation:()=>realEvaluation()+realCaseEvidence()+realCampaignPanel()};
- $('#app').innerHTML=heading(titles[current]||titles.overview)+controls+(views[current]||realOverview)();
+ const simulationEntry=!realData.population?'<section class="card"><h2>查看项目演示</h2><p>当前没有已共享的正式用户资料。万人模拟案例可展示八个页面的完整流程，数据与正式用户独立存放。</p><a class="primary small" href="http://127.0.0.1:8766/marketing/#trips" style="display:inline-block;text-decoration:none">打开万人模拟演示 →</a></section>':'';
+ $('#app').innerHTML=heading(titles[current]||titles.overview)+simulationEntry+controls+(views[current]||realOverview)();
 }
 async function refreshRealMarketing(quiet=false){
  const fresh=await api('real/dashboard?window_days='+realWindow+'&cohort='+encodeURIComponent(realCohort)),valid=new Set(fresh.profiles.map(p=>p.user_id));
